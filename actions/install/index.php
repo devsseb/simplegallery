@@ -1,4 +1,7 @@
 <?
+	if (is_file('./config.php'))
+		go('?');
+	
 	$_SESSION = array();
 	
 	if (exists($_POST, 'privatePath')) {
