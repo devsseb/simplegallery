@@ -374,7 +374,7 @@ class Simplegallery
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
 		$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&rcode=' . $user->active;
-		mail($mail, '[SimpleGallery] Registration, please active your account', 'Please click on this link for activate your account :<br /><a href="' . $link . '">' . $link . '</a>');
+		$this->mail($mail, '[SimpleGallery] Registration, please active your account', 'Please click on this link for activate your account :<br /><a href="' . $link . '">' . $link . '</a>');
 	
 		success('Please check your mailbox to complete the account creation.', '?');
 	}
@@ -530,7 +530,7 @@ class Simplegallery
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
 		$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&pcode=' . $user->passwordCode;
-		mail(
+		$this->mail(
 			$user->mail,
 			'[SimpleGallery] Password reset',
 			'A reset password was requested for login "' . toHtml($login) . '".<br />
@@ -581,6 +581,21 @@ class Simplegallery
 			error('Password reset code is invalid', '?user=lost');
 	}
 	
+	private function mail($to, $subject, $message)
+	{
+		mail(
+			$to,
+			$subject,
+			'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>' . toHtml($subject) . '</title></head><body>' . 
+				$message
+				. '</body></html>',
+			implode(chr(13).chr(10), array(
+				'MIME-Version: 1.0',
+    	 		'Content-type: text/html; charset=utf-8',
+    	 		'From: ' . get($this->config->parameters, k('name'), 'SimpleGallery') . ' <noreply@domain.com>'
+    	 	))
+		);
+	}
 }
 
 ?>
