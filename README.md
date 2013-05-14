@@ -1,3 +1,4 @@
 **TODO :**
 * On update user mail, resend verification mail
-* Support language 
+* Support language
+* Add cache management for pictures
