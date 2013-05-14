@@ -24,7 +24,7 @@
 			if ($login = get($_POST, k('login')))
 				$sg->userPasswordLost($login);
 				
-			if ($code = get($_GET, k('pcode')) and strlen($code) == 12)
+			if ($code = get($_GET, k('pcode')))
 				$sg->userPasswordReset($code, get($_POST, k('password')), get($_POST, k('password-check')));
 					
 				
@@ -34,7 +34,7 @@
 			if ($user)
 				go('?album');
 		
-			if ($code = get($_GET, k('rcode')) and strlen($code) == 12)
+			if ($code = get($_GET, k('rcode')))
 				$sg->userActive($code);
 		
 			if (exists($_POST, 'registration'))
@@ -43,6 +43,9 @@
 		case 'profil' :
 			if (!$user)
 				go('?');
+		
+			if ($code = get($_GET, k('mcode')))
+				$sg->userUpdateMail($code);
 		
 			if ($user and exists($_POST, 'profil'))
 				$sg->userUpdate($_POST);

@@ -391,6 +391,9 @@ class Simplegallery
 	
 	public function userActive($code)
 	{
+		if (strlen($code) != 12)
+			error('Code is invalid', '?user=registration');
+	
 		foreach ($this->config->users as &$user) {
 			if ((string)$user->active != (string)$code)
 				continue;
@@ -406,8 +409,7 @@ class Simplegallery
 	
 	public function userUpdate($data)
 	{
-//TODO:resend mail for check if mail is updated
-		
+
 		if ($data['password'])
 			if ($data['password'] !== $data['password-check'])
 				error('The two passwords are different. Please retype your password.', '?user=profil');
@@ -415,12 +417,41 @@ class Simplegallery
 		$login = $this->user->login;
 		$user = &$this->config->users->$login;
 		$user->name = $data['name'];
-		$user->mail = $data['mail'];
+		
+		if ($mailUpdate = $user->mail != $data['mail']) {
+			$user->mailUpdate = $data['mail'];
+			$user->mailUpdateCode = randomString(12);
+			
+			$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&mcode=' . $user->mailUpdateCode;
+			$this->mail($user->mailUpdate, '[SimpleGallery] Mail update, please valid your mail', 'Please click on this link for activate your mail :<br /><a href="' . $link . '">' . $link . '</a>');
+		}
 		if ($data['password'])
 			$user->password = $this->userCryptPassword($data['password']);
 		
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
-		success('Your profile has been updated successfully.', '?user=profil');
+		success('Your profile has been updated successfully.' . ($mailUpdate ? '<br />Please check your mailbox to activate your new mail.' : ''), '?user=profil');
+	}
+	
+	public function userUpdateMail($code)
+	{
+
+		if (strlen($code) != 12)
+			error('Code is invalid', '?');
+	
+		foreach ($this->config->users as &$user) {
+			if ((string)get($user, k('mailUpdateCode')) != (string)$code)
+				continue;
+
+			$user->mail = $user->mailUpdate;
+			unset($user->mailUpdate);
+			unset($user->mailUpdateCode);
+			file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
+			success('Your mail has been activate successfully.', '?user=profil');
+		}
+		unset($user);
+		
+		error('Code is invalid', '?');
+
 	}
 	
 	public function adminUpdate($data)
@@ -545,6 +576,9 @@ class Simplegallery
 	
 	public function userPasswordReset($code, $password, $passwordCheck)
 	{
+		if (strlen($code) != 12)
+			error('Password reset code is invalid', '?user=lost');
+	
 		$valid = false;
 		foreach ($this->config->users as &$user) {
 			if ((string)$user->passwordCode != (string)$code)
@@ -570,7 +604,6 @@ class Simplegallery
 				success('You password has been updated successfully.', '?');
 				
 			}
-
 
 			$valid = true;
 			break;
