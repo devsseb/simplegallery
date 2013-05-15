@@ -5,7 +5,7 @@ window.addEvent('domready', function() {
 var Simplegallery = new Class({
 	initialize: function()
 	{
-		if (!$('album')) {
+		if (!$('media')) {
 			if ($('no-media'))
 				$('no-media').setStyle('display', 'block');
 			return;
@@ -13,6 +13,8 @@ var Simplegallery = new Class({
 		
 		this.blank = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 		
+		this.locale = JSON.decode($('album-locales').get('text'));
+
 		this.mediaImage = $('mediaImage').addEvents({
 			load: function(e) {
 				var position = e.target.getPosition($('media'));
@@ -50,7 +52,7 @@ var Simplegallery = new Class({
 			this.loadMedia(this.media, 'rotateRight');
 		}.bind(this));
 		$('mediaDelete').addEvent('click', function() {
-			if (confirm('The deletion is permanent. You want to continue ?'))
+			if (confirm(this.locale['delete-confirm']))
 				this.loadMedia(this.media, 'delete');
 		}.bind(this));
 		this.mediaUpdateAction = $('mediaUpdateAction');

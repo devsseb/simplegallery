@@ -4,8 +4,9 @@
 .albums-menu>.albums>li:first-of-type>a{border-top:none;}
 .albums a:hover{background-color:rgba(255,255,255,0.3);}
 
+#album-locales{display:none;}
 #no-album{text-align:center;padding-top:20px;font-size:50px;color:#575757;}
-#no-media{margin-left:200px;text-align:center;padding-top:20px;font-size:50px;color:#575757;display:none;}
+#no-media{text-align:center;padding-top:20px;font-size:50px;color:#575757;display:none;}
 .album{position:relative;margin-left:200px;}
 .media{width:500px;position:fixed;padding:10px;padding-right:5px;text-align:center;}
 .media-loading{top:125px;left:211px;position:absolute;}

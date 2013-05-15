@@ -1,0 +1,92 @@
+{
+	"cancel":"Annuler",
+	"apply":"Appliquer",
+	"access-error":"L'accès n'est pas autorisé",
+	"structure": {
+		"logged-in-as":"Connecter en tant que",
+		"logout":"Me déconnecter",
+		"time-generation":"Page générée en  %1s"
+	},
+	"admin": {
+		"_":"Administration",
+		"message": {
+			"parameters-update-success":"Les paramètres ont été modifié avec succès"
+		},
+		"parameters":{
+			"name":"Nom de la galerie",
+			"locale":"Langue"
+		},
+		"groups":"Groupes",
+		"users-groups":"Utilisateurs"
+	},
+	"user":{
+		"message": {
+			"login-error":"Login ou mot de passe incorect.",
+			"login-success":"Connecté avec succès en tant que %1.",
+			"logout":"Vous êtes maintenant déconnecté.",
+			"no-found":"Utilisateur introuvable.",
+			"password-reset-link-sent":"Un email contenant le lien de modification de votre mot de passe vous a été envoyé.",
+			"password-reset-invalid-code":"Le code de modification de mot de passe est invalide.",
+			"password-update-error":"Le 2 mot de passe sont différents. Merci de resaisir votre mot de passe.",
+			"password-update-success":"Votre mot de passe a été modifié avec succès.",
+			"login-update-error":"Ce login existe déjà. Merci d'en saisir un différent.",
+			"registration-active-link-sent":"Merci de vérifier votre boite mail afin de valider la création de votre compte.",
+			"registration-active-invalid-code":"Le code est invalide.",
+			"registration-active-success":"Votre compte est maintenant actif.",
+			"user-update-success":"Votre profil a été modifier avec succès.",
+			"mail-update-link-sent":"Merci de vérifier votre boite mail afin de valider la modification de votre adresse email.",
+			"mail-update-invalid-code":"Le code est invalide.",
+			"mail-update-success":"Votre adresse email a été activée avec succès."
+		},
+		"login": {
+			"_":"Authentification",
+			"login":"Utilisateur",
+			"password":"Mot de passe",
+			"submit":"Connexion"
+		},
+		"lost-password": {
+			"_":"Mot de passe perdu",
+			"submit":"Valider",
+			"reset":"Modifier le mot de passe"
+		},
+		"registration": {
+			"_":"Enregistrement",
+			"login":"Login voulu",
+			"register":"M'enregistrer"
+		},
+		"profil": {
+			"_":"Mon profil",
+			"name":"Nom",
+			"mail":"Mail",
+			"mail-info":"Mail en attente de validation",
+			"password-info":"Laissez le mot de passe vide pour ne pas le changer",
+			"password":"Mot de passe",
+			"password-retype":"Vérification du mot de passe",
+			"update":"Mettre à jour"
+		}
+	},
+	"album": {
+		"message": {
+			"welcome":"Vous pouvez maintenant ajouter des albums et des médias dans %1.",
+			"error":"Album introuvable.",
+			"update-success":"Les paramètres de l'album on été modifier avec succès.",
+			"download-error":"Impossible de créer l'archive pour l'album : %1."
+		},
+		"no-album":"Aucun album trouvé",
+		"no-media":"Aucun média trouvé dans l'album",
+		"name":"Nom de l'album",
+		"groups":"Accès des groupes",
+		"inherited":"H",
+		"forbidden":"I",
+		"granted":"A",
+		"download":"Télécharger l'album",
+		"loading":"Chargement",
+		"media": {
+			"download":"Télécharger",
+			"rotate-left":"Pivoter à gauche",
+			"rotate-right":"Pivoter à droite",
+			"delete":"Supprimer",
+			"delete-confirm":"La suppression est définitive. Voulez vous continuer ?"
+		}
+	}
+}

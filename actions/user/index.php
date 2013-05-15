@@ -34,21 +34,22 @@
 			if ($user)
 				go('?album');
 		
-			if ($code = get($_GET, k('rcode')))
-				$sg->userActive($code);
-		
 			if (exists($_POST, 'registration'))
 				$sg->userRegistration($_POST['name'], $_POST['mail'], $_POST['login'], $_POST['password'], $_POST['password-check']);
+				
+			if ($code = get($_GET, k('rcode')))
+				$sg->userActive($code);
+				
 		break;
 		case 'profil' :
 			if (!$user)
 				go('?');
 		
-			if ($code = get($_GET, k('mcode')))
-				$sg->userUpdateMail($code);
-		
 			if ($user and exists($_POST, 'profil'))
 				$sg->userUpdate($_POST);
+				
+			if ($code = get($_GET, k('mcode')))
+				$sg->userUpdateMail($code);
 		break;
 	}
 ?>

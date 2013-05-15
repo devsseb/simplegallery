@@ -17,7 +17,7 @@ class Simplegallery
 			$name = basename($file, '.json');
 			$this->config->$name = json_decode(file_get_contents($this->pathConfig . $file));
 		}
-
+		$this->locale = new Locale(get($this->config->parameters, k('locale')));
 	}
 	
 	public function loadAlbums($dir = null)
@@ -37,7 +37,7 @@ class Simplegallery
 		unset($this->newAlbums);
 
 		if (!$this->albums->tree and $this->user->admin)
-			success('You can now add your albums and medias in ' . $this->pathAlbums);
+			success(l('album.message.welcome', $this->pathAlbums));
 	}
 	
 	private function getAlbumsTree($dir = null, &$albumParent = null)
@@ -125,7 +125,7 @@ class Simplegallery
 		$id = (int)$id;
 		
 		if (!$album = get($this->albums->indexed, k($id)))
-			error('Album not found.', '?');
+			error(l('album.message.error'), '?');
 
 		$album = &$this->albums->indexed[$id];
 		$medias = getDir($album->path);
@@ -167,6 +167,8 @@ class Simplegallery
 		$album->config->groups = $access;
 		
 		$this->albumSaveConfig($album->id);
+		
+		success(l('album.message.update-success'), '?album&id=' . $album->id);
 	}
 	
 	public function albumSaveConfig($id)
@@ -329,24 +331,24 @@ class Simplegallery
 	{
 
 		if (!$this->user = get($this->config->users, k($login)))
-			error('Incorrect user or password.', '?');
+			error(l('user.message.login-error'), '?');
 			
 		if ($this->user->active != 1)
-			error('Incorrect user or password.', '?');
+			error(l('user.message.login-error'), '?');
 
 		if ($this->user->password != crypt($password, $this->user->password))
-			error('Incorrect user or password.', '?');
+			error(l('user.message.login-error'), '?');
 
 		$_SESSION['login'] = $login;
 		
-		success('Successfully connected. Welcome ' . $login . '.', '?');
+		success(l('user.message.login-success', $login), '?');
 	}
 	
 	public function userLogout()
 	{
 		unset($_SESSION['login']);
 		
-		success('Successfully disconnected.', '?');
+		success(l('user.message.logout'), '?');
 	}
 	
 	public function userRegistration($name, $mail, $login, $password, $passwordCheck)
@@ -356,10 +358,10 @@ class Simplegallery
 		$this->config->users = json_decode(file_get_contents($this->pathConfig . 'users.json'));
 		
 		if (exists($this->config->users, $login))
-			error('The login is already taken. Please enter a different.', '?user=registration');
+			error(l('user.message.login-update-error'), '?user=registration');
 
 		if ($password !== $passwordCheck)
-			error('The two passwords are different. Please retype your password.', '?user=registration');
+			error(l('user.message.password-update-error'), '?user=registration');
 			
 		$user = new StdClass();
 		$user->login = $login;
@@ -376,7 +378,7 @@ class Simplegallery
 		$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&rcode=' . $user->active;
 		$this->mail($mail, '[SimpleGallery] Registration, please active your account', 'Please click on this link for activate your account :<br /><a href="' . $link . '">' . $link . '</a>');
 	
-		success('Please check your mailbox to complete the account creation.', '?');
+		success(l('user.message.registration-active-link-sent'), '?');
 	}
 	
 	private function userCryptPassword($password)
@@ -392,7 +394,7 @@ class Simplegallery
 	public function userActive($code)
 	{
 		if (strlen($code) != 12)
-			error('Code is invalid', '?user=registration');
+			error(l('user.message.registration-active-invalid-code'), '?user=registration');
 	
 		foreach ($this->config->users as &$user) {
 			if ((string)$user->active != (string)$code)
@@ -400,11 +402,11 @@ class Simplegallery
 
 			$user->active = true;
 			file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
-			success('Your account is now active.', '?');
+			success(l('user.message.registration-active-success'), '?');
 		}
 		unset($user);
 		
-		error('Code is invalid', '?user=registration');
+		error(l('user.message.registration-active-invalid-code'), '?user=registration');
 	}
 	
 	public function userUpdate($data)
@@ -412,7 +414,7 @@ class Simplegallery
 
 		if ($data['password'])
 			if ($data['password'] !== $data['password-check'])
-				error('The two passwords are different. Please retype your password.', '?user=profil');
+				error(l('user.message.password-update-error'), '?user=profil');
 		
 		$login = $this->user->login;
 		$user = &$this->config->users->$login;
@@ -429,14 +431,14 @@ class Simplegallery
 			$user->password = $this->userCryptPassword($data['password']);
 		
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
-		success('Your profile has been updated successfully.' . ($mailUpdate ? '<br />Please check your mailbox to activate your new mail.' : ''), '?user=profil');
+		success(l('user.message.user-update-success') . ($mailUpdate ? '<br />' . l('user.message.mail-update-link-sent') : ''), '?user=profil');
 	}
 	
 	public function userUpdateMail($code)
 	{
 
 		if (strlen($code) != 12)
-			error('Code is invalid', '?');
+			error(l('user.message.mail-update-invalid-code'), '?');
 	
 		foreach ($this->config->users as &$user) {
 			if ((string)get($user, k('mailUpdateCode')) != (string)$code)
@@ -446,17 +448,18 @@ class Simplegallery
 			unset($user->mailUpdate);
 			unset($user->mailUpdateCode);
 			file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
-			success('Your mail has been activate successfully.', '?user=profil');
+			success(l('user.message.mail-update-success'), '?user=profil');
 		}
 		unset($user);
 		
-		error('Code is invalid', '?');
+		error(l('user.message.mail-update-invalid-code'), '?');
 
 	}
 	
 	public function adminUpdate($data)
 	{
 		$this->config->parameters->name = $data['name'];
+		$this->config->parameters->locale = $data['locale'];
 		file_put_contents($this->pathConfig . 'parameters.json', json_encode($this->config->parameters));
 	
 		$this->config->groups = preg_split('/\W+/', $data['groups']);
@@ -522,20 +525,19 @@ class Simplegallery
 		$zipName = sys_get_temp_dir() . '/simplegallery_' . uniqid() . '.zip';
 
 		if ($error = $zip->open($zipName, ZIPARCHIVE::CREATE) !== true) {
-			$message = 'Unable to create archive for album : ';
 			switch ($error) {
-				default : $message.='unkown reason';
-				case ZIPARCHIVE::ER_EXISTS : $message.= 'file already exists'; break;
-				case ZIPARCHIVE::ER_INCONS : $message.= 'zip archive inconsistent'; break;
-				case ZIPARCHIVE::ER_INVAL : $message.= 'invalid argument'; break;
-				case ZIPARCHIVE::ER_MEMORY : $message.= 'malloc failure'; break;
-				case ZIPARCHIVE::ER_NOENT : $message.= 'no such file'; break;
-				case ZIPARCHIVE::ER_NOZIP : $message.= 'not a zip archive'; break;
-				case ZIPARCHIVE::ER_OPEN : $message.= 'can\'t open file'; break;
-				case ZIPARCHIVE::ER_READ : $message.= 'read error'; break;
-				case ZIPARCHIVE::ER_SEEK : $message.= 'seek error'; break;
+				default : $message ='unkown reason';
+				case ZIPARCHIVE::ER_EXISTS : $message = 'file already exists'; break;
+				case ZIPARCHIVE::ER_INCONS : $message = 'zip archive inconsistent'; break;
+				case ZIPARCHIVE::ER_INVAL : $message = 'invalid argument'; break;
+				case ZIPARCHIVE::ER_MEMORY : $message = 'malloc failure'; break;
+				case ZIPARCHIVE::ER_NOENT : $message = 'no such file'; break;
+				case ZIPARCHIVE::ER_NOZIP : $message = 'not a zip archive'; break;
+				case ZIPARCHIVE::ER_OPEN : $message = 'can\'t open file'; break;
+				case ZIPARCHIVE::ER_READ : $message = 'read error'; break;
+				case ZIPARCHIVE::ER_SEEK : $message = 'seek error'; break;
 			}
-			die($message . '.');
+			die(l('album.message.download-error', $message));
 		}
 
 		foreach ($album->medias as $media)
@@ -554,7 +556,7 @@ class Simplegallery
 	public function userPasswordLost($login)
 	{
 		if (!$user = get($this->config->users, k($login)))
-			error('User not found', '?user=lost');
+			error(l('user.message.not-found'), '?user=lost');
 			
 		$user->passwordCode = randomString(12);
 		$user->passwordCodeTime = time();
@@ -569,7 +571,8 @@ class Simplegallery
 				<a href="' . $link . '">' . $link . '</a>
 				If you are not the author of this request, just ignore this email.'
 		);
-		success('An mail with a link to reset your password has been sent.', '?');
+
+		success(l('user.message.password-reset-link-sent'), '?');
 		
 		
 	}
@@ -577,7 +580,7 @@ class Simplegallery
 	public function userPasswordReset($code, $password, $passwordCheck)
 	{
 		if (strlen($code) != 12)
-			error('Password reset code is invalid', '?user=lost');
+			error(l('user.message.password-reset-invalid-code'), '?user=lost');
 	
 		$valid = false;
 		foreach ($this->config->users as &$user) {
@@ -590,18 +593,18 @@ class Simplegallery
 			$time = new DateTime();
 			$passwordTime->add($interval);
 			if ($time > $passwordTime)
-				error('Password reset code is invalid', '?user=lost');
+				error(l('user.message.password-reset-invalid-code'), '?user=lost');
 
 			if ($password) {
 				if ($password !== $passwordCheck)
-					error('The two passwords are different. Please retype your password.', '?user=registration');
+					error(l('user.message.password-update-error'), '?user=registration');
 					
 				$user->password = $this->userCryptPassword($password);
 				unset($user->passwordCode);
 				unset($user->passwordCodeTime);
 				file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 				
-				success('You password has been updated successfully.', '?');
+				success(l('user.message.password-update-success'), '?');
 				
 			}
 
@@ -611,7 +614,7 @@ class Simplegallery
 		unset($user);
 		
 		if (!$valid)
-			error('Password reset code is invalid', '?user=lost');
+			error(l('user.message.password-reset-invalid-code'), '?user=lost');
 	}
 	
 	private function mail($to, $subject, $message)

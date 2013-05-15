@@ -22,6 +22,7 @@ try {
 		$config = new StdClass();
 		include('./config.php');
 		include('./classes/Simplegallery.class.php');
+		include('./classes/Locale.class.php');
 
 		$sg = new Simplegallery($config->privatePath);
 		$user = $sg->getUser();

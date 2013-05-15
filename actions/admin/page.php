@@ -1,10 +1,15 @@
 <form class="admin" action="?admin" method="post">
-	<h2 class="admin-title">Admin</h2>
+	<h2 class="admin-title"><?=l('admin._')?></h2>
 	<input type="hidden" name="admin" value="" />
 	<div class="admin-parameters">
-		<label for="parameters-name">Gallery name : </label><input type="text" id="parameters-name" name="name" value="<?=toHtml(get($sg->config->parameters, k('name'), 'SimpleGallery'))?>" />
+		<label for="parameters-name"><?=l('admin.parameters.name')?> : </label><input type="text" id="parameters-name" name="name" value="<?=toHtml(get($sg->config->parameters, k('name'), 'SimpleGallery'))?>" /><br />
+		<label for="parameters-locale"><?=l('admin.parameters.locale')?> : </label><select id="parameters-locale" name="locale">
+<? foreach ($sg->locale->langs as $lang) : ?>
+			<option value="<?=toHtml($lang)?>"<?=get($sg->config->parameters, k('locale')) == $lang ? ' selected="selected"' : ''?>><?=toHtml($lang)?></option>
+<? endforeach; ?>
+		</select>
 	</div>
-	<label>Users groups :</label>
+	<label><?=l('admin.users-groups')?> :</label>
 	<table class="admin-users-groups">
 		<tr>
 			<th></th>
@@ -21,11 +26,11 @@
 <? endforeach; ?>		
 	</table>
 	<p>
-		<label for="admin-groups">Groups :</label><br />
+		<label for="admin-groups"><?=l('admin.groups')?> :</label><br />
 		<textarea id="admin-groups" name="groups" cols="30" rows="<?=count($sg->config->groups)+2?>"><?=implode(chr(10), $sg->config->groups)?></textarea>
 	</p>
-	<div class="admin-submit"><input type="submit" value="Apply" /></div>
+	<div class="admin-submit"><input type="submit" value="<?=l('apply')?>" /></div>
 	<div class="admin-links">
-		<a href="?">Cancel</a>
+		<a href="?"><?=l('cancel')?></a>
 	</div>
 </form>

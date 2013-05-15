@@ -1,0 +1,92 @@
+{
+	"cancel":"Cancel",
+	"apply":"Apply",
+	"access-error":"Access is forbidden",
+	"structure": {
+		"logged-in-as":"Loggin in as",
+		"logout":"Logout",
+		"time-generation":"Page generated in %1s"
+	},
+	"admin": {
+		"_":"Administration",
+		"message": {
+			"parameters-update-success":"Parameters updated successfully"
+		},
+		"parameters":{
+			"name":"Gallery name",
+			"locale":"Language"
+		},
+		"groups":"Groups",
+		"users-groups":"Users groups"
+	},
+	"user":{
+		"message": {
+			"login-error":"Incorrect user or password.",
+			"login-success":"Successfully connected. Welcome %1.",
+			"logout":"You are now disconnected.",
+			"no-found":"User not found.",
+			"password-reset-link-sent":"An mail with a link to reset your password has been sent.",
+			"password-reset-invalid-code":"Password reset code is invalid.",
+			"password-update-error":"The two passwords are differents. Please retype your password.",
+			"password-update-success":"You password has been updated successfully.",
+			"login-update-error":"The login is already taken. Please enter a different.",
+			"registration-active-link-sent":"Please check your mailbox to complete the account creation.",
+			"registration-active-invalid-code":"Code is invalid.",
+			"registration-active-success":"Your account is now active.",
+			"user-update-success":"Your profile has been updated successfully.",
+			"mail-update-link-sent":"Please check your mailbox to activate your new mail.",
+			"mail-update-invalid-code":"Code is invalid.",
+			"mail-update-success":"Your mail has been activate successfully."
+		},
+		"login": {
+			"_":"Authentication",
+			"login":"Login",
+			"password":"Password",
+			"submit":"Connect"			
+		},
+		"lost-password": {
+			"_":"Lost password",
+			"submit":"Ok",
+			"reset":"Reset password"
+		},
+		"registration": {
+			"_":"Registration",
+			"login":"Login wanted",
+			"register":"register"
+		},
+		"profil": {
+			"_":"My profil",
+			"name":"Name",
+			"mail":"Mail",
+			"mail-info":"Mail awaiting validation",
+			"password-info":"Leave password blank not to change",
+			"password":"Password",
+			"password-retype":"Retype password",
+			"update":"Update"
+		}
+	},
+	"album": {
+		"message": {
+			"welcome":"You can now add your albums and medias in %1.",
+			"error":"Album not found.",
+			"update-success":"The parameters of the album have been updated successfully.",
+			"download-error":"Unable to create archive for album : %1."
+		},
+		"no-album":"No album found",
+		"no-media":"No media found in this album",
+		"name":"Album name",
+		"groups":"Groups access",
+		"inherited":"I",
+		"forbidden":"F",
+		"granted":"G",
+		"download":"Download album",
+		"loading":"Loading",
+		"media": {
+			"download":"Download",
+			"rotate-left":"Rotate left",
+			"rotate-right":"Rotate right",
+			"delete":"Delete",
+			"delete-confirm": "The deletion is permanent. You want to continue ?"
+		}
+	}
+}
