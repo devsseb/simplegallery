@@ -1,5 +1,6 @@
 **TODO :**
-* Add cache management for pictures
+* Manage cache for pictures
 * Comment code
+* Test on IE :'(
 * ~~Support language~~
 * ~~On update user mail, resend verification mail~~

@@ -469,7 +469,7 @@ class Simplegallery
 			$this->config->users->$login->groups = array_keys($groups);
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
-		success('Parameters updated successfully.', '?admin');
+		success(l('parameters-update-success'), '?admin');
 	}
 	
 	public function mediaUpdate($albumId, $media, $update)
