@@ -259,7 +259,6 @@ class Simplegallery
 				file_put_contents($fileInfos, json_encode($infos));
 			}
 		} else {
-			$md5 = md5_file($mediaFile);
 			$file = $mediaFile;
 		}
 		
@@ -268,24 +267,8 @@ class Simplegallery
 	    $typemime = finfo_file($finfo, $file);
 		finfo_close($finfo);
 
-		$etag = md5($time = gmdate('r', filemtime($file)) . $md5);
-
-		header("Cache-Control:private");
-		header('ETag:"' . $etag . '"');
-		header('Last-Modified:' . $time);
 		header('Content-Type: ' . $typemime);
-
-		if (
-			(
-				$headerSince = get($_SERVER, k('HTTP_IF_MODIFIED_SINCE')) or
-				$headerMatch = get($_SERVER, k('HTTP_IF_NONE_MATCH'))
-			) and (
-				$headerSince == $time or $headerMatch == $etag
-			)
-		)
-            header('HTTP/1.1 304 Not Modified');
-        else
-			readfile($file);
+		readfile($file);
 		exit();
 		
 	}
