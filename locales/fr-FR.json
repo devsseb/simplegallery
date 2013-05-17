@@ -10,14 +10,18 @@
 	"admin": {
 		"_":"Administration",
 		"message": {
-			"parameters-update-success":"Les paramètres ont été modifié avec succès"
+			"parameters-update-success":"Les paramètres ont été modifié avec succès",
+			"user-delete-success":"L'utilisateur a été supprimé avec succès"
 		},
 		"parameters":{
 			"name":"Nom de la galerie",
 			"locale":"Langue"
 		},
 		"groups":"Groupes",
-		"users-groups":"Utilisateurs"
+		"users":"Utilisateurs",
+		"user-no-active":"L'utilisateur n'est pas actif",
+		"user-delete":"supprimer",
+		"user-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?"
 	},
 	"user":{
 		"message": {

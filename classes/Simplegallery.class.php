@@ -476,6 +476,17 @@ class Simplegallery
 
 	}
 	
+	public function userDelete($login)
+	{
+		if (!$this->config->users->$login)
+			error(l('user.message.no-found'), '?admin');
+			
+		unset($this->config->users->$login);
+		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
+		
+		success(l('admin.message.user-delete-success'), '?admin');
+	}
+	
 	public function adminUpdate($data)
 	{
 		$this->config->parameters->name = $data['name'];

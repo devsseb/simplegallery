@@ -10,14 +10,18 @@
 	"admin": {
 		"_":"Administration",
 		"message": {
-			"parameters-update-success":"Parameters updated successfully"
+			"parameters-update-success":"Parameters updated successfully",
+			"user-delete-success":"The user was deleted successfully"
 		},
 		"parameters":{
 			"name":"Gallery name",
 			"locale":"Language"
 		},
 		"groups":"Groups",
-		"users-groups":"Users groups"
+		"users":"Users",
+		"user-no-active":"User is no active",
+		"user-delete":"delete",
+		"user-delete-confirm":"The deletion is permanent. You want to continue ?"
 	},
 	"user":{
 		"message": {

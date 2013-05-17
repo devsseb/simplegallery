@@ -7,4 +7,8 @@
 	
 	if (exists($_POST, 'admin'))
 		$sg->adminUpdate($_POST);
+		
+	if (exists($_GET, 'userDelete'))
+		$sg->userDelete($_GET['userDelete']);
+		
 ?>
