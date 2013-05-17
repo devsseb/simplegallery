@@ -12,9 +12,9 @@ class Locale
 			$this->dir = $dir;
 		$this->lang = $lang;
 		
-		$this->langs = getDir($this->dir);
+		$this->langs = getDir($this->dir, '^([^.])');
 		foreach ($this->langs as &$lang)
-			$lang = substr($lang, 0, strlen($lang) - 4);
+			$lang = substr($lang, 0, strlen($lang) - 5);
 		unset($lang);
 
 		if (!in_dir($this->dir, $file = $this->dir . $this->lang . '.json', true))

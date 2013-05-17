@@ -53,9 +53,11 @@ function error($message, $go = '')
 	}
 }
 
-function getDir($dir)
+function getDir($dir, $mask = null)
 {
-	return array_values(array_diff(scandir($dir), array('..', '.')));
+	$files = array_diff(scandir($dir), array('..', '.'));
+	$files = preg_grep('/' . $mask . '/', $files);
+	return array_values($files);
 }
 
 function in_dir($dir, $file, $exists = false)

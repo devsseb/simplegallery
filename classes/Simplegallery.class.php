@@ -265,7 +265,7 @@ class Simplegallery
 		
 
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-	    $typemime = finfo_file($finfo, $file);
+		$typemime = finfo_file($finfo, $file);
 		finfo_close($finfo);
 
 		$etag = md5($time = gmdate('r', filemtime($file)) . $md5);
@@ -282,10 +282,12 @@ class Simplegallery
 			) and (
 				$headerSince == $time or $headerMatch == $etag
 			)
-		)
-            header('HTTP/1.1 304 Not Modified');
-        else
-			readfile($file);
+		) {
+			header('HTTP/1.1 304 Not Modified');
+			exit();
+		}
+
+		readfile($file);
 		exit();
 		
 	}
@@ -346,7 +348,8 @@ class Simplegallery
 	
 	public function userLogin($login, $password)
 	{
-
+		$login = trim(strtolower($login));
+		
 		if (!$this->user = get($this->config->users, k($login)))
 			error(l('user.message.login-error'), '?');
 			
@@ -486,7 +489,7 @@ class Simplegallery
 			$this->config->users->$login->groups = array_keys($groups);
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
-		success(l('parameters-update-success'), '?admin');
+		success(l('admin.message.parameters-update-success'), '?admin');
 	}
 	
 	public function mediaUpdate($albumId, $media, $update)
