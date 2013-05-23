@@ -31,6 +31,9 @@
 		break;
 		case 'registration' :
 		
+			if ($sg->config->parameters->{'registration-disable'})
+				go('?');
+		
 			if ($user)
 				go('?album');
 		

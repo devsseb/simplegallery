@@ -491,6 +491,7 @@ class Simplegallery
 	{
 		$this->config->parameters->name = $data['name'];
 		$this->config->parameters->locale = $data['locale'];
+		$this->config->parameters->{'registration-disable'} = $data['registration-disable'];
 		file_put_contents($this->pathConfig . 'parameters.json', json_encode($this->config->parameters));
 	
 		$this->config->groups = preg_split('/\W+/', $data['groups']);

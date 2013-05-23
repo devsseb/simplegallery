@@ -15,7 +15,8 @@
 		},
 		"parameters":{
 			"name":"Nom de la galerie",
-			"locale":"Langue"
+			"locale":"Langue",
+			"registration-disable":"Inscription désactivée"
 		},
 		"groups":"Groupes",
 		"users":"Utilisateurs",

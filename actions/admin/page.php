@@ -8,7 +8,9 @@
 <? foreach ($sg->locale->langs as $lang) : ?>
 			<option value="<?=toHtml($lang)?>"<?=get($sg->config->parameters, k('locale')) == $lang ? ' selected="selected"' : ''?>><?=toHtml($lang)?></option>
 <? endforeach; ?>
-		</select>
+		</select><br />
+		<label for="parameters-registration-disable"><?=l('admin.parameters.registration-disable')?> : </label>
+		<input type="checkbox" id="parameters-registration-disable" name="registration-disable" value="1"<?=get($sg->config->parameters, k('registration-disable')) ? ' checked="checked"' : ''?> />
 	</div>
 	<label><?=l('admin.users')?> :</label>
 	<table class="admin-users-groups">
