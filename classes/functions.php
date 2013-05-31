@@ -21,7 +21,10 @@ function array_index($array, $index)
 
 function go($url)
 {
-	header('Location:' . $url);
+	if ($debug = debug() or headers_sent())
+		echo '<p style="text-align:center;font-weight:bold;">Redirecting to <br /><i>'.toHtml($url).'</i><br />...</p><script type="text/javascript">setTimeout("document.location.href=\''.$url.'\'", ' . ($debug ? 1200 : 0) . ');</script>';
+	else
+		header('Location:' . $url);
 	exit();
 }
 
@@ -40,17 +43,22 @@ function mailSend($to, $subject, $message, $from = 'noreply@simplegallery.com')
 function success($message, $go = '')
 {
 	$_SESSION['messages']['success'] = $message;
-	if ($go) {
+	if ($go)
 		go($go);
-	}
 }
 
 function error($message, $go = '')
 {
 	$_SESSION['messages']['error'] = $message;
-	if ($go) {
+	if ($go)
 		go($go);
-	}
+}
+
+function information($message, $go = '')
+{
+	$_SESSION['messages']['information'] = $message;
+	if ($go)
+		go($go);
 }
 
 function getDir($dir, $mask = null)
@@ -60,7 +68,7 @@ function getDir($dir, $mask = null)
 	return array_values($files);
 }
 
-function in_dir($dir, $file, $exists = false)
+function inDir($dir, $file, $exists = false)
 {
 	$dir = realpath($dir);
 	$element  = realpath(dirname($file)) . '/' . basename($file);
@@ -70,11 +78,13 @@ function in_dir($dir, $file, $exists = false)
 	return $return;
 }
 
-function stripAccents($string){
+function stripAccents($string)
+{
 	return strtr($string, array_combine(split_unicode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), str_split('aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY')));
 }
 
-function split_unicode($str, $l = 0) {
+function split_unicode($str, $l = 0)
+{
 	if ($l > 0) {
 	    $ret = array();
 	    $len = mb_strlen($str, "UTF-8");
@@ -86,7 +96,8 @@ function split_unicode($str, $l = 0) {
 	return preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY);
 }
 
-function randomString($length){ 
+function randomString($length)
+{ 
 	$randstr = '';
 	for ($i=0; $i<$length; $i++) {
 		$randnum = mt_rand(0,61);
@@ -99,5 +110,24 @@ function randomString($length){
 		}
 	}
 	return $randstr;
-} 
+}
+
+function imagesize($img)
+{
+	return (object)array('width' => imagesx($img), 'height' => imagesy($img));
+}
+
+function write($data, $nl = false)
+{
+	echo $data . ($nl ? '<br />' : '');
+	flush();
+	ob_flush();
+}
+
+function resetTimout($timeout = null)
+{
+	if (is_null($timeout))
+		$timeout = (int)ini_get('max_execution_time'); 
+	set_time_limit($timeout);
+}
 ?>

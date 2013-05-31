@@ -1,16 +1,15 @@
 <?
 try {
 
-	$phpStart = explode(' ', microtime());
 	session_start();
 	
-	$debug = true;
 	include('./classes/functions.php');
 	include('./classes/Get.class.php');
 	new Get();
 	include('./classes/Debug.class.php');
 	new Debug();
-	Debug::enable(true);
+
+	chronoStart('phptime');
 
 	if (!is_file('./config.php')) {
 
@@ -21,6 +20,7 @@ try {
 
 		$config = new StdClass();
 		include('./config.php');
+		Debug::enable(get($config, k('debug')));
 		include('./classes/Simplegallery.class.php');
 		include('./classes/Locale.class.php');
 

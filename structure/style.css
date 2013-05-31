@@ -13,7 +13,4 @@ footer a:hover{text-decoration:none;}
 
 .message_success{background-color:#c6edc4;color:#2a8c25;font-weight:bold;text-align:center;font-size:14px;padding:10px;}
 .message_error{background-color:#e8abae;color:#aa0a14;font-weight:bold;text-align:center;font-size:14px;padding:10px;}
-
-
-
-
+.message_information{background-color:#ffce77;color:#8b662f;font-weight:bold;text-align:center;font-size:14px;padding:10px;}

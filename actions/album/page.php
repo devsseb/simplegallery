@@ -1,25 +1,17 @@
 <div id="album-locales"><?=json_encode(array('delete-confirm' => l('album.media.delete-confirm')))?></div>
 
-<?
-	function htmlAlbums($albums, $level = 0) {
-		$html = '<ul class="albums">';
-		foreach ($albums as $album) {
-			$html.= '<li>';
-				$html.= '<a
-					style="padding-left:' . (5 + $level * 15) . 'px;' . (get($_GET, k('id')) == $album->id ? 'background-color:rgba(119, 167, 197, 0.5);' : '') . '"
-					href="?album&id=' . $album->id . '"
-				>' . $album->name . '</a>';
-				$html.= htmlAlbums($album->children, $level + 1);
-			$html.= '</li>';
-		}
-		$html.= '</ul>';
-		return $html;
-	}
-?>
-
-<? if ($sg->albums->tree) : ?>
+<? if ($sg->albums) : ?>
 <div class="albums-menu">
-	<?=htmlAlbums($sg->albums->tree)?>
+	<ul class="albums">
+	<? foreach ($sg->albums as $albumMenu) : ?>
+		<li>
+			<a
+				style="padding-left:<?=$albumMenu->depth * 15 + 5?>px;<?=get($_GET, k('id')) == $albumMenu->id ? 'background-color:rgba(119, 167, 197, 0.5);' : ''?>"
+				href="?album&id=<?=toHtml($albumMenu->id)?>"
+			><?=$albumMenu->name?></a>
+		</li>
+	<? endforeach; ?>
+	</ul>
 </div>
 <? else : ?>
 <div id="no-album">
@@ -56,12 +48,13 @@
 		<div class="album-admin-button"><input type="submit" value="<?=l('apply')?>" /></div>
 	</form>
 	<? endif; ?>
+	<? if (exists($album->data, 'thumbs') or !$album->medias) : ?>
 	<div id="no-media">
 		<?=l('album.no-media')?>
 	</div>
-	<? if ($album->medias) : ?>
-	<div class="album-action">
-		<a class="album-action-download" href="?album&download=<?=toHtml($album->id)?>" target="_blank" title="<?=l('album.download')?>"></a>
+		<? if ($album->medias) : ?>
+	<div id="album-action">
+		<a id="album-action-download" href="?album&download=<?=toHtml($album->id)?>" target="_blank" title="<?=l('album.download')?>"></a>
 	</div>
 	<div class="media" id="media">
 		<img class="media-loading" src="actions/album/loading.gif" alt="<?=l('album.loading')?>" />
@@ -72,25 +65,37 @@
 				<li title="<?=l('album.media.download')?>"><a id="mediaDownload" target="_blank" href="#"></a></li>
 				<li id="mediaRotateLeft" title="<?=l('album.media.rotate-left')?>"></li>
 				<li id="mediaRotateRight" title="<?=l('album.media.rotate-right')?>"></li>
+				<li id="mediaFlipHorizontal" title="<?=l('album.media.flip-horizontal')?>"></li>
+				<li id="mediaFlipVertical" title="<?=l('album.media.flip-vertical')?>"></li>
 				<li id="mediaDelete" title="<?=l('album.media.delete')?>"></li>
 			</ul>
 		</div>
 	</div>
 	<div class="thumbs" id="thumbs">
-		<? foreach ($album->medias as $media) : ?>
+		<?
+		$thumbs = array_flip($album->data->thumbs->{'75-sprite.jpg'}->index);
+		foreach ($album->medias as $media) :
+			$index = get($thumbs, k($media->name), count($thumbs));
+		?>
 		<a
 			title="<?=toHtml($media->name)?>"
 			class="thumb" 
-			style="background-image:url('?media&amp;album=<?=toUrl($album->id)?>&amp;media=<?=toUrl($media->name)?>&amp;dim=75-short');"
-			href="?media&amp;album=<?=toUrl($album->id)?>&amp;media=<?=toUrl($media->name)?>&amp;dim=500-long"
+			style="
+				background:transparent url('?media&amp;album=<?=toUrl($album->id)?>&amp;dim=thumb') no-repeat center -<?=$index * 75?>px;
+				<?=$media->styles?>
+			"
+			href="?media&amp;album=<?=toUrl($album->id)?>&amp;media=<?=toUrl($media->name)?>&amp;dim=play"
 			mediaType="<?=toHtml($sg->getMediaType($media->name))?>"
-			mediaWidth="<?=toHtml(get($media, k('width')))?>"
-			mediaHeight="<?=toHtml(get($media, k('height')))?>"
-<?/*			mediaOrientation="<?=toHtml(get($media, k('orientation')))?>"*/?>
+			mediaWidth="<?=toHtml(get($media, k('data', 'width')))?>"
+			mediaHeight="<?=toHtml(get($media, k('data', 'height')))?>"
+			mediaOrientation="<?=toHtml(get($media, k('data', 'orientation')))?>"
+			mediaRotation="<?=toHtml(get($media, k('data', 'rotation')))?>"
+			mediaFlip="<?=toHtml(get($media, k('data', 'flip')))?>"
 		></a>
 		<? endforeach; ?>
 		<div id="thumb-current"></div>
 	</div>
+		<? endif; ?>
 	<? endif; ?>
 </div>
 <? endif; ?>

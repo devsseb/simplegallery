@@ -1,4 +1,4 @@
-<form class="user" action="?user&amp;pcode=<?=toUrl($code)?>" method="post">
+<form class="user" action="?user" method="post">
 	<h2 class="user-title"><?=l('user.login._')?></h2>
 	<table>
 		<tr><th><?=l('user.login.login')?> :</th><td class="user-field"><input name="login" type="text" autofocus="autofocus" /></td></tr>

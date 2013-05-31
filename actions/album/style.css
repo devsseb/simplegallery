@@ -18,13 +18,15 @@
 #mediaDownload{background-image:url('media_download.png');}
 #mediaRotateLeft{background-image:url('media_rotate_left.png');}
 #mediaRotateRight{background-image:url('media_rotate_right.png');}
+#mediaFlipHorizontal{background-image:url('media_flip_horizontal.png');}
+#mediaFlipVertical{background-image:url('media_flip_vertical.png');}
 #mediaDelete{background-image:url('media_delete.png');}
 .thumbs{margin-left:515px;padding:10px;padding-left:5px;overflow:hidden;position:relative;}
 .thumb{width:75px;height:75px;float:left;background-position:center center;display:block;}
 #thumb-current{width:73px;height:73px;border:3px solid #fff;position:absolute;display:none;display:none;background-color:rgba(255,255,255,0.5);}
 
-.album-action{float:right;width:20px;padding:10px;}
-.album-action-download{display:block;width:20px;height:20px;background-image:url('album_download.png');margin:auto;}
+#album-action{float:right;width:20px;padding:10px;}
+#album-action-download{display:block;width:20px;height:20px;background-image:url('album_download.png');margin:auto;}
 
 .album-admin{float:right;width:150px;background-color:#c5a677;padding:10px;}
 .album-admin-title{text-align:center;font-weight:bold;padding:3px 0px;}

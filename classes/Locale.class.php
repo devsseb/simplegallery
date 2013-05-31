@@ -17,7 +17,7 @@ class Locale
 			$lang = substr($lang, 0, strlen($lang) - 5);
 		unset($lang);
 
-		if (!in_dir($this->dir, $file = $this->dir . $this->lang . '.json', true))
+		if (!inDir($this->dir, $file = $this->dir . $this->lang . '.json', true))
 			$file = $this->dir . 'en-US.json';
 
 		self::$index = json_decode(file_get_contents($file));

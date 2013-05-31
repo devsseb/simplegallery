@@ -2,7 +2,7 @@
 
 class Simplegallery
 {
-	private $newAlbums, $lastId, $passwordLostTimeOut = 'PT2H';
+	private $lastId, $passwordLostTimeOut = 'PT2H';
 
 	public function __construct($root)
 	{
@@ -18,135 +18,129 @@ class Simplegallery
 			$this->config->$name = json_decode(file_get_contents($this->pathConfig . $file));
 		}
 		$this->locale = new Locale(get($this->config->parameters, k('locale')));
+		
+		$this->dimensions = (object)array(
+			'thumb'	=> (object)array('size' => 75	, 'type' => 'sprite'),
+			'play'	=> (object)array('size' => 500	, 'type' => 'long'	),
+			'zoom'	=> (object)array('size' => 1000	, 'type' => 'long'	)
+		);
+
 	}
 	
 	public function loadAlbums($dir = null)
 	{
 		if (exists($this, 'albums'))
 			return;
-	
+
 		$this->lastId = 0;
-		$this->albums = new StdClass();
-		$this->newAlbums = array();
-		$this->albums->tree = $this->getAlbumsTree();
-		foreach ($this->newAlbums as &$album)
-			file_put_contents($album->path . '.id', $album->id = ++$this->lastId);
-		unset($album);
-		$this->albums->indexed = $this->getAlbumsIndexed();
+		$albums = $this->getAlbums();
+		$this->albums = array();
+		foreach ($albums as $album) {
+			if (!$album->id) {
+				file_put_contents($album->path . '.id', $album->id = ++$this->lastId);
+				$album->pathThumbs = $this->pathThumbs . $album->id . '/';
+			}
+			$this->albums[$album->id] = $album;
+		}	
 
-		unset($this->newAlbums);
-
-		if (!$this->albums->tree and $this->user->admin)
+		if (!$this->albums and $this->user->admin)
 			success(l('album.message.welcome', $this->pathAlbums));
 	}
 	
-	private function getAlbumsTree($dir = null, &$albumParent = null)
+	private function getAlbums($dir = null, $depth = 0, $groupsParent = array())
 	{
 		if (!$dir)
 			$dir = $this->pathAlbums;
-		$albums = getDir($dir);
 
-		foreach ($albums as $i => &$album) {
-			if (!is_string($album)) continue;
-			if (!is_dir($dir . $album)) {
-				unset($albums[$i]);
+		$albumsInDir = getDir($dir);
+		
+		$albums = array();
+		foreach ($albumsInDir as $album) {
+			if (!is_dir($dir . $album))
 				continue;
-			}
 			
 			$album = (object)array('name' => $album);
+			$album->id = 0;
 			$album->path = $dir . $album->name . '/';
+			$album->groups = array();
+			$album->groupsParent = $groupsParent;
+			$album->data = null;
+			$album->depth = $depth;
+			$album->parent = &$albumParent;
+			
 			if (is_file($album->path . '.id')) {
 				$album->id = file_get_contents($album->path . '.id');
-				if ($album->id > $this->lastId) $this->lastId = $album->id;
-			} else {
-				$this->newAlbums[] = &$album;
-				$album->id = 0;
+				$album->pathThumbs = $this->pathThumbs . $album->id . '/';
+				if ($album->id > $this->lastId)
+					$this->lastId = $album->id;	
+				if (is_file($file = $album->pathThumbs . 'data.json'))
+					$album->data = json_decode(file_get_contents($file));
 			}
-			$album->parent = &$albumParent;
 
-			if (is_file($file = $this->pathThumbs . $album->id . '/.config.json'))
-				$album->config = json_decode(file_get_contents($file));
-			else
-				$album->config = new StdClass();
+			if (!is_object($album->data))
+				$album->data = new StdClass();
 
-			$album->groups = array();
+			
 			$groupsAllow = array('admins');
 			foreach ($this->config->groups as $group) {
 				if ($group == 'admins')
 					continue;
 			
-				$access = get($album->config, k('groups', $group));
+				$access = get($album->data, k('groups', $group));
 				if ($access !== null)
 					$album->groups[$group] = $access;
 				else {
-					if ($albumParent)
-						$album->groups[$group] = $albumParent->groups[$group] < 0 ? $albumParent->groups[$group] : $albumParent->groups[$group] - 2;
-					else
-						$album->groups[$group] = -2;
+					$album->groups[$group] = get($groupsParent, k($group), -2);
+					if ($album->groups[$group] >= 0)
+						$album->groups[$group]-= 2;
 				}
 				if ($album->groups[$group] == -1 or $album->groups[$group] == 1)
 					$groupsAllow[] = $group;
 			}
 			
-			$album->children = array();
 			if (array_intersect($this->user->groups, $groupsAllow))
-				$album->children = array_merge($album->children, $this->getAlbumsTree($album->path, $album));
-			elseif ($albumParent) {
-				unset($albums[$i]);
-				$albumParent->children = array_merge($albumParent->children,$this->getAlbumsTree($album->path, $albumParent)); 
-			} else {
-				unset($albums[$i]);
-				array_splice($albums, $i, 0, $this->getAlbumsTree($album->path));
-			}
-				
-			
+				$albums[] = $album;
+			foreach ($this->getAlbums($album->path, $depth+1, $album->groups) as $album)
+				$albums[] = $album;
+
 		}
-		unset($album);
 
 		return $albums;
 	}
 	
-	private function getAlbumsIndexed($albums = null)
-	{
-		if (!is_array($albums))
-			$albums = $this->albums->tree;
-	
-		$indexed = array();
-		foreach ($albums as &$album) {
-			$indexed[$album->id] = &$album;
-			$indexed+= $this->getAlbumsIndexed($album->children);
-		}
-		unset($album);
-		return $indexed;
-	}
-	
+	// Return album infos
 	public function getAlbum($id)
 	{
 		$id = (int)$id;
-		
-		if (!$album = get($this->albums->indexed, k($id)))
+
+		// Test if album exists
+		if (!$album = get($this->albums, k($id)))
 			error(l('album.message.error'), '?');
 
-		$album = &$this->albums->indexed[$id];
-		$medias = getDir($album->path);
+		// Retrieve files of album dir ...
+		$album->medias = array();
 
+		$medias = getDir($album->path);
+		// ... and generate medias list
 		foreach ($medias as $i => $media) {
-			if ($media[0] == '.' or !is_file($mediaFile = $album->path . $media)) {
+		
+			// Delete hiddens files, json files and dir from list
+			if (
+				$media[0] == '.' or
+				$media == 'data.json' or
+				!is_file($mediaFile = $album->path . $media)
+			) {
 				unset($medias[$i]);
 				continue;
 			}
 
-			if (is_file($fileInfos = $this->pathThumbs . $album->id . '/' . $media . '.json'))
-				$infos = json_decode(file_get_contents($fileInfos));
-			else
-				$infos = new StdClass();
-				
-			$infos->name = $media;
-			$medias[$i] = $infos;
+			$album->medias[$media] = (object)array(
+				'name' => $media,
+				'file' => $mediaFile,
+				'data' => get($album->data, k('medias', $media), new StdClass())
+			);
 		}
 
-		$album->medias = $medias;
-		
 		return $album;
 	}
 	
@@ -164,7 +158,7 @@ class Simplegallery
 				continue;
 			unset($access[$group]);
 		}
-		$album->config->groups = $access;
+		$album->data->groups = $access;
 		
 		$this->albumSaveConfig($album->id);
 		
@@ -176,93 +170,281 @@ class Simplegallery
 		$album = $this->getAlbum($id);
 		if (!is_dir($dir = $this->pathThumbs . $album->id))
 			mkdir($dir, 0777, true); 
-		file_put_contents($dir . '/.config.json', json_encode($album->config));
+		file_put_contents($dir . '/data.json', json_encode($album->data));
 	}
 	
-	public function getMedia($albumId, $media, $dim = null)
+	// Return list of medias who need update and files who are not necessary
+	public function albumCheck($id)
+	{
+	
+		// Retrieve album
+		$album = $this->getAlbum($id);
+
+		// Retrieve list of files in thumb dir (contains delete list at end of this function)
+		
+		if (is_dir($album->pathThumbs))
+			$delete = array_fill_keys(array_values(getDir($album->pathThumbs)), true);
+		else
+			$delete = array();
+
+		if (exists($delete, 'data.json'))
+			unset($delete['data.json']);
+
+		// Retrieve list of medias files who need update
+		$update = array();
+		foreach ($album->medias as $media) {
+
+			$needUpdate = get($media->data, k('md5')) != md5_file($media->file);
+		
+			foreach ($this->dimensions as $dimension) {
+			
+				if ($dimension->type == 'sprite') {
+			
+					$thumb = $dimension->size . '-' . $dimension->type . '.jpg';
+					
+					// Format delete sprite data
+					if (exists($delete, $thumb) and !is_object($delete[$thumb])) {
+						$delete[$thumb] = (object)array(
+							'dimension' => $dimension,
+							'medias' => get($album->data, k('thumbs', $thumb, 'index'), array())
+						);
+					}
+
+					// If media need update or does not exists in sprite data
+					if (!$needUpdate)
+						$needUpdate = !in_array($media->name, get($delete, k($thumb, 'medias'), array()));
+
+					// Delete media from json sprite file list
+					if (false !== $index = array_search($media->name, get($delete, k($thumb, 'medias'), array())))
+						unset($delete[$thumb]->medias[$index]);
+
+				} else {
+
+					$thumb = $media->name . '.' . $dimension->size . '-' . $dimension->type . '.jpg';				
+
+					if (!$needUpdate)
+						$needUpdate = !exists($delete, $thumb);
+				
+				}
+
+				if (!get($delete, k($thumb, 'medias')))
+					unset($delete[$thumb]);
+				
+				if (!$needUpdate)
+					continue;
+
+				if (!exists($update, $media->name))
+					$update[$media->name] = (object)array('media' => $media, 'dimensions' => array());
+				$update[$media->name]->dimensions[] = $dimension;
+
+			}
+		}
+
+		return (object)array(
+			'album' => $album,
+			'delete' => $delete,
+			'update' => $update
+		);
+
+	}
+	
+	// Generate missing thumbs for the album $id
+	public function albumGenerate($result)
+	{
+		if (!is_object($result))
+			// Retrieve udpate and delete list
+			$result = $this->albumCheck($result);
+
+		$album = $result->album;
+
+		write('<pre>');
+		write('<h3>' . l('album.generation._', $album->name) . '</h3>');
+
+		// Create thumb dir
+		if (!is_dir($album->pathThumbs))
+			mkdir($album->pathThumbs, 0777, true);
+
+		// Create medias data and thumbs
+		if (!exists($album->data, 'medias'))
+			$album->data->medias = new StdClass();
+		if (!exists($album->data, 'thumbs'))
+			$album->data->thumbs = new StdClass();
+
+		// Delete files not required
+		write('<h4>' . l('album.generation.delete') . '</h4>');
+		if (!$result->delete)
+			write(l('album.generation.delete-nothing'));
+		foreach ($result->delete as $file => $data) {
+			
+			if (is_object($data)) {
+				foreach ($data->medias as $media) {			
+					$this->mediaDelete($album->id, $media, $data->dimension);
+					write(l('album.generation.delete-sprite', $media, $file), true);
+				}
+			} else {
+				// Delete file
+				unlink($album->pathThumbs . $file);
+				write(l('album.generation.delete-file', $file), true);
+			}
+			
+		}
+
+		// Update files
+		write('<h4>' . l('album.generation.update') . '</h4>');
+		if (!$result->update)
+			write(l('album.generation.update-nothing'));
+		else {
+			// Retrieve total medias to update
+			$progress = (object)array(
+				'total' => 0,
+				'now' => 0,
+				'percent' => 0
+			);
+			foreach ($result->update as $file => $data)
+				$progress->total+= count($data->dimensions);
+		}
+
+		foreach ($result->update as $data) {
+			$media = $data->media;
+
+			write(l('album.generation.update-start', $media->name), true);
+
+			// Load original media
+			$mediaType = $this->getMediaType($media->file);
+			$imgMedia = imagecreatefromstring($mediaType == 'video' ?
+				$this->videoTakeCapture($media->file) :
+				file_get_contents($media->file)
+			);
+			$geometry = imagesize($imgMedia);
+			$md5 = md5_file($media->file);
+
+			// Save media data
+			$album->data->medias->{$media->name} = $media->data = (object)array(
+				'md5' => $md5,
+				'width' => $geometry->width,
+				'height' => $geometry->height,
+				'orientation' => exif_imagetype($media->file) === false ? 1 : (int)geta(exif_read_data($media->file), k('Orientation'), 1),
+				'rotation' => get($media, k('data', 'rotation'), 0),
+				'flip' => get($media, k('data', 'flip'), '')
+			);
+
+			foreach ($data->dimensions as $dimension) {
+				
+				// Progression
+				resetTimout();
+				$progress->percent = round(++$progress->now * 100 / $progress->total);
+
+				// Create or load thumb image
+				$file = ($dimension->type == 'sprite' ? '' : $media->name . '.') . $dimension->size . '-' . $dimension->type . '.jpg';
+				$fileThumb = $album->pathThumbs . $file;
+				$new = true;
+				if ($dimension->type == 'sprite' and !$new = !is_file($fileThumb))
+					// Load existant sprite
+					$imgThumb = imagecreatefromstring(file_get_contents($fileThumb));
+
+				// Create thumbs entry for album data
+				if (!exists($album->data->thumbs, $file))
+					$album->data->thumbs->$file = (object)array('md5'=> '');
+
+				// Prepare vars for resize and crop image
+				$dstY = $lagX = $lagY = 0;
+				if ($dimension->type == 'sprite') {
+				
+					if ($geometry->width >= $geometry->height) {
+						$srcWidth = $geometry->height;
+						$srcHeight = $geometry->height;
+						$lagX = ($geometry->width - $geometry->height)/2;
+					} else {
+						$srcWidth = $geometry->width;
+						$srcHeight = $geometry->width;
+						$lagY = ($geometry->height - $geometry->width)/2;
+					}
+					$dstWidth = $dstHeight = $dimension->size;
+					
+					if (!exists($album->data->thumbs->$file, 'index'))
+						$album->data->thumbs->$file->index = array();
+					
+					// Retrieve index for sprite
+					$index = $new ? 0 : array_search($media->name, $album->data->thumbs->$file->index);
+					//Insert
+					if ($index === false) {
+						$spriteHeight = imagesy($imgThumb);
+						$index = $spriteHeight / $dimension->size;
+							$imgNewThumb = imagecreatetruecolor($dimension->size, $spriteHeight + $dimension->size);
+						imagecopy($imgNewThumb, $imgThumb, 0, 0, 0, 0, $dimension->size, $spriteHeight);
+						imagedestroy($imgThumb);
+						$imgThumb = $imgNewThumb;
+					}
+					// Save index for thumb sprite
+					$album->data->thumbs->$file->index[$index] = $media->name;
+
+					$dstY = $index * $dimension->size;
+				} else {
+					$srcWidth = $geometry->width;
+					$srcHeight = $geometry->height;
+					if ($geometry->width >= $geometry->height) {
+						$dstWidth = $dimension->size;
+						$dstHeight = floor($dimension->size * $geometry->height / $geometry->width);
+					} else {
+						$dstWidth = floor($dimension->size * $geometry->width / $geometry->height);
+						$dstHeight = $dimension->size;
+					}
+				}
+				
+				if ($new)
+					$imgThumb = imagecreatetruecolor($dstWidth, $dstHeight);
+				
+				imagecopyresampled($imgThumb, $imgMedia, 0, $dstY, $lagX, $lagY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
+
+				imagejpeg($imgThumb, $fileThumb);
+				imagedestroy($imgThumb);
+
+				// Save md5 of thumb (for cache management)
+				$album->data->thumbs->$file->md5 = md5_file($fileThumb);
+			
+				write(chr(9) . str_pad($progress->percent, 3, ' ', STR_PAD_LEFT) . ' % - ' . str_pad($progress->now, strlen($progress->total), ' ', STR_PAD_LEFT) . ' / ' . $progress->total . ' - ');
+				if ($dimension->type == 'sprite')
+					write(l('album.generation.update-sprite', $file), true);
+				else
+					write(l('album.generation.update-file', $file), true);
+
+			}
+			
+			imagedestroy($imgMedia);
+			$this->albumSaveConfig($album->id);
+		}
+		
+		write('</pre>');
+
+		success(l('album.message.generate-success'), '?album&id=' . $album->id);
+	}
+	
+	public function getMedia($albumId, $media = null, $dim = null)
 	{
 		$this->loadAlbums();
 		
 		$albumId = (int)$albumId;
-		if (!$album = get($this->albums->indexed, k($albumId)))
-			die('Media not found (1)');
-		
-		$mediaFile = $album->path . $media;
-		if (!in_dir($album->path, $mediaFile, true))
-			die('Media not found (2)');
-		
-		if (!$mediaType = $this->getMediaType($mediaFile))
-			die('Media not found (3)');
+		if (!$album = get($this->albums, k($albumId)))
+			die(l('album.media.not-found'));
+			
+		if ($media and !exists($album, 'data', 'medias', $media))
+			die(l('album.media.not-found'));
+
+		if ($dim and !$dim = get($this->dimensions, k($dim)))
+			die(l('album.media.not-found'));
+			
 			
 		if ($dim) {
-			foreach ($this->config->dimensions as $dimension)
-				if ($dimension->size . '-' . $dimension->type == $dim) {
-					$dim = $dimension;
-					break;
-				}
-			
-			if (is_string($dim))
-				die('Media not found (4)');
-			
-			if (!is_dir($pathThumbs = $this->pathThumbs . $album->id . '/'))
-				mkdir($pathThumbs, 0777, true); 
-			
-			
-			if (is_file($fileInfos = $pathThumbs . $media . '.json'))
-				$infos = json_decode(file_get_contents($fileInfos));
+			if ($dim->type == 'sprite')
+				$file = $dim->size . '-' . $dim->type . '.jpg';
 			else
-				$infos = new StdClass();
-			
-			$overwrite = false;
-			$md5 = md5_file($mediaFile);
-			if ($overwrite = get($infos, k('md5')) != $md5)
-				foreach ($this->config->dimensions as $dimension)
-					if (is_file($file = $pathThumbs  . $media . '.' . $dimension->size . '-' . $dimension->type . '.jpg'))
-						unlink($file);
-
-			$file = $pathThumbs  . $media . '.' . $dim->size . '-' . $dim->type . '.jpg';
-			if (!is_file($file)) {
-
-				if ($mediaType == 'video')
-					$mediaFile = $this->videoTakeCapture($mediaFile);
-			
-				$img = imagecreatefromstring(file_get_contents($mediaFile));
-				$geometry = getimagesize($mediaFile);		
-
-				$geometry = array('width' => $geometry[0], 'height' => $geometry[1]);
-		
-				if ($geometry['width'] >= $geometry['height']) {
-					$width = $dim->type == 'long' ? $dim->size : floor($dim->size * $geometry['width'] / $geometry['height']);
-					$height = $dim->type == 'long' ? floor($dim->size * $geometry['height'] / $geometry['width']) : $dim->size;
-				} else {
-					$width = $dim->type == 'long' ? floor($dim->size * $geometry['width'] / $geometry['height']) : $dim->size;
-					$height = $dim->type == 'long' ? $dim->size : floor($dim->size * $geometry['height'] / $geometry['width']);
-				}
-				
-				$infos->width = $geometry['width'];
-				$infos->height = $geometry['height'];
-//				$infos->orientation = geta(exif_read_data($mediaFile), k('Orientation'));
-
-				$thumb = imagecreatetruecolor($width, $height);
-				imagecopyresampled($thumb, $img, 0, 0, 0, 0, $width, $height, $geometry['width'], $geometry['height']);
-				imagejpeg($thumb, $file);
-				imagedestroy($thumb);		
-				imagedestroy($img);
-				
-				if ($mediaType == 'video')
-					unlink($mediaFile);
-
-			}
-
-			if ($overwrite) {
-				$infos->md5 = $md5;
-				file_put_contents($fileInfos, json_encode($infos));
-			}
+				$file = $media . '.' . $dim->size . '-' . $dim->type . '.jpg';
+			$md5 = get($album, k('data', 'thumbs', $file, 'md5'));
+			$file = $album->pathThumbs . $file;
 		} else {
-			$md5 = md5_file($mediaFile);
-			$file = $mediaFile;
+			$md5 = get($album, k('data', 'medias', $media, 'data', 'md5'));
+			$file = $album->path . $media;
 		}
-		
 
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		$typemime = finfo_file($finfo, $file);
@@ -280,7 +462,7 @@ class Simplegallery
 				$headerSince = get($_SERVER, k('HTTP_IF_MODIFIED_SINCE')) or
 				$headerMatch = get($_SERVER, k('HTTP_IF_NONE_MATCH'))
 			) and (
-				$headerSince == $time or $headerMatch == $etag
+				$headerSince == $time or get($headerMatch) == $etag
 			)
 		) {
 			header('HTTP/1.1 304 Not Modified');
@@ -292,7 +474,66 @@ class Simplegallery
 		
 	}
 	
-	private function videoTakeCapture($video)
+	private function mediaDelete($albumId, $media, $dimension = null)
+	{
+	
+		$album = $this->getAlbum($albumId);
+		
+		if ($dimension)
+			$dimensions = array($dimension);
+		else {
+			if (!$media = get($album->medias, k($media)))
+				die(l('album.media.not-found'));
+			unlink($media->file);
+			$media = $media->name;
+			$dimensions = $this->dimensions;
+		}
+			
+		foreach ($dimensions as $dimension) {
+			
+			if ($dimension->type == 'sprite') {
+
+				$thumb = $dimension->size . '-' . $dimension->type . '.jpg';
+				
+				// Retrieve index of thumbnail in sprite
+				$thumbs = get($album, k('data', 'thumbs', $thumb, 'index'), array());
+				if (false === $index = array_search($media, $thumbs))
+					continue;
+
+				// Load sprite image
+				$fileThumb = $album->pathThumbs . $thumb;
+				$imgSprite = imagecreatefromstring(file_get_contents($fileThumb));
+				$height = imagesy($imgSprite);
+				$imgNewSprite = imagecreatetruecolor($dimension->size, $height - $dimension->size);
+			
+				// Retrieve part of sprite before thumbnail to delete
+				$heightSrc = $index * $dimension->size - 0;
+				imagecopy($imgNewSprite, $imgSprite, 0, 0, 0, 0, $dimension->size, $heightSrc);
+
+				// Retrieve part of sprite after thumbnail to delete
+				$lastSrc = $heightSrc + $dimension->size;
+				imagecopy($imgNewSprite, $imgSprite, 0, $heightSrc, 0, $lastSrc, $dimension->size, $height - $lastSrc);
+		
+				// Save sprite
+				imagejpeg($imgNewSprite, $fileThumb);
+				imagedestroy($imgNewSprite);
+				imagedestroy($imgSprite);				
+			
+				// Delete sprite index
+				unset($album->data->thumbs->{$thumb}->index[$index]);
+				$album->data->thumbs->{$thumb}->index = array_values($album->data->thumbs->{$thumb}->index);
+				$this->albumSaveConfig($album->id);
+			} else {
+				$fileThumb = $album->pathThumbs . $media . '.' . $dimension->size . '-' . $dimension->type . '.jpg';
+
+				if (inDir($album->pathThumbs, $fileThumb, true))
+					unlink($fileThumb);
+			}
+		}
+	
+	}
+	
+	private function videoTakeCapture($video, $file = null)
 	{
 	
 		$result = shell_exec('ffmpeg -i ' . $this->escapefile($video) . ' 2>&1');
@@ -307,10 +548,15 @@ class Simplegallery
 		$time-= $minutes * 60;
 		$time = date('H:i:s', mktime($hours, $minutes, $time));
 				
-		$image = sys_get_temp_dir() . '/simplegallery_' . uniqid();
+		$image = $file ? $file : sys_get_temp_dir() . '/simplegallery_' . uniqid();
 		shell_exec('ffmpeg -ss ' . $time . ' -t 1 -i ' . $this->escapefile($video) . ' -f mjpeg ' . $this->escapefile($image));
 		
-		return $image;
+		$capture = file_get_contents($image);
+		
+		if (!$file)
+			unlink($image);
+			
+		return $capture;
 	
 	}
 	
@@ -506,47 +752,54 @@ class Simplegallery
 	
 	public function mediaUpdate($albumId, $media, $update)
 	{
-	
 		$this->loadAlbums();
 
 		$album = $this->getAlbum($albumId);
-
-		$mediaFile = $album->path . $media;
-		if (!in_dir($album->path, $mediaFile, true))
-			die('Media not found');
+		if (!$media = get($album->medias, k($media)))
+			die(l('album.media.not-found'));
 			
-		$updated = true;
-
 		switch ($update) {
 			case 'rotateLeft' :
 			case 'rotateRight' :
-				$img = imagecreatefromstring(file_get_contents($mediaFile));		
-				$img = imagerotate($img, $update == 'rotateLeft' ? 90 : 270, 0);
-				imagejpeg($img, $mediaFile, 85);
+				$direction = $update == 'rotateLeft' ? -1 : 1;
+				
+				$media->data->rotation+= $direction * 90;
+				if ($media->data->rotation < 0)
+					$media->data->rotation = 270;
+				elseif ($media->data->rotation > 270)
+					$media->data->rotation = 0;
+				$this->albumSaveConfig($album->id);
+			break;
+			case 'flipVertical' :
+			case 'flipHorizontal' :
+				$orientation = $update == 'flipVertical' ? 'vertical' : 'horizontal';
+			
+				$media->data->flip = explode(' ', $media->data->flip);
+				 if (false === $index = in_array($orientation, $media->data->flip))
+				 	$media->data->flip[] = $orientation;
+				 else
+				 	unset($media->data->flip[$index]);
+				 $media->data->flip = implode(' ', $media->data->flip);
+				 $this->albumSaveConfig($album->id);
 			break;
 			case 'delete' :
-				unlink($mediaFile);
+				$this->mediaDelete($album->id, $media->name);
+				exit();
 			break;
 			case 'download' :
 				$updated = false;
-				header('Pragma: public'); 	// required
-				header('Expires: 0');		// no cache
+				header('Pragma: public');
+				header('Expires: 0');
 				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($mediaFile)).' GMT');
+				header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($media->file)).' GMT');
 				header('Cache-Control: private',false);
-				header('Content-Disposition: attachment; filename="'.basename($mediaFile).'"');
+				header('Content-Disposition: attachment; filename="'.basename($media->file).'"');
 				header('Content-Transfer-Encoding: binary');
-				header('Content-Length: '.filesize($mediaFile));	// provide file size
+				header('Content-Length: '.filesize($media->file));
 				header('Connection: close');
 				$this->getMedia($albumId, $media);
 			break;
 		}
-		
-		if ($updated)
-			foreach ($this->config->dimensions as $dimension)
-				if (is_file($file = $this->pathThumbs . $album->id . '/'  . $media . '.' . $dimension->size . '-' . $dimension->type . '.jpg'))
-					unlink($file);
-
 	}
 	
 	public function albumDownload($id)

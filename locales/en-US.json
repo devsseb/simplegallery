@@ -75,10 +75,16 @@
 			"welcome":"You can now add your albums and medias in %1.",
 			"error":"Album not found.",
 			"update-success":"The parameters of the album have been updated successfully.",
-			"download-error":"Unable to create archive for album : %1."
+			"download-error":"Unable to create archive for album : %1.",
+			"generate-success":"The thumbnails have been generated successfully.",
+			"generate-update":"Some thumbnails are missing or outdated for this album.",
+			"generate-update-link":"You can click here to generate it.",
+			"generate-delete":"Some files on the \"thumbs\" folder in this album are not neccessary.",
+			"generate-delete-link":"You can click here to clean it."
 		},
 		"no-album":"No album found",
 		"no-media":"No media found in this album",
+		"generate":"This album need a generation",
 		"name":"Album name",
 		"groups":"Groups access",
 		"inherited":"I",
@@ -87,11 +93,26 @@
 		"download":"Download album",
 		"loading":"Loading",
 		"media": {
+			"not-found":"Media not found",
 			"download":"Download",
 			"rotate-left":"Rotate left",
 			"rotate-right":"Rotate right",
+			"flip-horizontal":"Flip horizontal",
+			"flip-vertical":"Flip vertical",
 			"delete":"Delete",
 			"delete-confirm": "The deletion is permanent. You want to continue ?"
+		},
+		"generation": {
+			"_":"Generation of album %1",
+			"delete":"Medias deletion :",
+			"delete-nothing":"No thumbnail to delete",
+			"delete-sprite":"\"%1\" deleted from thumb \"%2\"",
+			"delete-file":"\"%1\" deleted",
+			"update":"Medias updates :",
+			"update-nothing":"No thumbnail to update",
+			"update-start":"Update \"%1\" ...",
+			"update-sprite":"thumbnail generated in \"%1\"",
+			"update-file":"\"%1\" generated"
 		}
 	}
 }

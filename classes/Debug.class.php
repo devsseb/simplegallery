@@ -15,7 +15,10 @@ class Debug {
 			'tracec' => 'color',
 			'color' => 'color',
 			'quit' => 'quit',
-			'trace_stack' => 'stack'
+			'trace_stack' => 'stack',
+			'debug' => 'isEnable',
+			'chronoStart' => 'chronoStart',
+			'chronoGet' => 'chronoGet'
 		);
 		$this->alias();
 	}
@@ -36,16 +39,21 @@ class Debug {
 			if (!function_exists($alias))
 				eval('function ' . $alias . '(){
 					$debug = new Debug();
-					call_user_func_array(array($debug, \'' . $function . '\'), func_get_args());
+					return call_user_func_array(array($debug, \'' . $function . '\'), func_get_args());
 				}');
 
-		// create alias of Get class to global namepace
+		// create alias of Debug class to global namepace
 		if (!class_exists('debug')) class_alias('Debug', 'debug');
 	}
 	
 	static public function enable($enable)
 	{
 		$_SESSION['debug'] = (bool)$enable;
+	}
+	
+	static public function isEnable()
+	{
+		return (bool)get($_SESSION, k('debug'));
 	}
 	
 	private function html($message)
@@ -160,6 +168,18 @@ class Debug {
 		$this->trace($result);
 	}
 
+	static public function chronoStart($id = '')
+	{
+		$_SESSION['debug_chrono_' . $id] = explode(' ', microtime());
+		return 0;
+	}
+	
+	static public function chronoGet($id = '')
+	{
+		$start = get($_SESSION, k('debug_chrono_' . $id), array(0,0));
+		$time = explode(' ', microtime());
+		return $time[1] + $time[0] - $start[1] - $start[0];
+	}
 }
 
 ?>

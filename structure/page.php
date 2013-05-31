@@ -31,21 +31,20 @@
 <? if ($message = get($_SESSION, k('messages' ,'success'))) : ?>
 			<div class="message_success"><?=$message?></div>
 	<? unset($_SESSION['messages']['success'])?>
-<? endif; ?>
-<? if ($message = get($_SESSION, k('messages' ,'error'))) : ?>
+<? endif;
+	if ($message = get($_SESSION, k('messages' ,'error'))) : ?>
 			<div class="message_error"><?=$message?></div>
 	<? unset($_SESSION['messages']['error'])?>
 <? endif;
-
+	if ($message = get($_SESSION, k('messages' ,'information'))) : ?>
+			<div class="message_information"><?=$message?></div>
+	<? unset($_SESSION['messages']['information'])?>
+<? endif;
 		include($actionPath . $actionPage);
 ?>
 		</div>
 		<footer>
-<?
-	$phpEnd = explode(' ', microtime());
-	$phpTime = round($phpEnd[1] + $phpEnd[0] - $phpStart[1] - $phpStart[0], 3);
-?>
-			Page generated in <?=$phpTime?>s |
+			<?=l('structure.time-generation', round(chronoGet('phptime'), 3))?> |
 			<a href="mailto:essarea@gmail.com">Ess</a> © 2012<?=date('Y') > 2012 ? ' - ' . date('Y') : ''?>
 		</footer>
 	</body>
