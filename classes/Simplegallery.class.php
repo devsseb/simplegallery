@@ -579,11 +579,10 @@ class Simplegallery
 	public function getUser()
 	{
 
-		if (!$login = get($_SESSION, k('login')))
+		if (!$mail = get($_SESSION, k('user')))
 			return false;
 
-		$this->user = get($this->config->users, k($login));
-		$this->user->login = $login;
+		$this->user = get($this->config->users, k($mail));
 		if (!exists($this->user, 'groups'))
 			$this->user->groups = array();
 			
@@ -592,11 +591,11 @@ class Simplegallery
 		return true;
 	}
 	
-	public function userLogin($login, $password)
+	public function userLogin($mail, $password)
 	{
-		$login = trim(strtolower($login));
+		$mail = trim(strtolower($mail));
 		
-		if (!$this->user = get($this->config->users, k($login)))
+		if (!$this->user = get($this->config->users, k($mail)))
 			error(l('user.message.login-error'), '?');
 			
 		if ($this->user->active != 1)
@@ -605,46 +604,59 @@ class Simplegallery
 		if ($this->user->password != crypt($password, $this->user->password))
 			error(l('user.message.login-error'), '?');
 
-		$_SESSION['login'] = $login;
+		$_SESSION['user'] = $mail;
 		
-		success(l('user.message.login-success', $login), '?');
+		success(l('user.message.login-success', $this->user->name), '?');
 	}
 	
 	public function userLogout()
 	{
-		unset($_SESSION['login']);
+		unset($_SESSION['user']);
 		
 		success(l('user.message.logout'), '?');
 	}
 	
-	public function userRegistration($name, $mail, $login, $password, $passwordCheck)
+	public function userRegistration($name, $mail, $password = null, $passwordCheck = null)
 	{
-		$login = stripAccents(strtolower(trim($login)));
+		if (is_null($password)) {
+			// Add user from admin
+			$errorLink = '?admin';
+			$successLink = '?admin';
+		} else {
+			// Add user from registration
+			$errorLink = '?user=registration';
+			$successLink = '?';
+		}
 		
-		$this->config->users = json_decode(file_get_contents($this->pathConfig . 'users.json'));
-		
-		if (exists($this->config->users, $login))
-			error(l('user.message.login-update-error'), '?user=registration');
+		if (!preg_match('/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,6}$/', $mail))
+			error(l('user.message.mail-update-error-invalid', $mail), $errorLink);
+	
+		if (exists($this->config->users, $mail))
+			error(l('user.message.mail-update-error', $mail), $errorLink);
 
-		if ($password !== $passwordCheck)
-			error(l('user.message.password-update-error'), '?user=registration');
-			
+		if (!is_null($password) and $password !== $passwordCheck)
+			error(l('user.message.password-update-error'), $errorLink);
+
 		$user = new StdClass();
-		$user->login = $login;
 		$user->name = $name;
 		$user->mail = $mail;
-		$user->password = $this->userCryptPassword($password);
+		$user->password = $password ? $this->userCryptPassword($password) : null;
 		$user->active = randomString(12);
 		if (!(bool)(array)$this->config->users)
 			$user->groups = array('admins');
 
-		$this->config->users->$login = $user;
+		if (!is_object($this->config->users))
+			$this->config->users = new StdClass();
+
+		$this->config->users->$mail = $user;
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
-		
-		$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&rcode=' . $user->active;
+
+		$code = $password ? 'rcode' : 'rpcode';
+		$link = httpUrl() . '?user=registration&' . $code . '=' . $user->active;
 		$this->mail($mail, '[SimpleGallery] Registration, please active your account', 'Please click on this link for activate your account :<br /><a href="' . $link . '">' . $link . '</a>');
 	
-		success(l('user.message.registration-active-link-sent'), '?');
+		if (!is_null($password))
+			success(l('user.message.registration-active-link-sent'), $successLink);
 	}
 	
 	private function userCryptPassword($password)
@@ -657,7 +669,7 @@ class Simplegallery
 		return crypt($password, sprintf('$2a$%02d$', 7) . $salt);
 	}
 	
-	public function userActive($code)
+	public function userActive($code, $password = null, $passwordCheck = null)
 	{
 		if (strlen($code) != 12)
 			error(l('user.message.registration-active-invalid-code'), '?user=registration');
@@ -665,6 +677,17 @@ class Simplegallery
 		foreach ($this->config->users as &$user) {
 			if ((string)$user->active != (string)$code)
 				continue;
+
+			// Check password
+			if (!is_null($password)) {
+				if (trim($password) == '')
+					error(l('user.message.password-update-error-empty'), '?user=registration&rpcode=' . $code);
+
+				if ($password !== $passwordCheck)
+					error(l('user.message.password-update-error'), '?user=registration&rpcode=' . $code);
+
+				$user->password = $this->userCryptPassword($password);					
+			}
 
 			$user->active = true;
 			file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
@@ -682,15 +705,15 @@ class Simplegallery
 			if ($data['password'] !== $data['password-check'])
 				error(l('user.message.password-update-error'), '?user=profil');
 		
-		$login = $this->user->login;
-		$user = &$this->config->users->$login;
+		$mail = $this->user->mail;
+		$user = $this->config->users->$mail;
 		$user->name = $data['name'];
 		
 		if ($mailUpdate = $user->mail != $data['mail']) {
 			$user->mailUpdate = $data['mail'];
 			$user->mailUpdateCode = randomString(12);
 			
-			$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&mcode=' . $user->mailUpdateCode;
+			$link = httpUrl() . '?user=profil&mcode=' . $user->mailUpdateCode;
 			$this->mail($user->mailUpdate, '[SimpleGallery] Mail update, please valid your mail', 'Please click on this link for activate your mail :<br /><a href="' . $link . '">' . $link . '</a>');
 		}
 		if ($data['password'])
@@ -722,12 +745,12 @@ class Simplegallery
 
 	}
 	
-	public function userDelete($login)
+	public function userDelete($mail)
 	{
-		if (!$this->config->users->$login)
+		if (!$this->config->users->$mail)
 			error(l('user.message.no-found'), '?admin');
 			
-		unset($this->config->users->$login);
+		unset($this->config->users->$mail);
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
 		success(l('admin.message.user-delete-success'), '?admin');
@@ -737,17 +760,32 @@ class Simplegallery
 	{
 		$this->config->parameters->name = $data['name'];
 		$this->config->parameters->locale = $data['locale'];
-		$this->config->parameters->{'registration-disable'} = $data['registration-disable'];
+		$this->config->parameters->{'registration-disable'} = get($data, k('registration-disable'));
 		file_put_contents($this->pathConfig . 'parameters.json', json_encode($this->config->parameters));
 	
 		$this->config->groups = preg_split('/\W+/', $data['groups']);
 		file_put_contents($this->pathConfig . 'groups.json', json_encode($this->config->groups));
 		
-		foreach ($data['usersGroups'] as $login => $groups)
-			$this->config->users->$login->groups = array_keys($groups);
+		foreach ($data['usersGroups'] as $user => $groups)
+			$this->config->users->$user->groups = array_keys($groups);
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
-		success(l('admin.message.parameters-update-success'), '?admin');
+		$user = (object)array(
+			'name' => get($data, k('user-name')),
+			'mail' => get($data, k('user-mail'))
+		);
+		
+		$success = '';
+		if ($user->name or $user->mail) {
+
+			$this->userRegistration($user->name, $user->mail);
+			
+			$success = l('user.message.user-add-success', $user->name);
+		
+		}
+		
+		success(l('admin.message.parameters-update-success') . ($success ? '<br />' . $success : ''), '?admin');
+
 	}
 	
 	public function mediaUpdate($albumId, $media, $update)
@@ -838,20 +876,20 @@ class Simplegallery
 		exit();
 	}
 	
-	public function userPasswordLost($login)
+	public function userPasswordLost($mail)
 	{
-		if (!$user = get($this->config->users, k($login)))
+		if (!$user = get($this->config->users, k($mail)))
 			error(l('user.message.not-found'), '?user=lost');
 			
 		$user->passwordCode = randomString(12);
 		$user->passwordCodeTime = time();
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
-		$link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '&pcode=' . $user->passwordCode;
+		$link = httpUrl() . '?user=lost&pcode=' . $user->passwordCode;
 		$this->mail(
 			$user->mail,
 			'[SimpleGallery] Password reset',
-			'A reset password was requested for login "' . toHtml($login) . '".<br />
+			'A reset password was requested for your mail adress.<br />
 				To change the password click on the following link:
 				<a href="' . $link . '">' . $link . '</a>
 				If you are not the author of this request, just ignore this email.'

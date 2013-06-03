@@ -22,7 +22,7 @@
 	<? if (in_array('admins', $sg->user->groups)) : ?>
 				<a href="?admin"><?=l('admin._')?></a><br />
 	<? endif; ?>
- 				<?=l('structure.logged-in-as')?> <a href="?user=profil" title="Update my profil"><span class="header-login"><?=toHtml($sg->user->login)?></span></a> |
+ 				<?=l('structure.logged-in-as')?> <a href="?user=profil" title="Update my profil"><span class="header-login"><?=toHtml($sg->user->name)?></span></a> |
  				<a href="?user=logout"><?=l('structure.logout')?></a>
  			</div>
 <? endif; ?>

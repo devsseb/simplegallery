@@ -4,11 +4,13 @@
 .admin-parameters{margin:5px 0px;}
 .admin-parameters input{border:1px solid #707070;padding:0px 3px;}
 .admin label{font-weight:bold;}
+.admin-user-add{font-weight:normal;}
 .admin-user-no-active{color:#aa2424;}
 .admin-users-groups{border-collapse:collapse;table-layout:fixed;}
 .admin-users-groups th{padding:3px 5px;font-weight:normal;}
 .admin-users-groups th,.admin-users-groups td{border:1px #ccc dotted;}
-.admin-users-groups th.table-empty-cell-top-left{border-top:none;border-left:none;}
+.admin-users-groups th.table-empty-cell-top-left1{border-top:none;border-left:none;border-right:none;}
+.admin-users-groups th.table-empty-cell-top-left2{border-top:none;border-left:none;}
 .admin-users-groups th.table-empty-cell-top-right{border-top:none;border-right:none;border-bottom:none;}
 .admin-users-group-check{text-align:center;}
 .admin-users-groups td.admin-user-delete{border:none;padding:0px 5px;}
@@ -17,3 +19,6 @@
 .admin-submit input{border:1px solid #323232;font-weight:bold;}
 .admin-links{text-align:right;}
 
+#user-add{display:none;background-color:#e9cfa8;padding:10px;margin-bottom:10px;}
+#user-add table th{text-align:right;font-size:13px;}
+.user-field input{border:1px solid #707070;width:150px;}

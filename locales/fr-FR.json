@@ -10,8 +10,10 @@
 	"admin": {
 		"_":"Administration",
 		"message": {
-			"parameters-update-success":"Les paramètres ont été modifié avec succès",
-			"user-delete-success":"L'utilisateur a été supprimé avec succès"
+			"parameters-update-success":"Les paramètres ont été modifié avec succès.",
+			"user-delete-success":"L'utilisateur a été supprimé avec succès.",
+			"user-add-empty-name":"Le nom ne peut être vide.",
+			"user-add-empty-mail":"Le mail ne peut être vide."
 		},
 		"parameters":{
 			"name":"Nom de la galerie",
@@ -22,7 +24,9 @@
 		"users":"Utilisateurs",
 		"user-no-active":"L'utilisateur n'est pas actif",
 		"user-delete":"supprimer",
-		"user-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?"
+		"user-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?",
+		"user-add":"Ajouter",
+		"user-add-link":"ajouter"
 	},
 	"user":{
 		"message": {
@@ -34,18 +38,21 @@
 			"password-reset-invalid-code":"Le code de modification de mot de passe est invalide.",
 			"password-update-error":"Le 2 mot de passe sont différents. Merci de resaisir votre mot de passe.",
 			"password-update-success":"Votre mot de passe a été modifié avec succès.",
-			"login-update-error":"Ce login existe déjà. Merci d'en saisir un différent.",
+			"password-update-error-empty":"Le mot de passe ne peut être vide.",
+			"mail-update-error":"The mail \"%1\" is already registered.",
+			"mail-update-error-invalid":"The mail \"%1\" is invalid.",
 			"registration-active-link-sent":"Merci de vérifier votre boite mail afin de valider la création de votre compte.",
 			"registration-active-invalid-code":"Le code est invalide.",
-			"registration-active-success":"Votre compte est maintenant actif.",
+			"registration-active-success":"Votre compte est maintenant actif. Vous pouvez vous connecter avec votre mot de passe.",
 			"user-update-success":"Votre profil a été modifier avec succès.",
 			"mail-update-link-sent":"Merci de vérifier votre boite mail afin de valider la modification de votre adresse email.",
 			"mail-update-invalid-code":"Le code est invalide.",
-			"mail-update-success":"Votre adresse email a été activée avec succès."
+			"mail-update-success":"Votre adresse email a été activée avec succès.",
+			"user-add-success":"L'utilisateur \"%1\" a été ajouter avec succès, un email d'activation lui a été envoyé."
 		},
 		"login": {
 			"_":"Authentification",
-			"login":"Utilisateur",
+			"mail":"Adresse mail",
 			"password":"Mot de passe",
 			"submit":"Connexion"
 		},
@@ -56,8 +63,9 @@
 		},
 		"registration": {
 			"_":"Enregistrement",
-			"login":"Login voulu",
-			"register":"M'enregistrer"
+			"register":"M'enregistrer",
+			"new-password":"Enregistrement : nouveau mot de passe",
+			"password-create":"Créer mon mot de passe"
 		},
 		"profil": {
 			"_":"Mon profil",

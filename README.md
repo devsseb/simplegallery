@@ -1,5 +1,4 @@
 **TODO :**
-* Add users from the administration
 * Add zoom on media
 * Add diaporama mode
 * Comment code
@@ -9,3 +8,4 @@
 * ~~Manage cache for pictures~~
 * ~~Option for disable registration~~
 * ~~Apply virtual roation on pircture~~
+* ~~Add users from the administration~~

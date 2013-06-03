@@ -32,11 +32,11 @@ try {
 
 	}
 
-		$actionPath = './actions/' . $action . '/';
-		$actionPage = 'page.php';
-		include($actionPath . 'index.php');
+	$actionPath = './actions/' . $action . '/';
+	$actionPage = 'page.php';
+	include($actionPath . 'index.php');
 
-		include('./structure/page.php');
+	include('./structure/page.php');
 
 } catch (Exception $exception) {
 	echo '<!DOCTYPE html><html><head><title>' . toHtml($sg->config->parameters->name) . '</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>';

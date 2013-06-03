@@ -10,8 +10,10 @@
 	"admin": {
 		"_":"Administration",
 		"message": {
-			"parameters-update-success":"Parameters updated successfully",
-			"user-delete-success":"The user was deleted successfully"
+			"parameters-update-success":"Parameters updated successfully.",
+			"user-delete-success":"The user was deleted successfully.",
+			"user-add-empty-name":"Name can't be empty.",
+			"user-add-empty-mail":"Mail can't be empty."
 		},
 		"parameters":{
 			"name":"Gallery name",
@@ -22,7 +24,9 @@
 		"users":"Users",
 		"user-no-active":"User is no active",
 		"user-delete":"delete",
-		"user-delete-confirm":"The deletion is permanent. You want to continue ?"
+		"user-delete-confirm":"The deletion is permanent. You want to continue ?",
+		"user-add":"Add",
+		"user-add-link":"add"
 	},
 	"user":{
 		"message": {
@@ -34,18 +38,21 @@
 			"password-reset-invalid-code":"Password reset code is invalid.",
 			"password-update-error":"The two passwords are differents. Please retype your password.",
 			"password-update-success":"You password has been updated successfully.",
-			"login-update-error":"The login is already taken. Please enter a different.",
+			"password-update-error-empty":"The password can't be empty.",
+			"mail-update-error":"The mail \"%1\" is already registered.",
+			"mail-update-error-invalid":"The mail \"%1\" is invalid.",
 			"registration-active-link-sent":"Please check your mailbox to complete the account creation.",
 			"registration-active-invalid-code":"Code is invalid.",
-			"registration-active-success":"Your account is now active.",
+			"registration-active-success":"Your account is now active. You can now log in with your password.",
 			"user-update-success":"Your profile has been updated successfully.",
 			"mail-update-link-sent":"Please check your mailbox to activate your new mail.",
 			"mail-update-invalid-code":"Code is invalid.",
-			"mail-update-success":"Your mail has been activate successfully."
+			"mail-update-success":"Your mail has been activate successfully.",
+			"user-add-success":"User \"%1\" was added successfully, an email with an activation link has been sent to him."
 		},
 		"login": {
 			"_":"Authentication",
-			"login":"Login",
+			"mail":"Mail",
 			"password":"Password",
 			"submit":"Connect"			
 		},
@@ -56,8 +63,9 @@
 		},
 		"registration": {
 			"_":"Registration",
-			"login":"Login wanted",
-			"register":"register"
+			"register":"register",
+			"new-password":"Registration : new password",
+			"password-create":"Create my password"
 		},
 		"profil": {
 			"_":"My profil",

@@ -130,4 +130,11 @@ function resetTimout($timeout = null)
 		$timeout = (int)ini_get('max_execution_time'); 
 	set_time_limit($timeout);
 }
+
+function httpUrl()
+{
+	$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
+	$url = preg_replace('/index\.php$/', '', $url);
+	return $url;
+}
 ?>
