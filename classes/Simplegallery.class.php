@@ -124,11 +124,14 @@ class Simplegallery
 		// ... and generate medias list
 		foreach ($medias as $i => $media) {
 		
+			$mediaType = $this->getMediaType($media);
+		
 			// Delete hiddens files, json files and dir from list
 			if (
 				$media[0] == '.' or
 				$media == 'data.json' or
-				!is_file($mediaFile = $album->path . $media)
+				!is_file($mediaFile = $album->path . $media) or
+				!$mediaType
 			) {
 				unset($medias[$i]);
 				continue;
@@ -137,6 +140,7 @@ class Simplegallery
 			$album->medias[$media] = (object)array(
 				'name' => $media,
 				'file' => $mediaFile,
+				'type' => $mediaType,
 				'data' => get($album->data, k('medias', $media), new StdClass())
 			);
 		}
@@ -310,8 +314,7 @@ class Simplegallery
 			write(l('album.generation.update-start', $media->name), true);
 
 			// Load original media
-			$mediaType = $this->getMediaType($media->file);
-			$imgMedia = imagecreatefromstring($mediaType == 'video' ?
+			$imgMedia = imagecreatefromstring($media->type == 'video' ?
 				$this->videoTakeCapture($media->file) :
 				file_get_contents($media->file)
 			);

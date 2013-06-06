@@ -75,7 +75,11 @@
 			title="<?=toHtml($media->name)?>"
 			class="thumb" 
 			style="
-				background:transparent url('?media&amp;album=<?=toUrl($album->id)?>&amp;dim=thumb') no-repeat center -<?=$index * 75?>px;
+				background:
+					<?=$media->type == 'video' ? 'url(\'actions/album/media_video.png\') no-repeat bottom right,' : ''?>
+					url('?media&amp;album=<?=toUrl($album->id)?>&amp;dim=thumb') no-repeat center -<?=$index * 75?>px
+					
+				;
 				<?=$media->styles?>
 			"
 			href="#<?=toUrl($media->name)?>"

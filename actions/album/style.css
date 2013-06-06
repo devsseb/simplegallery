@@ -10,9 +10,9 @@
 #album{position:relative;margin-left:200px;min-height:520px;}
 #preview{width:500px;position:absolute;top:0px;margin:10px;padding-right:5px;text-align:center;}
 #mediaLoading{top:125px;left:211px;position:absolute;}
-#previewImage{position:relative;display:none;margin:auto;}
-#previewVideo{position:relative;display:none;margin:auto;}
-#mediaAction{height:26px;background-color:rgba(0,0,0,0.5);position:absolute;border-radius:15px;display:none;}
+#previewImage{position:relative;display:none;margin:auto;box-shadow:0px 0px 5px #000;background:#fff url('loading.gif') no-repeat center center;}
+#previewVideo{position:relative;display:none;margin:auto;box-shadow:0px 0px 5px #000;background:#fff url('loading.gif') no-repeat center center;}
+#mediaAction{height:26px;background-color:rgba(0,0,0,0.2);position:absolute;border-radius:15px;display:none;}
 #mediaPrevious{display:block;position:absolute;left:0px;top:-2px;width:30px;height:30px;background:transparent url('media_previous.png') no-repeat center center;}
 #mediaNext{display:block;position:absolute;right:0px;top:-2px;width:30px;height:30px;background:transparent url('media_next.png') no-repeat center center;}
 #mediaSlideshowPlay{display:block;width:30px;height:30px;margin:-2px auto 0px auto;background:transparent url('media_play.png') no-repeat center center;}
@@ -32,7 +32,7 @@
 #mediaDelete{background-image:url('media_delete.png');}
 #thumbs{margin-left:515px;padding:10px;padding-left:5px;overflow:hidden;position:relative;}
 .thumb{width:75px;height:75px;float:left;background-position:center center;display:block;}
-#thumbCurrent{width:73px;height:73px;border:3px solid #fff;position:absolute;display:none;display:none;background-color:rgba(255,255,255,0.5);}
+#thumbCurrent{width:75px;height:75px;border:2px solid #fff;position:absolute;display:none;background-color:rgba(255,255,255,0.35);box-shadow:0px 0px 3px #000;}
 
 #albumAction{float:right;width:20px;padding:10px;}
 #albumAction-download{display:block;width:20px;height:20px;background-image:url('album_download.png');margin:auto;}
