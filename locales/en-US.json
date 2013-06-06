@@ -108,7 +108,14 @@
 			"flip-horizontal":"Flip horizontal",
 			"flip-vertical":"Flip vertical",
 			"delete":"Delete",
-			"delete-confirm": "The deletion is permanent. You want to continue ?"
+			"delete-confirm":"The deletion is permanent. You want to continue ?",
+			"previous":"Previous media",
+			"next":"Next media",
+			"slideshow-play":"Start slideshow",
+			"slideshow-start":"View album in fullscreen",
+			"slideshow-end":"Return to normal view",
+			"slideshow-pause":"Pause",
+			"slideshow-stop":"Stop slideshow"
 		},
 		"generation": {
 			"_":"Generation of album %1",

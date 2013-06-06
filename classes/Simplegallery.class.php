@@ -20,9 +20,9 @@ class Simplegallery
 		$this->locale = new Locale(get($this->config->parameters, k('locale')));
 		
 		$this->dimensions = (object)array(
-			'thumb'	=> (object)array('size' => 75	, 'type' => 'sprite'),
-			'play'	=> (object)array('size' => 500	, 'type' => 'long'	),
-			'zoom'	=> (object)array('size' => 1000	, 'type' => 'long'	)
+			'thumb'		=> (object)array('size' => 75	, 'type' => 'sprite'),
+			'preview'	=> (object)array('size' => 500	, 'type' => 'long'	),
+			'slide'		=> (object)array('size' => 1000	, 'type' => 'long'	)
 		);
 
 	}
@@ -822,22 +822,30 @@ class Simplegallery
 			break;
 			case 'delete' :
 				$this->mediaDelete($album->id, $media->name);
-				exit();
-			break;
-			case 'download' :
-				$updated = false;
-				header('Pragma: public');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($media->file)).' GMT');
-				header('Cache-Control: private',false);
-				header('Content-Disposition: attachment; filename="'.basename($media->file).'"');
-				header('Content-Transfer-Encoding: binary');
-				header('Content-Length: '.filesize($media->file));
-				header('Connection: close');
-				$this->getMedia($albumId, $media);
 			break;
 		}
+		
+		exit(json_encode(array('success' => 'Update success')));
+	}
+	
+	public function mediaDownload($albumId, $media)
+	{
+		$this->loadAlbums();
+		$album = $this->getAlbum($albumId);
+		if (!$media = get($album->medias, k($media)))
+			die(l('album.media.not-found'));
+
+		header('Pragma: public');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($media->file)).' GMT');
+		header('Cache-Control: private',false);
+		header('Content-Disposition: attachment; filename="'.basename($media->file).'"');
+		header('Content-Transfer-Encoding: binary');
+		header('Content-Length: '.filesize($media->file));
+		header('Connection: close');
+		$this->getMedia($albumId, $media->name);
+
 	}
 	
 	public function albumDownload($id)

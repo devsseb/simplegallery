@@ -6,7 +6,7 @@ header h1{font-size:30px;font-family:"Times New Roman";font-weight:bold;color:#3
 header h1 a{color:inherit;text-shadow:1px 1px 0px #77a7c5, 2px 2px 0px #707070;margin:0px;text-decoration:inherit;}
 .header-menu{position:absolute;right:0px;bottom:0px;padding:5px;text-align:right;}
 .header-login{font-style:italic;font-weight:bold;}
-.page{overflow:hidden;}
+.page{}
 footer{text-align:right;position:fixed;bottom:0px;right:0px;padding:3px;color:323232;font-size:11px;}
 footer a{text-decoration:underline;}
 footer a:hover{text-decoration:none;}

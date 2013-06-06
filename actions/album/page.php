@@ -1,4 +1,4 @@
-<div id="album-locales"><?=json_encode(array('delete-confirm' => l('album.media.delete-confirm')))?></div>
+<div id="albumLocales"><?=json_encode(array('delete-confirm' => l('album.media.delete-confirm')))?></div>
 
 <? if ($sg->albums) : ?>
 <div class="albums-menu">
@@ -14,13 +14,13 @@
 	</ul>
 </div>
 <? else : ?>
-<div id="no-album">
+<div id="noAlbum">
 	<?=l('album.no-album')?>
 </div>
 <? endif; ?>
 <? if ($id) : ?>
-<div class="album" id="album-container">
-	<div id="album" style="display:none;"><?=toHtml($album->id)?></div>
+<div id="album">
+	<div id="albumId" style="display:none;"><?=toHtml($album->id)?></div>
 	<? if ($sg->user->admin) : ?>
 	<form class="album-admin" method="post" action="?album&id=<?=toUrl($album->id)?>">
 		<input type="hidden" name="id" value="<?=toHtml($album->id)?>" />
@@ -30,7 +30,7 @@
 		<table>
 			<tr><th><?=l('album.inherited')?></th><th><?=l('album.forbidden')?></th><th><?=l('album.granted')?></th><th></th></tr>
 		<? foreach ($album->groups as $group => $access) :
-			$accessInherited = $album->parent ? ($album->parent->groups[$group] < 0 ? $album->parent->groups[$group] : $album->parent->groups[$group]-2) : -2;
+			$accessInherited = $album->groupsParent ? ($album->groupsParent[$group] < 0 ? $album->groupsParent[$group] : $album->groupsParent[$group]-2) : -2;
 		?>
 			<tr>
 				<td class="album-admin-radio album-admin-radio-inherited-<?=$accessInherited == -2 ? 'f' : 'g'?>">
@@ -49,29 +49,23 @@
 	</form>
 	<? endif; ?>
 	<? if (exists($album->data, 'thumbs') or !$album->medias) : ?>
-	<div id="no-media">
+	<div id="noMedia">
 		<?=l('album.no-media')?>
 	</div>
 		<? if ($album->medias) : ?>
-	<div id="album-action">
-		<a id="album-action-download" href="?album&download=<?=toHtml($album->id)?>" target="_blank" title="<?=l('album.download')?>"></a>
+	<div id="albumAction">
+		<a id="albumActionDownload" href="?album&download=<?=toHtml($album->id)?>" target="_blank" title="<?=l('album.download')?>"></a>
 	</div>
-	<div class="media" id="media">
-		<img class="media-loading" src="actions/album/loading.gif" alt="<?=l('album.loading')?>" />
-		<img id="mediaImage" src="actions/album/blank.gif" />
-		<video id="mediaVideo" controls src="" width="500"></video>
-		<div id="mediaUpdate">
-			<ul id="mediaUpdateAction">
-				<li title="<?=l('album.media.download')?>"><a id="mediaDownload" target="_blank" href="#"></a></li>
-				<li id="mediaRotateLeft" title="<?=l('album.media.rotate-left')?>"></li>
-				<li id="mediaRotateRight" title="<?=l('album.media.rotate-right')?>"></li>
-				<li id="mediaFlipHorizontal" title="<?=l('album.media.flip-horizontal')?>"></li>
-				<li id="mediaFlipVertical" title="<?=l('album.media.flip-vertical')?>"></li>
-				<li id="mediaDelete" title="<?=l('album.media.delete')?>"></li>
-			</ul>
-		</div>
+	
+	<!-- Preview zone -->
+	<div id="preview">
+		<img id="mediaLoading" src="actions/album/loading.gif" alt="<?=l('album.loading')?>" />
+		<img id="previewImage" src="actions/album/blank.gif" />
+		<video id="previewVideo" controls></video>
 	</div>
-	<div class="thumbs" id="thumbs">
+	
+	<!-- Thumbnails zone -->
+	<div id="thumbs">
 		<?
 		$thumbs = array_flip($album->data->thumbs->{'75-sprite.jpg'}->index);
 		foreach ($album->medias as $media) :
@@ -84,7 +78,8 @@
 				background:transparent url('?media&amp;album=<?=toUrl($album->id)?>&amp;dim=thumb') no-repeat center -<?=$index * 75?>px;
 				<?=$media->styles?>
 			"
-			href="?media&amp;album=<?=toUrl($album->id)?>&amp;media=<?=toUrl($media->name)?>&amp;dim=play"
+			href="#<?=toUrl($media->name)?>"
+			mediaUrl="?media&amp;album=<?=toUrl($album->id)?>&amp;media=<?=toUrl($media->name)?>"
 			mediaType="<?=toHtml($sg->getMediaType($media->name))?>"
 			mediaWidth="<?=toHtml(get($media, k('data', 'width')))?>"
 			mediaHeight="<?=toHtml(get($media, k('data', 'height')))?>"
@@ -93,7 +88,40 @@
 			mediaFlip="<?=toHtml(get($media, k('data', 'flip')))?>"
 		></a>
 		<? endforeach; ?>
-		<div id="thumb-current"></div>
+		<div id="thumbCurrent"></div>
+	</div>
+	
+	<!-- Slideshow zone -->
+	<div id="slideshow">
+		<div id="slide">
+			<img id="slideImage" src="actions/album/blank.gif" />
+			<video id="slideVideo" controls></video>
+		</div>
+	</div>
+	
+	<!-- Media action zone -->
+	<div id="mediaAction">
+		<a href="#" id="mediaPrevious" title="<?=l('album.media.previous')?>"></a>
+		<a href="#" id="mediaNext" title="<?=l('album.media.next')?>"></a>
+		<a href="#" id="mediaSlideshowPlay" title="<?=l('album.media.slideshow-play')?>"></a>
+		<a href="#" id="mediaSlideshowStart" title="<?=l('album.media.slideshow-start')?>"></a>
+		<a href="#" id="mediaSlideshowEnd" title="<?=l('album.media.slideshow-end')?>"></a>
+		<a href="#" id="mediaDownload" title="<?=l('album.media.download')?>" target="_blank"></a>
+		<div id="mediaSlideshowPauseStop">
+			<a href="#" id="mediaSlideshowPause" title="<?=l('album.media.slideshow-pause')?>"></a>
+			<a href="#" id="mediaSlideshowStop" title="<?=l('album.media.slideshow-stop')?>"></a>
+		</div>
+		<? if ($sg->user->admin) : ?>
+		<div id="mediaUpdate">
+			<ul>
+				<li id="mediaRotateLeft" title="<?=l('album.media.rotate-left')?>"></li>
+				<li id="mediaRotateRight" title="<?=l('album.media.rotate-right')?>"></li>
+				<li id="mediaFlipHorizontal" title="<?=l('album.media.flip-horizontal')?>"></li>
+				<li id="mediaFlipVertical" title="<?=l('album.media.flip-vertical')?>"></li>
+				<li id="mediaDelete" title="<?=l('album.media.delete')?>"></li>
+			</ul>
+		</div>
+		<? endif; ?>
 	</div>
 		<? endif; ?>
 	<? endif; ?>

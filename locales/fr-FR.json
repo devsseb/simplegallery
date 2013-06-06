@@ -108,7 +108,14 @@
 			"flip-horizontal":"Miroir horizontal",
 			"flip-vertical":"Miroir vertical",
 			"delete":"Supprimer",
-			"delete-confirm":"La suppression est définitive. Voulez vous continuer ?"
+			"delete-confirm":"La suppression est définitive. Voulez vous continuer ?",
+			"previous":"Média précédent",
+			"next":"Média suivant",
+			"slideshow-play":"Démarrer le diaporama",
+			"slideshow-start":"Voir l'album en plein écran",
+			"slideshow-end":"Revenir à l'affichage normal",
+			"slideshow-pause":"Pause",
+			"slideshow-stop":"Arrêter le diaporama"
 		},
 		"generation": {
 			"_":"Génération de l'album %1",
