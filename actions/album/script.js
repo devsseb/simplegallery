@@ -257,10 +257,8 @@ var Simplegallery = new Class({
 		this.mediaPrevious.setStyle('display', this.getPreviousThumb() ? 'block' : 'none');
 		this.mediaNext.setStyle('display', this.getNextThumb() ? 'block' : 'none');
 	
-		this.mediaUpdateRotateLeft.setStyle('display', this.media.type == 'image' ? 'block' : 'none');
-		this.mediaUpdateRotateRight.setStyle('display', this.media.type == 'image' ? 'block' : 'none');
-		this.mediaUpdateFlipHorizontal.setStyle('display', this.media.type == 'image' ? 'block' : 'none');
-		this.mediaUpdateFlipVertical.setStyle('display', this.media.type == 'image' ? 'block' : 'none');
+		if (this.mediaUpdate)
+			$$(this.mediaUpdateRotateLeft, this.mediaUpdateRotateRight, this.mediaUpdateFlipHorizontal, this.mediaUpdateFlipVertical).setStyle('display', this.media.type == 'image' ? 'block' : 'none');
 	
 		var element = this[this.mode][this.media.type];
 		var position = element.getPosition(this.container);

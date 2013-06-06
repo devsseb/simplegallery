@@ -1,9 +1,10 @@
 body{background:#afafaf url('./body.jpg');color:#000;font-family:Arial;font-size:12px;margin:0px;}
 a{color:#fff;}
 
-header{padding:10px 20px;background-color:#77a7c5;position:relative;}
-header h1{font-size:30px;font-family:"Times New Roman";font-weight:bold;color:#323232;text-shadow:1px 1px 0px #77a7c5, 2px 2px 0px #707070;margin:0px;}
-header h1 a{color:inherit;text-shadow:1px 1px 0px #77a7c5, 2px 2px 0px #707070;margin:0px;text-decoration:inherit;}
+header{padding:10px 20px;background-color:#9cc8e4;position:relative;}
+header h1{font-size:30px;font-family:"Times New Roman";font-weight:bold;color:#323232;margin:0px;text-shadow:1px 1px 0px #9cc8e4, 2px 2px 0px #8a8a8a;}
+header h1 a{color:inherit;text-decoration:inherit;}
+header h1 a:hover{color:#1e3d5a;text-shadow:1px 1px 0px #9cc8e4, 2px 2px 0px #4a7c9c;}
 .header-menu{position:absolute;right:0px;bottom:0px;padding:5px;text-align:right;}
 .header-login{font-style:italic;font-weight:bold;}
 .page{}
