@@ -49,7 +49,9 @@ var Simplegallery = new Class({
 
 		this.thumb = null;
 		
-		this.container = $('album');
+		if (!(this.container = $('album')))
+			return;
+		
 		this.album = $('albumId').get('text');
 		this.thumbOver = $('thumbCurrent');
 		this.mediaAction = $('mediaAction');
