@@ -47,7 +47,7 @@ class Locale
 				return get($args, k($matches[1]), $matches[0]);
 			}, $return);
 		
-		return toHtml($return);
+		return preg_replace('/[\\n\\r]/', '<br />', toHtml($return));
 			
 	}
 }

@@ -129,5 +129,21 @@
 			"update-sprite":"thumbnail generated in \"%1\"",
 			"update-file":"\"%1\" generated"
 		}
+	},
+	"mail": {
+		"signature":"\n\nSoon on %1",
+		"registration":{
+			"object":"[%1] Registration, please active your account",
+			"message":"Hello %1,\n\nTo activate your account, please click on the following link :\n"
+		},
+		"mail-update":{
+			"object":"[%1] Mail update, please valid your mail",
+			"message":"Hello %1,\n\nTo activate your mail updating, please click on the following link :\n"
+		},
+		"password-reset":{
+			"object":"[%1] Lost password",
+			"message":"Hello %1,\n\nA reset password was requested for your mail adress.\nTo update your password, please click on the following link :\n",
+			"message2":"\n\nIf you are not the author of this request, just ignore this email."
+		}
 	}
 }

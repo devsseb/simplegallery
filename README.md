@@ -1,5 +1,4 @@
 **TODO :**
-* Set locales for mails
 * Comment code
 * Test on IE :'(
 * ~~On update user mail, resend verification mail~~
@@ -10,3 +9,4 @@
 * ~~Add users from the administration~~
 * ~~Add zoom on media~~
 * ~~Add slideshow mode~~
+* ~~Set locales for mails~~

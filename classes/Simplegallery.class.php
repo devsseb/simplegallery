@@ -658,7 +658,12 @@ class Simplegallery
 
 		$code = $password ? 'rcode' : 'rpcode';
 		$link = httpUrl() . '?user=registration&' . $code . '=' . $user->active;
-		$this->mail($mail, '[SimpleGallery] Registration, please active your account', 'Please click on this link for activate your account :<br /><a href="' . $link . '">' . $link . '</a>');
+		$this->mail(
+			$mail,
+			l('mail.registration.object', $this->config->parameters->name),
+			l('mail.registration.message', $user->name) . '<a href="' . $link . '">' . $link . '</a>' . l('mail.signature', $this->config->parameters->name)
+		);
+
 	
 		if (!is_null($password))
 			success(l('user.message.registration-active-link-sent'), $successLink);
@@ -719,7 +724,11 @@ class Simplegallery
 			$user->mailUpdateCode = randomString(12);
 			
 			$link = httpUrl() . '?user=profil&mcode=' . $user->mailUpdateCode;
-			$this->mail($user->mailUpdate, '[SimpleGallery] Mail update, please valid your mail', 'Please click on this link for activate your mail :<br /><a href="' . $link . '">' . $link . '</a>');
+			$this->mail(
+				$user->mailUpdate,
+				l('mail.mail-update.object', $this->config->parameters->name),
+				l('mail.mail-update.message', $user->name) . '<a href="' . $link . '">' . $link . '</a>' . l('mail.signature', $this->config->parameters->name)
+			);
 		}
 		if ($data['password'])
 			$user->password = $this->userCryptPassword($data['password']);
@@ -899,13 +908,11 @@ class Simplegallery
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
 		$link = httpUrl() . '?user=lost&pcode=' . $user->passwordCode;
+
 		$this->mail(
 			$user->mail,
-			'[SimpleGallery] Password reset',
-			'A reset password was requested for your mail adress.<br />
-				To change the password click on the following link:
-				<a href="' . $link . '">' . $link . '</a>
-				If you are not the author of this request, just ignore this email.'
+			l('mail.password-reset.object', $this->config->parameters->name),
+			l('mail.password-reset.message', $user->name) . '<a href="' . $link . '">' . $link . '</a>' . l('mail.password-reset.message2') . l('mail.signature', $this->config->parameters->name)
 		);
 
 		success(l('user.message.password-reset-link-sent'), '?');
@@ -920,12 +927,12 @@ class Simplegallery
 	
 		$valid = false;
 		foreach ($this->config->users as &$user) {
-			if ((string)$user->passwordCode != (string)$code)
+			if ((string)get($user, k('passwordCode')) != (string)$code)
 				continue;
 
 			$interval = new DateInterval($this->passwordLostTimeOut);
 			$passwordTime = new DateTime();
-			$passwordTime->setTimestamp($user->passwordCodeTime);
+			$passwordTime->setTimestamp(get($user, k('passwordCodeTime')));
 			$time = new DateTime();
 			$passwordTime->add($interval);
 			if ($time > $passwordTime)

@@ -129,5 +129,21 @@
 			"update-sprite":"miniature générée dans  \"%1\"",
 			"update-file":"\"%1\" généré"
 		}
+	},
+	"mail": {
+		"signature":"\n\nÀ bientôt sur %1",
+		"registration":{
+			"object":"[%1] Enregistrement, veuillez activer votre compte",
+			"message":"Bonjour %1,\n\nAfin d'activer votre compte, veuillez cliquer sur le lien suivant :\n"
+		},
+		"mail-update":{
+			"object":"[%1] Mise à jour du mail, veuillez valider votre adresse mail",
+			"message":"Bonjour %1,\n\nAfin d'activer votre adresse mail, veuillez cliquer sur le lien suivant :\n"
+		},
+		"password-reset":{
+			"object":"[%1] Mot de passe perdu",
+			"message":"Bonjour %1,\n\nUn demande de modification de mot de passe a été demandée pour votre adresse mail.\nAfin de modifier votre mot de passe, veuillez cliquer sur le lien suivant :\n",
+			"message2":"\n\nSi vous n'êtes pas l'auteur de cette demande, ignorez juste cet email."
+		}
 	}
 }
