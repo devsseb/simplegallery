@@ -118,11 +118,14 @@ var Simplegallery = new Class({
 		});
 		
 		$$(this.mediaImage, this.mediaVideo).addEvents({
-			load: function(e) {
-				if (e.target.get('src')[0] != '?')
+			load: function(e, src) {
+
+				if (!src && e)
+					src = e.target.get('src');
+				if (src && src[0] != '?')
 					return;
 
-				e.target.fadeIn.start(0,1);
+				this.mediaElement.fadeIn.start(1);
 
 				if (this.slideshow.play) {
 					clearTimeout(this.slideshow.play);
@@ -135,8 +138,8 @@ var Simplegallery = new Class({
 				this.setMediaActionHide();
 				this.mediaAction.setStyle('display', 'block');
 			}.bind(this),
-			canplay: function(e) {
-				e.target.fireEvent('load', [e]);
+			loadeddata: function(e) {
+				e.target.fireEvent('load', [e, e.target.getElement('source').get('src')]);
 			},
 			ended: function() {
 				if (this.slideshow.play && this.mode == 'slideshow')
@@ -324,7 +327,8 @@ var Simplegallery = new Class({
 		};
 		this.media.transform = '';
 
-		$$(this.mediaImage, this.mediaVideo).set('src', this.blank);
+		this.mediaImage.set('src', this.blank);
+		this.mediaVideo.getElements('source').destroy();
 
 		this.mediaElement = this[this.media.type == 'image' ? 'mediaImage' : 'mediaVideo'];
 
@@ -338,7 +342,8 @@ var Simplegallery = new Class({
 				this.mediaElement.set('src', this.media.url + '&dim=' + this.mode);
 			break;
 			case 'video' :
-				this.mediaElement.set('src', this.media.url);
+				new Element('source', {src: this.media.url, type: 'video/webm'}).inject(this.mediaElement);
+//				this.mediaElement.set('src', this.media.url);
 				this.mediaElement.load();
 			break;
 		}
@@ -386,6 +391,10 @@ var Simplegallery = new Class({
 					this.thumb.set('mediaFlip', flip.join(' '));
 				break;
 			}
+			
+			this.mediaSetTransform();
+			
+			this.mediaElement.fireEvent('load');
 		}
 		
 		if (update == 'delete') {
@@ -400,8 +409,6 @@ var Simplegallery = new Class({
 				$('noMedia').setStyle('display', 'block');
 			}
 		}
-		
-		this.mediaSetTransform();
 		
 	},
 	mediaSetSize: function()

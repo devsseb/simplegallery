@@ -80,7 +80,8 @@
 					$flip->v = $flip->v ? -1 : 1;
 				break;
 			}
-			$media->styles.= '-webkit-transform:rotate(' . $rotation . 'deg) scaleX(' . $flip->h . ') scaleY(' . $flip->v . ');';
+			foreach (array('', '-webkit-', '-moz-', '-o-', '-ms-') as $cssPrefix)
+				$media->styles.= $cssPrefix . 'transform:rotate(' . $rotation . 'deg) scaleX(' . $flip->h . ') scaleY(' . $flip->v . ');';
 		}
 
 	}
