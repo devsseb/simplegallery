@@ -35,8 +35,11 @@ var Simplegallery = new Class({
 	},
 	initialize: function(options)
 	{
-		if (!$('thumbs') && $('noMedia'))
-			return $('noMedia').setStyle('display', 'block');
+		this.mediaThumbs = $('thumbs');
+		this.noMedia = $('noMedia');
+	
+		if (!this.mediaThumbs && this.noMedia)
+			return this.noMedia.setStyle('display', 'block');
 		
 		this.setOptions(options);
 		
@@ -68,7 +71,6 @@ var Simplegallery = new Class({
 				this.mediaUpdateDelete = $('mediaDelete');
 			}
 			this.mediaDownload = $('mediaDownload');
-		this.mediaLoading = $('mediaLoading');
 		
 		this.preview = $('preview');
 		this.preview.image = $('previewImage');
@@ -203,13 +205,18 @@ var Simplegallery = new Class({
 					});
 				this.setMediaActionPosition();
 			}.bind(this),
-			keyup: function(e) {
+			keydown: function(e) {
 				switch (e.key) {
 					case 'left' :
 						this.mediaLoad(this.getPreviousThumb());
 					break;
 					case 'right' :
 						this.mediaLoad(this.getNextThumb());
+					break;
+					case 'up' :
+					case 'down' :
+						this.mediaLoad(this.getThumbGrid(e.key));
+						e.preventDefault();
 					break;
 					case 'esc' :
 						if (this.mode == 'slide')
@@ -246,6 +253,16 @@ var Simplegallery = new Class({
 	{
 		return this.thumb.getPrevious('a.thumb');
 	},
+	getThumbGrid: function(at)
+	{
+		var width = this.mediaThumbs.getSize().x;
+		var thumbByLine = (width / 75).floor();
+		var position = this.thumb.getPosition(this.mediaThumbs);
+		var x = (position.x / 75).floor();
+		var y = (position.y / 75).floor() + (at == 'up' ? -1 : 1 );
+		var index = y * thumbByLine + x;
+		return this.thumbs[index];
+	},
 	setMediaActionPosition: function()
 	{
 		this.mediaPrevious.setStyle('display', this.getPreviousThumb() ? 'block' : 'none');
@@ -254,12 +271,13 @@ var Simplegallery = new Class({
 		if (this.mediaUpdate)
 			$$(this.mediaUpdateRotateLeft, this.mediaUpdateRotateRight, this.mediaUpdateFlipHorizontal, this.mediaUpdateFlipVertical).setStyle('display', this.media.type == 'image' ? 'block' : 'none');
 	
+	
 		var element = this[this.mode][this.media.type];
-		var position = element.getPosition(this.container);
-		var size = element.getSize();
+		var position = element.getPosition(this.mode == 'preview' ? this.container : null);
 		var rotate = this.mediaGetRotation();
 		this.mediaAction.setStyles({
-			width: size[rotate == 0 || rotate == 180 ? 'x' : 'y'] - 10,
+			position: this.mode == 'preview' ? 'absolute' : 'fixed',
+			width: element.size[rotate == 0 || rotate == 180 ? 'width' : 'height'] - 10,
 			left: position.x + 6,
 			top: position.y + 5
 		});
@@ -300,29 +318,20 @@ var Simplegallery = new Class({
 
 		$$(mode.image, mode.video).set('src', this.blank);
 
+		this[this.mode][this.media.type == 'image' ? 'video' : 'image'].setStyle('display', 'none');
+		this[this.mode][this.media.type].setStyle('display', 'block');
+
 		this.mediaSetTransform()
 
 		switch (this.media.type) {
 			case 'image' :
-				
-				mode.video.setStyle('display', 'none');
-				
 				mode.image.set('src', this.media.url + '&dim=' + this.mode);
-
 			break;
 			case 'video' :
-			
-				mode.image.setStyle('display', 'none');
-				
-				mode.video.src = this.media.url;
+				mode.video.set('src', this.media.url);
 				mode.video.load();
-				
 			break;
 		}
-
-		this[this.mode][this.media.type].setStyle('display', 'block');
-
-		this.setMediaActionPosition();
 
 		this.mediaDownload.set('href', this.media.url + '&download');
 
@@ -406,16 +415,14 @@ var Simplegallery = new Class({
 				height: this.slide.size
 			});
 
-			this.mediaLoading.setStyles({
-				left: this[this.mode].size / 2 - 64
-			});
 		}
 
-
-		mode[this.media.type].setStyles({
+		var size = {
 			width: this.media.width > this.media.height ? mode.size : mode.size * this.media.width / this.media.height,
 			height: this.media.width > this.media.height ? mode.size * this.media.height / this.media.width : mode.size
-		})		
+		};
+
+		mode[this.media.type].setStyles(size).size = size;
 		
 		if (this.media.type == 'image')
 			mode.image.setStyle3('transform', this.media.transform + ' translateX(' + this.mediaGetTransformLag() + 'px)');
@@ -521,7 +528,7 @@ var Simplegallery = new Class({
 
 		this.mode = 'slide';
 
-		this.mediaLoading.inject(this[this.mode], 'top');
+		document.body.setStyle('overflow', 'hidden');
 
 		this.mediaLoad(this.thumb);
 
@@ -539,13 +546,10 @@ var Simplegallery = new Class({
 
 		this.mode = 'preview';
 	
-		this.mediaLoading.inject(this[this.mode], 'top').setStyles({
-			left: this[this.mode].size / 2 - 64
-		});
-	
 		this.slideshow.setStyle('display', 'none');
 		this.mediaSlideshowStart.setStyle('display', 'block');
 		this.mediaSlideshowEnd.setStyle('display', 'none');
+		document.body.setStyle('overflow', 'auto');
 		this.mediaLoad(this.thumb);
 	},
 	slideshowResize: function()

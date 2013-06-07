@@ -1,6 +1,7 @@
 <div id="albumLocales"><?=json_encode(array('delete-confirm' => l('album.media.delete-confirm')))?></div>
 
 <? if ($sg->albums) : ?>
+<div class="albums-menu-background"></div>
 <div class="albums-menu">
 	<ul class="albums">
 	<? foreach ($sg->albums as $albumMenu) : ?>
@@ -59,7 +60,6 @@
 	
 	<!-- Preview zone -->
 	<div id="preview">
-		<img id="mediaLoading" src="actions/album/loading.gif" alt="<?=l('album.loading')?>" />
 		<img id="previewImage" src="actions/album/blank.gif" />
 		<video id="previewVideo" controls></video>
 	</div>
