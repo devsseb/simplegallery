@@ -60,8 +60,10 @@
 	
 	<!-- Preview zone -->
 	<div id="preview">
-		<img id="previewImage" src="actions/album/blank.gif" />
-		<video id="previewVideo" controls></video>
+		<div id="mediaBackground" class="mediaBackgroundPreview">
+			<img id="mediaImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+			<video id="mediaVideo" controls></video>
+		</div>
 	</div>
 	
 	<!-- Thumbnails zone -->
@@ -96,12 +98,7 @@
 	</div>
 	
 	<!-- Slideshow zone -->
-	<div id="slideshow">
-		<div id="slide">
-			<img id="slideImage" src="actions/album/blank.gif" />
-			<video id="slideVideo" controls></video>
-		</div>
-	</div>
+	<div id="slideshow"></div>
 	
 	<!-- Media action zone -->
 	<div id="mediaAction">

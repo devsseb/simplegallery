@@ -19,10 +19,10 @@ class Simplegallery
 		}
 		$this->locale = new Locale(get($this->config->parameters, k('locale')));
 		
-		$this->dimensions = (object)array(
-			'thumb'		=> (object)array('size' => 75	, 'type' => 'sprite'),
-			'preview'	=> (object)array('size' => 500	, 'type' => 'long'	),
-			'slide'		=> (object)array('size' => 1000	, 'type' => 'long'	)
+		$this->dimensions = object(
+			'thumb'		, object('size', 75		, 'type', 'sprite'	),
+			'preview'	, object('size', 500	, 'type', 'long'	),
+			'slideshow'	, object('size', 1000	, 'type', 'long'	)
 		);
 
 	}
@@ -59,14 +59,16 @@ class Simplegallery
 			if (!is_dir($dir . $album))
 				continue;
 			
-			$album = (object)array('name' => $album);
-			$album->id = 0;
-			$album->path = $dir . $album->name . '/';
-			$album->groups = array();
-			$album->groupsParent = $groupsParent;
-			$album->data = null;
-			$album->depth = $depth;
-			$album->parent = &$albumParent;
+			$album = object(
+				'name'	, $album,
+				'id'	, 0,
+				'path'	, $dir . $album . '/',
+				'groups', array(),
+				'groupsParent', $groupsParent,
+				'data'	, null,
+				'depth'	, $depth,
+				'parent', $groupsParent
+			);
 			
 			if (is_file($album->path . '.id')) {
 				$album->id = file_get_contents($album->path . '.id');
@@ -137,11 +139,11 @@ class Simplegallery
 				continue;
 			}
 
-			$album->medias[$media] = (object)array(
-				'name' => $media,
-				'file' => $mediaFile,
-				'type' => $mediaType,
-				'data' => get($album->data, k('medias', $media), new StdClass())
+			$album->medias[$media] = object(
+				'name', $media,
+				'file', $mediaFile,
+				'type', $mediaType,
+				'data', get($album->data, k('medias', $media), new StdClass())
 			);
 		}
 
@@ -208,9 +210,9 @@ class Simplegallery
 					
 					// Format delete sprite data
 					if (exists($delete, $thumb) and !is_object($delete[$thumb])) {
-						$delete[$thumb] = (object)array(
-							'dimension' => $dimension,
-							'medias' => get($album->data, k('thumbs', $thumb, 'index'), array())
+						$delete[$thumb] = object(
+							'dimension'	, $dimension,
+							'medias'	, get($album->data, k('thumbs', $thumb, 'index'), array())
 						);
 					}
 
@@ -238,16 +240,16 @@ class Simplegallery
 					continue;
 
 				if (!exists($update, $media->name))
-					$update[$media->name] = (object)array('media' => $media, 'dimensions' => array());
+					$update[$media->name] = object('media', $media, 'dimensions', array());
 				$update[$media->name]->dimensions[] = $dimension;
 
 			}
 		}
 
-		return (object)array(
-			'album' => $album,
-			'delete' => $delete,
-			'update' => $update
+		return object(
+			'album'	, $album,
+			'delete', $delete,
+			'update', $update
 		);
 
 	}
@@ -299,10 +301,10 @@ class Simplegallery
 			write(l('album.generation.update-nothing'));
 		else {
 			// Retrieve total medias to update
-			$progress = (object)array(
-				'total' => 0,
-				'now' => 0,
-				'percent' => 0
+			$progress = object(
+				'total'	, 0,
+				'now'	, 0,
+				'percent', 0
 			);
 			foreach ($result->update as $file => $data)
 				$progress->total+= count($data->dimensions);
@@ -322,13 +324,13 @@ class Simplegallery
 			$md5 = md5_file($media->file);
 
 			// Save media data
-			$album->data->medias->{$media->name} = $media->data = (object)array(
-				'md5' => $md5,
-				'width' => $geometry->width,
-				'height' => $geometry->height,
-				'orientation' => exif_imagetype($media->file) === false ? 1 : (int)geta(exif_read_data($media->file), k('Orientation'), 1),
-				'rotation' => get($media, k('data', 'rotation'), 0),
-				'flip' => get($media, k('data', 'flip'), '')
+			$album->data->medias->{$media->name} = $media->data = object(
+				'md5'	, $md5,
+				'width'	, $geometry->width,
+				'height', $geometry->height,
+				'orientation', exif_imagetype($media->file) === false ? 1 : (int)geta(exif_read_data($media->file), k('Orientation'), 1),
+				'rotation', get($media, k('data', 'rotation'), 0),
+				'flip', get($media, k('data', 'flip'), '')
 			);
 
 			foreach ($data->dimensions as $dimension) {
@@ -347,7 +349,7 @@ class Simplegallery
 
 				// Create thumbs entry for album data
 				if (!exists($album->data->thumbs, $file))
-					$album->data->thumbs->$file = (object)array('md5'=> '');
+					$album->data->thumbs->$file = object('md5', '');
 
 				// Prepare vars for resize and crop image
 				$dstY = $lagX = $lagY = 0;
@@ -773,9 +775,9 @@ class Simplegallery
 			$this->config->users->$user->groups = array_keys($groups);
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
 		
-		$user = (object)array(
-			'name' => get($data, k('user-name')),
-			'mail' => get($data, k('user-mail'))
+		$user = object(
+			'name', get($data, k('user-name')),
+			'mail', get($data, k('user-mail'))
 		);
 		
 		$success = '';

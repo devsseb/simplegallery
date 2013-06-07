@@ -114,7 +114,7 @@ function randomString($length)
 
 function imagesize($img)
 {
-	return (object)array('width' => imagesx($img), 'height' => imagesy($img));
+	return object('width', imagesx($img), 'height', imagesy($img));
 }
 
 function write($data, $nl = false)
@@ -136,5 +136,17 @@ function httpUrl()
 	$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
 	$url = preg_replace('/index\.php$/', '', $url);
 	return $url;
+}
+
+function object($x)
+{
+	if (is_array($x))
+		return (object)$x;
+	$args = func_get_args();
+	$total = func_num_args();
+	$o = new StdClass();
+	for ($i = 0; $i < $total; $i = $i + 2)
+		$o->{$args[$i]} = $args[$i + 1];
+	return $o;
 }
 ?>

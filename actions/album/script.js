@@ -72,17 +72,14 @@ var Simplegallery = new Class({
 			}
 			this.mediaDownload = $('mediaDownload');
 		
+		this.mediaBackground = $('mediaBackground');
+		this.mediaImage = $('mediaImage');
+		this.mediaVideo = $('mediaVideo');
+		
 		this.preview = $('preview');
-		this.preview.image = $('previewImage');
-		this.preview.video = $('previewVideo');
-		this.preview.size = 500;
 		this.preview.distanceTop = this.preview.getPosition().y + 10;
-
 		this.slideshow = $('slideshow');
-		this.slide = $('slide');
-		this.slide.image = $('slideImage');
-		this.slide.video = $('slideVideo');
-		this.slide.size = 1000;
+
 
 		this.media = {
 			name: '',
@@ -108,16 +105,31 @@ var Simplegallery = new Class({
 			this.mediaLoad(e.target);
 		}.bind(this));
 		
-		$$(this.preview.image, this.preview.video, this.slide.image, this.slide.video).addEvents({
+		this.mediaImage.fadeIn = new Fx.Tween(this.mediaImage, {
+			property: 'opacity',
+			link: 'cancel'
+		});
+		this.mediaVideo.fadeIn = new Fx.Tween(this.mediaVideo, {
+			property: 'opacity',
+			link: 'cancel',
+			onComplete: function(video) {
+				video.play();
+			}
+		});
+		
+		$$(this.mediaImage, this.mediaVideo).addEvents({
 			load: function(e) {
+				if (e.target.get('src')[0] != '?')
+					return;
+
+				e.target.fadeIn.start(0,1);
 
 				if (this.slideshow.play) {
 					clearTimeout(this.slideshow.play);
-					if (this.mode == 'slide' && this.media.type == 'image')
+					if (this.mode == 'slideshow' && this.media.type == 'image')
 						this.slideshow.play = this.mediaLoad.delay(this.options.slideShowSpeed, this, [this.getNextThumb()]);
 				}
-					
-				
+
 			}.bind(this),
 			mousemove: function() {
 				this.setMediaActionHide();
@@ -125,10 +137,9 @@ var Simplegallery = new Class({
 			}.bind(this),
 			canplay: function(e) {
 				e.target.fireEvent('load', [e]);
-				e.target.play();
 			},
 			ended: function() {
-				if (this.slideshow.play && this.mode == 'slide')
+				if (this.slideshow.play && this.mode == 'slideshow')
 					this.mediaLoad(this.getNextThumb());
 			}.bind(this)
 		});
@@ -219,23 +230,20 @@ var Simplegallery = new Class({
 						e.preventDefault();
 					break;
 					case 'esc' :
-						if (this.mode == 'slide')
+						if (this.mode == 'slideshow')
 							this.slideshowStop();
 					break;
 					case 'space' :
-						if (this.mode == 'slide') {
-						
-							if (this.media.type == 'video') {
-								if (this.slide.video.paused)
-									this.slide.video.play();
-								else
-									this.slide.video.pause();
-							} else {
-								if (this.slideshow.play)
-									this.slideshowPause();
-								else
-									this.slideshowPlay();
-							}
+						if (this.media.type == 'video') {
+							if (this.mediaVideo.paused)
+								this.mediaVideo.play();
+							else
+								this.mediaVideo.pause();
+						} else if (this.mode == 'slideshow') {
+							if (this.slideshow.play)
+								this.slideshowPause();
+							else
+								this.slideshowPlay();
 						}
 					break;
 				}
@@ -272,12 +280,11 @@ var Simplegallery = new Class({
 			$$(this.mediaUpdateRotateLeft, this.mediaUpdateRotateRight, this.mediaUpdateFlipHorizontal, this.mediaUpdateFlipVertical).setStyle('display', this.media.type == 'image' ? 'block' : 'none');
 	
 	
-		var element = this[this.mode][this.media.type];
-		var position = element.getPosition(this.mode == 'preview' ? this.container : null);
+		var position = this.mediaElement.getPosition(this.mode == 'preview' ? this.container : null);
 		var rotate = this.mediaGetRotation();
 		this.mediaAction.setStyles({
 			position: this.mode == 'preview' ? 'absolute' : 'fixed',
-			width: element.size[rotate == 0 || rotate == 180 ? 'width' : 'height'] - 10,
+			width: this.mediaElement.size[rotate == 0 || rotate == 180 ? 'width' : 'height'] - 10,
 			left: position.x + 6,
 			top: position.y + 5
 		});
@@ -288,6 +295,9 @@ var Simplegallery = new Class({
 			clearTimeout(this.mediaActionHide);
 		this.mediaActionHide = this.mediaAction.setStyle.delay(this.options.mediaActionTimeOut, this.mediaAction, ['display', 'none']);
 	},
+	
+	// Load media in his html element
+		// resize and transform (rotate/flip) the thumb and element
 	mediaLoad: function(thumb)
 	{
 		if (!thumb) {
@@ -297,8 +307,6 @@ var Simplegallery = new Class({
 		}
 
 		this.setMediaActionHide();
-
-		var mode = this[this.mode];
 
 		this.thumb = thumb;
 
@@ -316,20 +324,22 @@ var Simplegallery = new Class({
 		};
 		this.media.transform = '';
 
-		$$(mode.image, mode.video).set('src', this.blank);
+		$$(this.mediaImage, this.mediaVideo).set('src', this.blank);
 
-		this[this.mode][this.media.type == 'image' ? 'video' : 'image'].setStyle('display', 'none');
-		this[this.mode][this.media.type].setStyle('display', 'block');
+		this.mediaElement = this[this.media.type == 'image' ? 'mediaImage' : 'mediaVideo'];
+
+		this[this.media.type == 'image' ? 'mediaVideo' : 'mediaImage'].setStyle('display', 'none');
+		this.mediaElement.setStyle('display', 'block');
 
 		this.mediaSetTransform()
 
 		switch (this.media.type) {
 			case 'image' :
-				mode.image.set('src', this.media.url + '&dim=' + this.mode);
+				this.mediaElement.set('src', this.media.url + '&dim=' + this.mode);
 			break;
 			case 'video' :
-				mode.video.set('src', this.media.url);
-				mode.video.load();
+				this.mediaElement.set('src', this.media.url);
+				this.mediaElement.load();
 			break;
 		}
 
@@ -398,34 +408,28 @@ var Simplegallery = new Class({
 	{
 		var mode = this[this.mode];
 
-		if (this.mode == 'slide') {
+		var size = mode.getSize();
+		var x = this.media.width / this.media.height > size.x / size.y;
+		var angle = this.mediaGetRotation();
+		var horizontal = (this.media.width > this.media.height && (angle == 0 || angle == 180));	
+		if (horizontal)
+			x = !x;
+		mode.size = size[x ? 'x' : 'y'];
+		if (mode.size > 1000)
+			mode.size = 1000;
 
-			var size = this.slideshow.getSize();
-			var x = this.media.width / this.media.height > size.x / size.y;
-			var angle = this.mediaGetRotation();
-			var horizontal = (this.media.width > this.media.height && (angle == 0 || angle == 180));	
-			if (horizontal)
-				x = !x;
-			this.slide.size = size[x ? 'x' : 'y'];
-
-			if (this.slide.size > 1000)
-				this.slide.size = 1000;
-			this.slide.setStyles({
-				width: this.slide.size,
-				height: this.slide.size
-			});
-
-		}
-
-		var size = {
+		this.mediaElement.size = {
 			width: this.media.width > this.media.height ? mode.size : mode.size * this.media.width / this.media.height,
 			height: this.media.width > this.media.height ? mode.size * this.media.height / this.media.width : mode.size
 		};
+		var transform = this.media.type == 'image' ? this.media.transform + ' translateX(' + this.mediaGetTransformLag() + 'px)' : 'none';
 
-		mode[this.media.type].setStyles(size).size = size;
-		
-		if (this.media.type == 'image')
-			mode.image.setStyle3('transform', this.media.transform + ' translateX(' + this.mediaGetTransformLag() + 'px)');
+		this.mediaBackground.setStyles(this.mediaElement.size).setStyle3('transform', transform);
+		this.mediaElement.setStyles({
+			width: this.mediaElement.size.width,
+			height: this.mediaElement.size.height,
+			opacity: 0
+		});
 
 		this.setMediaActionPosition();
 	},
@@ -526,16 +530,17 @@ var Simplegallery = new Class({
 	slideshowStart: function()
 	{
 
-		this.mode = 'slide';
+		this.mode = 'slideshow';
 
 		document.body.setStyle('overflow', 'hidden');
 
+		this.mediaBackground.inject(this.slideshow).removeClass('mediaBackgroundPreview').addClass('mediaBackgroundSlideshow');
+		this.slideshow.setStyle('display', 'block');
+
 		this.mediaLoad(this.thumb);
 
-		this.slideshow.setStyle('display', 'block');
 		this.mediaSlideshowStart.setStyle('display', 'none');
 		this.mediaSlideshowEnd.setStyle('display', 'block');
-		this.slideshowResize();
 	
 	},
 	slideshowEnd: function()
@@ -546,6 +551,8 @@ var Simplegallery = new Class({
 
 		this.mode = 'preview';
 	
+		this.mediaBackground.inject(this.preview).removeClass('mediaBackgroundSlideshow').addClass('mediaBackgroundPreview');
+	
 		this.slideshow.setStyle('display', 'none');
 		this.mediaSlideshowStart.setStyle('display', 'block');
 		this.mediaSlideshowEnd.setStyle('display', 'none');
@@ -554,7 +561,7 @@ var Simplegallery = new Class({
 	},
 	slideshowResize: function()
 	{
-		if (this.mode != 'slide')
+		if (this.mode != 'slideshow')
 			return;
 
 		this.mediaSetSize();
