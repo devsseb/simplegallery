@@ -18,6 +18,7 @@
 		"parameters":{
 			"name":"Gallery name",
 			"locale":"Language",
+			"locale-auto":"Auto",
 			"registration-disable":"Registration disable"
 		},
 		"groups":"Groups",
@@ -145,5 +146,13 @@
 			"message":"Hello %1,\n\nA reset password was requested for your mail adress.\nTo update your password, please click on the following link :\n",
 			"message2":"\n\nIf you are not the author of this request, just ignore this email."
 		}
+	},
+	"install":{
+		"_":"Install",
+		"message":{
+			"success":"You can now register a new account and login"
+		},
+		"informations":"Path to the private folder. This folder will contain your albums, thumbnails and configurations. It is highly recommended to place it in an inaccessible http location.",
+		"private-path":"Private path"
 	}
 }

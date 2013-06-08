@@ -303,6 +303,8 @@ var Simplegallery = new Class({
 		// resize and transform (rotate/flip) the thumb and element
 	mediaLoad: function(thumb)
 	{
+		this.mediaVideo.pause();
+	
 		if (!thumb) {
 			if (this.slideshow.play)
 				this.slideshowStop();
@@ -310,8 +312,6 @@ var Simplegallery = new Class({
 		}
 
 		this.setMediaActionHide();
-
-		this.mediaVideo.pause();
 
 		this.thumb = thumb;
 

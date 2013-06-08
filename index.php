@@ -8,6 +8,7 @@ try {
 	new Get();
 	include('./classes/Debug.class.php');
 	new Debug();
+	include('./classes/Locale.class.php');
 
 	chronoStart('phptime');
 
@@ -22,7 +23,7 @@ try {
 		include('./config.php');
 		Debug::enable(get($config, k('debug')));
 		include('./classes/Simplegallery.class.php');
-		include('./classes/Locale.class.php');
+
 
 		$sg = new Simplegallery($config->privatePath);
 		$user = $sg->getUser();

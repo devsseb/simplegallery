@@ -34,7 +34,7 @@
 		break;
 		case 'registration' :
 
-			if ($sg->config->parameters->{'registration-disable'} and get($sg->config, k('users')))
+			if (get($sg->config->parameters, k('registration-disable')) and get($sg->config, k('users')))
 				go('?');
 
 			if ($user)

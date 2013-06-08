@@ -6,12 +6,18 @@ class Locale
 	private static $index, $indexDefault;
 	public $langs = array();
 
-	public function __construct($lang, $dir = null)
+	public function __construct($lang = null, $dir = null)
 	{
 		if ($dir)
 			$this->dir = $dir;
+		if (!$lang) {
+			$lang = explode('-',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			if (!exists($lang, 1))
+				$lang[1] = $lang[0];
+			$lang = strtolower($lang[0]) . '-' . strtoupper($lang[1]);
+		}
 		$this->lang = $lang;
-		
+
 		$this->langs = getDir($this->dir, '^([^.])');
 		foreach ($this->langs as &$lang)
 			$lang = substr($lang, 0, strlen($lang) - 5);

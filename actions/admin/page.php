@@ -5,6 +5,7 @@
 	<div class="admin-parameters">
 		<label for="parameters-name"><?=l('admin.parameters.name')?> : </label><input type="text" id="parameters-name" name="name" value="<?=toHtml(get($sg->config->parameters, k('name'), 'SimpleGallery'))?>" /><br />
 		<label for="parameters-locale"><?=l('admin.parameters.locale')?> : </label><select id="parameters-locale" name="locale">
+			<option value=""<?=!get($sg->config->parameters, k('locale')) ? ' selected="selected"' : ''?>><?=l('admin.parameters.locale-auto')?></option>
 <? foreach ($sg->locale->langs as $lang) : ?>
 			<option value="<?=toHtml($lang)?>"<?=get($sg->config->parameters, k('locale')) == $lang ? ' selected="selected"' : ''?>><?=toHtml($lang)?></option>
 <? endforeach; ?>

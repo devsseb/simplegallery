@@ -18,6 +18,7 @@
 		"parameters":{
 			"name":"Nom de la galerie",
 			"locale":"Langue",
+			"locale-auto":"Auto",
 			"registration-disable":"Inscription désactivée"
 		},
 		"groups":"Groupes",
@@ -145,5 +146,13 @@
 			"message":"Bonjour %1,\n\nUn demande de modification de mot de passe a été demandée pour votre adresse mail.\nAfin de modifier votre mot de passe, veuillez cliquer sur le lien suivant :\n",
 			"message2":"\n\nSi vous n'êtes pas l'auteur de cette demande, ignorez juste cet email."
 		}
+	},
+	"install":{
+		"_":"Installation",
+		"message":{
+			"success":"Vous pouvez maintenant enregistrer un nouveau compte et vous connecter."
+		},
+		"informations":"Chemin vert le dossier privé. Ce dossier contiendra vos albums, vignettes et configurations. Il est fortement recommandé de e placer dans un endroit non accessible en http.",
+		"private-path":"Chemin privé"
 	}
 }

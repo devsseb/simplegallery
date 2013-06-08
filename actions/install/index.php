@@ -2,6 +2,8 @@
 	if (is_file('./config.php'))
 		go('?');
 	
+	new Locale();
+	
 	$_SESSION = array();
 	
 	if (exists($_POST, 'privatePath')) {
@@ -35,6 +37,6 @@
 			file_put_contents($file, '[{"size":500	, "type":"long"},{"size":75	, "type":"short"},{"size":1000, "type":"long"}]');
 		
 	
-		success('You can now register a new account to log.', '?user=registration');
+		success(l('install.message.success'), '?user=registration');
 	}
 ?>
