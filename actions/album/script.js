@@ -125,7 +125,7 @@ var Simplegallery = new Class({
 				if (src && src[0] != '?')
 					return;
 
-//				this.mediaElement.fadeIn.start(1);
+				this.mediaElement.fadeIn.start(1);
 
 				if (this.slideshow.play) {
 					clearTimeout(this.slideshow.play);
@@ -144,13 +144,8 @@ var Simplegallery = new Class({
 			ended: function() {
 				if (this.slideshow.play && this.mode == 'slideshow')
 					this.mediaLoad(this.getNextThumb());
-			}.bind(this),
-			error: function(e) {
-				var source = e.target.getElement('source');
-				e.target.fireEvent('load', [e, source && source.get('src')]);
-			}
+			}.bind(this)
 		});
-		
 		this.mediaSlideshowStart.addEvents({
 			click: this.slideshowStart.bind(this)
 		});
@@ -316,6 +311,8 @@ var Simplegallery = new Class({
 
 		this.setMediaActionHide();
 
+		this.mediaVideo.pause();
+
 		this.thumb = thumb;
 
 		this.media.name = this.thumb.get('title');
@@ -439,8 +436,8 @@ var Simplegallery = new Class({
 		this.mediaBackground.setStyles(this.mediaElement.size).setStyle3('transform', transform);
 		this.mediaElement.setStyles({
 			width: this.mediaElement.size.width,
-			height: this.mediaElement.size.height/*,
-			opacity: 0*/
+			height: this.mediaElement.size.height,
+			opacity: 0
 		});
 
 		this.setMediaActionPosition();
@@ -477,7 +474,7 @@ var Simplegallery = new Class({
 
 			var flipV = /scaleX\(-1\)/.test(this.media.transform);
 			var lag = (thumbWidth-thumbHeight)/2;
-			if ((degree == 90 && flipV) || (degree == 270 && !flipV))
+			if ((degree == 90 && flipV) || (degree == 270 && !flipV))
 				lag*= -1
 		}
 		return lag;
@@ -555,4 +552,73 @@ var Simplegallery = new Class({
 		this.mediaSlideshowEnd.setStyle('display', 'block');
 	
 	},
-	slideshowEnd: 
+	slideshowEnd: function()
+	{
+	
+		if (this.slideshow.play)
+			this.slideshowStop();
+
+		this.mode = 'preview';
+	
+		this.mediaBackground.inject(this.preview).removeClass('mediaBackgroundSlideshow').addClass('mediaBackgroundPreview');
+	
+		this.slideshow.setStyle('display', 'none');
+		this.mediaSlideshowStart.setStyle('display', 'block');
+		this.mediaSlideshowEnd.setStyle('display', 'none');
+		document.body.setStyle('overflow', 'auto');
+		this.mediaLoad(this.thumb);
+	},
+	slideshowResize: function()
+	{
+		if (this.mode != 'slideshow')
+			return;
+
+		this.mediaSetSize();
+
+	},
+	slideshowPlay: function()
+	{
+		this.slideshow.play = true;
+		this.mediaSlideshowPlay.setStyle('display', 'none');
+		this.mediaSlideshowPauseStop.setStyle('display', 'block');
+		this.fullscreen(true);
+		if (this.mode != 'slide')
+			this.slideshowStart();
+		else
+			this.mediaLoad(this.thumb);
+		
+	},
+	slideshowPause: function()
+	{
+		if (this.slideshow.play)
+			clearTimeout(this.slideshow.play);
+		this.slideshow.play = false;
+		this.mediaSlideshowPauseStop.setStyle('display', 'none');
+		this.mediaSlideshowPlay.setStyle('display', 'block');
+	},
+	slideshowStop: function()
+	{
+		this.slideshowPause();
+		this.fullscreen(false);
+		this.slideshowEnd();
+	},
+	fullscreen: function(active)
+	{
+		if (active) {
+			if (document.documentElement.requestFullscreen)
+				document.documentElement.requestFullscreen();
+			else if (document.documentElement.mozRequestFullScreen)
+				document.documentElement.mozRequestFullScreen();
+			else if (document.documentElement.webkitRequestFullScreen)
+				document.documentElement.webkitRequestFullScreen();
+		} else {
+			if (document.cancelFullScreen)
+				document.cancelFullScreen();
+			else if (document.webkitCancelFullScreen)
+				document.webkitCancelFullScreen();
+			else if (document.mozCancelFullScreen)
+				document.mozCancelFullScreen();
+		}
+	}
+
+});
