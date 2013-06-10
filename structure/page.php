@@ -4,11 +4,18 @@
 		<title><?=toHtml(get($sg, k('config', 'parameters', 'name'), 'SimpleGallery'))?></title>
  		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  		<link rel="stylesheet" type="text/css" href="./structure/style.css" />
-		<script type="text/javascript" src="./structure/mootools.js"></script>
-
 <?	if (is_file($file = $actionPath . 'style.css')) : ?>
 		<link rel="stylesheet" type="text/css" href="<?=$file?>" />
 <? endif; ?>
+
+<!--[if lt IE 9]>
+<script>
+document.createElement('header');
+document.createElement('footer');
+</script>
+<![endif]-->
+
+		<script type="text/javascript" src="./structure/mootools.js"></script>
 <?	if (is_file($file = $actionPath . 'script.js')) : ?>
 		<script type="text/javascript" src="<?=$file?>"></script>
 <? endif; ?>

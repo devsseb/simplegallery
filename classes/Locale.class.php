@@ -5,29 +5,50 @@ class Locale
 	private $dir = 'locales/';
 	private static $index, $indexDefault;
 	public $langs = array();
+	private $langDefault = 'en-US';
 
 	public function __construct($lang = null, $dir = null)
 	{
 		if ($dir)
 			$this->dir = $dir;
-		if (!$lang) {
-			$lang = explode('-',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-			if (!exists($lang, 1))
-				$lang[1] = $lang[0];
-			$lang = strtolower($lang[0]) . '-' . strtoupper($lang[1]);
+		if ($lang) {
+		
+			if (!is_array($lang))
+				$langs = array($lang);
+			else
+				$langs = $lang;
+		
+		} else {
+		
+			$langs = get($_SERVER, k('HTTP_ACCEPT_LANGUAGE'));//fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3
+			$langs = preg_split('/[,;]/', $langs);
+			foreach ($langs as &$lang) {
+				$lang = explode('-', $lang);
+				if (!exists($lang, 1))
+					$lang[1] = $lang[0];
+				$lang = strtolower($lang[0]) . '-' . strtoupper($lang[1]);
+			}
+			unset($lang);
 		}
-		$this->lang = $lang;
-
+		
 		$this->langs = getDir($this->dir, '^([^.])');
 		foreach ($this->langs as &$lang)
 			$lang = substr($lang, 0, strlen($lang) - 5);
 		unset($lang);
 
-		if (!inDir($this->dir, $file = $this->dir . $this->lang . '.json', true))
-			$file = $this->dir . 'en-US.json';
+		$this->lang = false;
+		foreach ($langs as $lang) {
+			if (inDir($this->dir, $this->dir . $lang . '.json', true))
+				$this->lang = $lang;
+		}
+		
+		if (!$this->lang)
+			$this->lang = $this->langDefault;
+			
+		$file = $this->dir . $this->lang . '.json';
 
 		self::$index = json_decode(file_get_contents($file));
-		self::$indexDefault = json_decode(file_get_contents($this->dir . 'en-US.json'));
+		self::$indexDefault = json_decode(file_get_contents($this->dir . $this->langDefault . '.json'));
 
 		eval('function l($key){
 			return call_user_func_array(\'Locale::get\', func_get_args());

@@ -8,6 +8,14 @@ Element.implement({
 		return result;
 	},
 	setStyle3: function(style, value) {
+/*
+var img = this.getElement('img');	
+	if (img) {
+		img.setStyle('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=1)');
+	}
+	
+*/
+	
 		var styles = {};
 		for (var i = 0; i < css3Prefix.length; i++)
 			styles[css3Prefix[i] + style] = value;
@@ -74,6 +82,24 @@ var Simplegallery = new Class({
 		
 		this.mediaBackground = $('mediaBackground');
 		this.mediaImage = $('mediaImage');
+		
+		// IE 6-7-8 compability
+		if (Browser.ie && Browser.version < 9) {
+			if (!document.namespaces.v) {
+				document.namespaces.add('v', 'urn:schemas-microsoft-com:vml');
+				document.createStyleSheet().addRule('v\\:image', 'behavior: url(#default#VML);');
+			}
+
+			var size = this.mediaImage.getSize();
+			this.mediaImageVml = new Element('v\\:image', {
+				styles:{
+					display: 'block',
+					width: 100,
+					height: 100
+				}
+			}).inject(this.mediaImage, 'before');
+		}
+		
 		this.mediaVideo = $('mediaVideo');
 		
 		if (!this.mediaVideo.pause) {
@@ -129,8 +155,12 @@ var Simplegallery = new Class({
 					src = e.target.get('src');
 				if (src && src[0] != '?')
 					return;
-
-				this.mediaElement.fadeIn.start(1);
+				
+				if (this.mediaImageVml) {
+					this.mediaImageVml.src = this.mediaImage.src;
+					this.mediaImageVml.setStyle('opacity', 1);
+				} else
+					this.mediaElement.fadeIn.start(1);
 
 				if (this.slideshow.play) {
 					clearTimeout(this.slideshow.play);
@@ -161,7 +191,7 @@ var Simplegallery = new Class({
 		this.mediaAction.addEvents({
 			mouseover: function() {
 				this.setMediaActionHide();
-			}.bind(this),
+			}.bind(this)
 		});
 		this.mediaPrevious.addEvent('click', function() {
 			this.mediaLoad(this.getPreviousThumb());
@@ -334,23 +364,30 @@ var Simplegallery = new Class({
 		};
 		this.media.transform = '';
 
-		this.mediaImage.set('src', this.blank);
+		if (this.mediaImageVml)
+			this.mediaImageVml.src = 'none';
+		else
+			this.mediaImage.src = this.blank;
 		this.mediaVideo.getElements('source').destroy();
 
-		this.mediaElement = this[this.media.type == 'image' ? 'mediaImage' : 'mediaVideo'];
+		if (this.media.type == 'image') {
+			this.mediaElement = this.mediaImageVml || this.mediaImage;
+			this.mediaVideo.setStyle('display', 'none');
+		} else {
+			this.mediaElement = this.mediaVideo;
+			(this.mediaImageVml || this.mediaImage).setStyle('display', 'none');
+		}
 
-		this[this.media.type == 'image' ? 'mediaVideo' : 'mediaImage'].setStyle('display', 'none');
 		this.mediaElement.setStyle('display', 'block');
 
 		this.mediaSetTransform()
 
 		switch (this.media.type) {
 			case 'image' :
-				this.mediaElement.set('src', this.media.url + '&dim=' + this.mode);
+				this.mediaImage.src = this.media.url + '&dim=' + this.mode;
 			break;
 			case 'video' :
 				new Element('source', {src: this.media.url, type: 'video/webm'}).inject(this.mediaElement);
-//				this.mediaElement.set('src', this.media.url);
 				this.mediaElement.load();
 			break;
 		}
