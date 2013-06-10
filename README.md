@@ -1,6 +1,5 @@
 **TODO :**
 * Comment code
-* Test on IE :'(
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
 * ~~Manage cache for pictures~~
@@ -10,3 +9,4 @@
 * ~~Add zoom on media~~
 * ~~Add slideshow mode~~
 * ~~Set locales for mails~~
+* ~~Test on IE :'(~~
