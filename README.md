@@ -1,4 +1,5 @@
 **TODO :**
+* Convert video medias to webm and/or mp4
 * Comment code
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
@@ -10,3 +11,5 @@
 * ~~Add slideshow mode~~
 * ~~Set locales for mails~~
 * ~~Test on IE :'(~~
+* ~~Rename album virtually, add date (start and/or end) and description~~
+* ~~Sort medias manually~~

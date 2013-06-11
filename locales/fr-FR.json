@@ -95,6 +95,13 @@
 		"no-media":"Aucun média trouvé dans l'album",
 		"generate":"Cet album doit être généré",
 		"name":"Nom de l'album",
+		"date":{
+			"start":"Début",
+			"end":"Fin",
+			"at":"au"
+		},
+		"description":"Description",
+		"reorder":"Réordonner les médias",
 		"groups":"Accès des groupes",
 		"inherited":"H",
 		"forbidden":"I",
@@ -154,5 +161,30 @@
 		},
 		"informations":"Chemin vert le dossier privé. Ce dossier contiendra vos albums, vignettes et configurations. Il est fortement recommandé de e placer dans un endroit non accessible en http.",
 		"private-path":"Chemin privé"
+	},
+	"date":{
+		"week":{
+			"1":"lundi",
+			"2":"mardi",
+			"3":"mercredi",
+			"4":"jeudi",
+			"5":"vendredi",
+			"6":"samedi",
+			"7":"dimanche"
+		},
+		"month":{
+			"1":"janvier",
+			"2":"février",
+			"3":"mars",
+			"4":"avril",
+			"5":"mai",
+			"6":"juin",
+			"7":"juillet",
+			"8":"août",
+			"9":"septembre",
+			"10":"octobre",
+			"11":"novembre",
+			"12":"décembre"
+		}
 	}
 }

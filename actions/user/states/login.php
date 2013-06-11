@@ -6,7 +6,7 @@
 		<tr><td class="user-submit" colspan="2"><input type="submit" value="<?=l('user.login.submit')?>" /></td></tr>
 		<tr><td class="user-lost" colspan="2"><a href="?user=lost"><?=l('user.lost-password._')?> ...</a><td></tr>
 	</table>
-<? if (!$sg->config->parameters->{'registration-disable'}) : ?>
+<? if (!get($sg->config->parameters, k('registration-disable'))) : ?>
 	<div class="user-links">
 		<a href="?user=registration"><?=l('user.registration._')?></a>
 	</div>

@@ -95,6 +95,13 @@
 		"no-media":"No media found in this album",
 		"generate":"This album need a generation",
 		"name":"Album name",
+		"date":{
+			"start":"Start",
+			"end":"End",
+			"at":"at"
+		},
+		"description":"Description",
+		"reorder":"Reorder the medias",
 		"groups":"Groups access",
 		"inherited":"I",
 		"forbidden":"F",
@@ -154,5 +161,30 @@
 		},
 		"informations":"Path to the private folder. This folder will contain your albums, thumbnails and configurations. It is highly recommended to place it in an inaccessible http location.",
 		"private-path":"Private path"
+	},
+	"date":{
+		"week":{
+			"1":"monday",
+			"2":"tuesday",
+			"3":"wednesday",
+			"4":"thursday",
+			"5":"friday",
+			"6":"saturday",
+			"7":"sunday"
+		},
+		"month":{
+			"1":"january",
+			"2":"february",
+			"3":"march",
+			"4":"april",
+			"5":"may",
+			"6":"june",
+			"7":"july",
+			"8":"august",
+			"9":"september",
+			"10":"october",
+			"11":"november",
+			"12":"december"
+		}
 	}
 }

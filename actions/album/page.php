@@ -1,6 +1,7 @@
 <div id="albumLocales"><?=json_encode(array('delete-confirm' => l('album.media.delete-confirm')))?></div>
 
 <? if ($sg->albums) : ?>
+<!-- Navigation zone -->
 <div class="albums-menu-background"></div>
 <div class="albums-menu">
 	<ul class="albums">
@@ -9,7 +10,20 @@
 			<a
 				style="padding-left:<?=$albumMenu->depth * 15 + 5?>px;<?=get($_GET, k('id')) == $albumMenu->id ? 'background-color:rgba(119, 167, 197, 0.5);' : ''?>"
 				href="?album&id=<?=toHtml($albumMenu->id)?>"
-			><?=$albumMenu->name?></a>
+				title="<?
+					$start = Locale::sdate($albumMenu->data->date->start);
+					$end = Locale::sdate($albumMenu->data->date->end);
+					if ($start and $end and $start != $end)
+						echo $start . ' ' . l('album.date.at') . ' ' . $end;
+					elseif ($start == $end)
+						echo $start;
+					else
+						echo $start . $end;
+					if (($start or $end) and $albumMenu->data->description != '')
+						echo chr(10);
+					echo toHtml($albumMenu->data->description);
+					?>"
+			><?=toHtml($albumMenu->data->name)?></a>
 		</li>
 	<? endforeach; ?>
 	</ul>
@@ -23,15 +37,25 @@
 <div id="album">
 	<div id="albumId" style="display:none;"><?=toHtml($album->id)?></div>
 	<? if ($sg->user->admin) : ?>
+	<!-- Update zone -->
 	<form class="album-admin" method="post" action="?album&id=<?=toUrl($album->id)?>">
 		<input type="hidden" name="id" value="<?=toHtml($album->id)?>" />
-		<div class="album-admin-title"><?=l('album.name')?> :</div>
-		<input class="album-admin-name" type="text" name="name" value="<?=toHtml($album->name)?>" />
-		<div class="album-admin-title"><?=l('album.groups')?> :</div>
+		<label for="albumAdminName"><?=l('album.name')?> :</label>
+		<input id="albumAdminName" type="text" name="name" value="<?=toHtml(get($album->data, k('name')))?>" />
+		<label for="albumAdminDateStart"><?=l('album.date.start')?> :</label>
+		<input id="albumAdminDateStart" type="date" name="date-start" value="<?=toHtml($album->data->date->start)?>" />
+		<label for="albumAdminDateEnd"><?=l('album.date.end')?> :</label>
+		<input id="albumAdminDateEnd" type="date" name="date-end" value="<?=toHtml($album->data->date->end)?>" />
+		<label for="albumAdminDescription"><?=l('album.description')?> :</label>
+		<textarea id="albumAdminDescription" name="description"><?=toHtml(get($album->data, k('description')))?></textarea>
+		<label for="albumAdminReorder"><?=l('album.reorder')?> : </label>
+		<input id="albumAdminReorder" type="checkbox" />
+		<input type="hidden" name="reorder" id="albumAdminReorderValue" />
+		<label for=""><?=l('album.groups')?> :</label>
 		<table>
 			<tr><th><?=l('album.inherited')?></th><th><?=l('album.forbidden')?></th><th><?=l('album.granted')?></th><th></th></tr>
 		<? foreach ($album->groups as $group => $access) :
-			$accessInherited = $album->groupsParent ? ($album->groupsParent[$group] < 0 ? $album->groupsParent[$group] : $album->groupsParent[$group]-2) : -2;
+			$accessInherited = $album->parentGroups ? ($album->parentGroups[$group] < 0 ? $album->parentGroups[$group] : $album->parentGroups[$group]-2) : -2;
 		?>
 			<tr>
 				<td class="album-admin-radio album-admin-radio-inherited-<?=$accessInherited == -2 ? 'f' : 'g'?>">
@@ -78,20 +102,20 @@
 			class="thumb" 
 			style="
 				background:
-					<?=$media->type == 'video' ? 'url(\'actions/album/media_video.png\') no-repeat bottom right,' : ''?>
+					<?=$media->type == 'video' ? 'url(\'actions/album/images/media_video.png\') no-repeat bottom right,' : ''?>
 					url('?media&amp;album=<?=toUrl($album->id)?>&amp;dim=thumb') no-repeat center -<?=$index * 75?>px
-					
 				;
 				<?=$media->styles?>
 			"
 			href="#<?=toUrl($media->name)?>"
 			mediaUrl="?media&amp;album=<?=toUrl($album->id)?>&amp;media=<?=toUrl($media->name)?>"
 			mediaType="<?=toHtml($sg->getMediaType($media->name))?>"
-			mediaWidth="<?=toHtml(get($media, k('data', 'width')))?>"
-			mediaHeight="<?=toHtml(get($media, k('data', 'height')))?>"
-			mediaOrientation="<?=toHtml(get($media, k('data', 'orientation')))?>"
-			mediaRotation="<?=toHtml(get($media, k('data', 'rotation')))?>"
-			mediaFlip="<?=toHtml(get($media, k('data', 'flip')))?>"
+			mediaOrder="<?=toHtml($media->data->order)?>"
+			mediaWidth="<?=toHtml($media->data->width)?>"
+			mediaHeight="<?=toHtml($media->data->height)?>"
+			mediaOrientation="<?=toHtml($media->data->orientation)?>"
+			mediaRotation="<?=toHtml($media->data->rotation)?>"
+			mediaFlip="<?=toHtml($media->data->flip)?>"
 		></a>
 		<? endforeach; ?>
 		<div id="thumbCurrent"></div>

@@ -44,7 +44,7 @@ class Locale
 		
 		if (!$this->lang)
 			$this->lang = $this->langDefault;
-			
+
 		$file = $this->dir . $this->lang . '.json';
 
 		self::$index = json_decode(file_get_contents($file));
@@ -76,6 +76,14 @@ class Locale
 		
 		return preg_replace('/[\\n\\r]/', '<br />', toHtml($return));
 			
+	}
+	
+	public static function sdate($date)
+	{
+		if (!$date)
+			return '';
+		$date = strtotime($date);
+		return ucfirst(self::get('date.week.' . date('N', $date))) . ' ' . date('j', $date) . ' ' . self::get('date.month.' . date('n', $date)) . ' ' . date('Y', $date);
 	}
 }
 

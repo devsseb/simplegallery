@@ -47,7 +47,7 @@ class Simplegallery
 			success(l('album.message.welcome', $this->pathAlbums));
 	}
 	
-	private function getAlbums($dir = null, $depth = 0, $groupsParent = array())
+	private function getAlbums($dir = null, $depth = 0, $parentId = 0 ,$parentGroups = array())
 	{
 		if (!$dir)
 			$dir = $this->pathAlbums;
@@ -64,10 +64,11 @@ class Simplegallery
 				'id'	, 0,
 				'path'	, $dir . $album . '/',
 				'groups', array(),
-				'groupsParent', $groupsParent,
+				'parentId', $parentId,
+				'parentGroups', $parentGroups,
 				'data'	, null,
 				'depth'	, $depth,
-				'parent', $groupsParent
+				'parent', $parentGroups
 			);
 			
 			if (is_file($album->path . '.id')) {
@@ -82,6 +83,12 @@ class Simplegallery
 			if (!is_object($album->data))
 				$album->data = new StdClass();
 
+			if (!exists($album->data->name))
+				$album->data->name = $album->name;
+			if (!exists($album->data->date))
+				$album->data->date = object('start', '', 'end', '');
+			if (!exists($album->data->description))
+				$album->data->description = '';
 			
 			$groupsAllow = array('admins');
 			foreach ($this->config->groups as $group) {
@@ -92,7 +99,7 @@ class Simplegallery
 				if ($access !== null)
 					$album->groups[$group] = $access;
 				else {
-					$album->groups[$group] = get($groupsParent, k($group), -2);
+					$album->groups[$group] = get($parentGroups, k($group), -2);
 					if ($album->groups[$group] >= 0)
 						$album->groups[$group]-= 2;
 				}
@@ -102,12 +109,53 @@ class Simplegallery
 			
 			if (array_intersect($this->user->groups, $groupsAllow))
 				$albums[] = $album;
-			foreach ($this->getAlbums($album->path, $depth+1, $album->groups) as $album)
-				$albums[] = $album;
+				
+			$children = $this->getAlbums($album->path, $depth+1, $album->id, $album->groups);
+			foreach ($children as $child)
+				$albums[] = $child;
 
 		}
 
-		return $albums;
+		return $this->albumsSort($albums, $parentId);
+	}
+	
+	private function albumsSort($albums, $parentId)
+	{
+		$result = $index = array();
+		$last = false;
+		foreach ($albums as $album) {
+			if ($album->parentId != $parentId) {
+				if ($last)
+					$last->children[] = $album;
+				else
+					$result[] = $album;
+				continue;
+			}
+				
+			
+			$start = $album->data->date->start;
+			$end = $album->data->date->end;
+			if (!$start)
+				$start = $end;
+			if (!$end)
+				$end = $start;
+			if (!$start)
+				$start = $end = '0000-00-00';
+			
+			$index[$start . $end . '.' . $album->data->name] = object(
+				'album', $album,
+				'children', array()
+			);
+			$last = &$index[$start . $end . '.' . $album->data->name];
+		}
+		
+		ksort($index);
+		foreach ($index as $data) {
+			$result[] = $data->album;
+			foreach ($data->children as $album)
+				$result[] = $album;
+		}
+		return $result;
 	}
 	
 	// Return album infos
@@ -121,7 +169,7 @@ class Simplegallery
 
 		// Retrieve files of album dir ...
 		$album->medias = array();
-
+		$mediasOrder = array();
 		$medias = getDir($album->path);
 		// ... and generate medias list
 		foreach ($medias as $i => $media) {
@@ -139,13 +187,35 @@ class Simplegallery
 				continue;
 			}
 
-			$album->medias[$media] = object(
+			$mediaData = get($album->data, k('medias', $media), new StdClass());
+			if (!exists($mediaData, 'md5'))
+				$mediaData->md5 = '';
+			if (!exists($mediaData, 'order'))
+				$mediaData->order = 0;
+			if (!exists($mediaData, 'width'))
+				$mediaData->width = 0;
+			if (!exists($mediaData, 'height'))
+				$mediaData->height = 0;
+			if (!exists($mediaData, 'orientation'))
+				$mediaData->orientation = 1;
+			if (!exists($mediaData, 'rotation'))
+				$mediaData->rotation = 0;
+			if (!exists($mediaData, 'flip'))
+				$mediaData->flip = '';
+			
+			if (!exists($mediasOrder, $mediaData->order))
+				$mediasOrder[$mediaData->order] = array();
+			$mediasOrder[$mediaData->order][] = object(
 				'name', $media,
 				'file', $mediaFile,
 				'type', $mediaType,
-				'data', get($album->data, k('medias', $media), new StdClass())
+				'data', $mediaData
 			);
 		}
+		
+		foreach ($mediasOrder as $medias)
+			foreach ($medias as $media)
+				$album->medias[$media->name] = $media;
 
 		return $album;
 	}
@@ -153,10 +223,24 @@ class Simplegallery
 	public function albumUpdate($id, $data)
 	{
 		$album = $this->getAlbum($id);
+
+		if ($data['name'] == '' or $album->name == $data['name'])
+			unset($album->data->name);
+		else
+			$album->data->name = $data['name'];
+		$album->data->date = object(
+			'start', $data['date-start'],
+			'end', $data['date-end']
+		);
+		$album->data->description = $data['description'];
 		
-		$data['name'] =str_replace(array('/\\:<>?*"|'), '_', trim($data['name']));
-		if ($data['name'] and $data['name'] != $album->name)
-			rename($album->path, dirname($album->path) . '/' . $data['name']);
+		$reorder = $data['reorder'];
+		if ($reorder) {
+			$reorder = json_decode($reorder);
+			foreach ($reorder as $order => $media)
+				if (exists($album->data->medias, $media))
+					$album->data->medias->$media->order = $order;
+		}
 		
 		$access = $data['access'];
 		foreach ($access as $group => $value) {
