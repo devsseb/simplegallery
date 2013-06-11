@@ -213,6 +213,7 @@ class Simplegallery
 			);
 		}
 		
+		ksort($mediasOrder);
 		foreach ($mediasOrder as $medias)
 			foreach ($medias as $media)
 				$album->medias[$media->name] = $media;

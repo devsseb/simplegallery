@@ -703,8 +703,8 @@ var Simplegallery = new Class({
 		var size = this.mediaThumbs.getSize();
 		
 		position = {
-			x: e.client.x - position.x - 37,
-			y: e.client.y - position.y - 37
+			x: e.page.x - position.x - 37,
+			y: e.page.y - position.y - 37
 		};
 		if (position.x < 0)
 			position.x = 0;
@@ -721,7 +721,7 @@ var Simplegallery = new Class({
 			top: position.y
 		});
 		
-		var overs = document.elementsFromPoint(e.client.x, e.client.y);
+		var overs = document.elementsFromPoint(e.page.x, e.page.y);
 		for (var i = 0, el; el = overs[i]; i++) {
 			if (!el.hasClass('thumb'))
 				break;
@@ -730,7 +730,7 @@ var Simplegallery = new Class({
 				continue;
 			
 			this.reorderTarget = el;
-			this.reorderTargetLeft = e.client.x <= this.reorderTarget.getPosition().x + 37;
+			this.reorderTargetLeft = e.page.x <= this.reorderTarget.getPosition().x + 37;
 			
 			var position = this.reorderTarget.getPosition(this.mediaThumbs);
 			this.thumbCurrent.setStyles({
