@@ -1,5 +1,8 @@
 **TODO :**
 * Convert video medias to webm and/or mp4
+* Browse albums by date with calendar
+* Add description and comments for medias
+* Tag medias
 * Comment code
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
@@ -13,3 +16,4 @@
 * ~~Test on IE :'(~~
 * ~~Rename album virtually, add date (start and/or end) and description~~
 * ~~Sort medias manually~~
+* ~~Send mail to administrator at user registration~~

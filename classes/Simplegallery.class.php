@@ -732,8 +732,9 @@ class Simplegallery
 		$user->mail = $mail;
 		$user->password = $password ? $this->userCryptPassword($password) : null;
 		$user->active = randomString(12);
+		$user->groups = array();
 		if (!(bool)(array)$this->config->users)
-			$user->groups = array('admins');
+			$user->groups[] = 'admins';
 
 		if (!is_object($this->config->users))
 			$this->config->users = new StdClass();
@@ -749,7 +750,18 @@ class Simplegallery
 			l('mail.registration.message', $user->name) . '<a href="' . $link . '">' . $link . '</a>' . l('mail.signature', $this->config->parameters->name)
 		);
 
-	
+		foreach ($this->config->users as $admin) {
+
+			if (!in_array('admins', $admin->groups))
+				continue;
+
+			$this->mail(
+				$admin->mail,
+				l('mail.registration-admin.object', $this->config->parameters->name, $user->name, $user->mail),
+				l('mail.registration-admin.message', $admin->name) . l('mail.signature', $this->config->parameters->name)
+			);
+		}
+
 		if (!is_null($password))
 			success(l('user.message.registration-active-link-sent'), $successLink);
 	}

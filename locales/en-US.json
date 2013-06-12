@@ -144,6 +144,10 @@
 			"object":"[%1] Registration, please active your account",
 			"message":"Hello %1,\n\nTo activate your account, please click on the following link :\n"
 		},
+		"registration-admin":{
+			"object":"[%1] New registration of %2 (%3)",
+			"message":"Hello %1,\n\nA new account has been registered. Now you can assign groups in the administration."
+		},
 		"mail-update":{
 			"object":"[%1] Mail update, please valid your mail",
 			"message":"Hello %1,\n\nTo activate your mail updating, please click on the following link :\n"
