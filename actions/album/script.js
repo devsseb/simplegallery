@@ -382,12 +382,13 @@ var Simplegallery = new Class({
 
 		this.mediaSetTransform()
 
+		var src = this.media.url + '&dim=' + this.mode;
 		switch (this.media.type) {
 			case 'image' :
-				this.mediaElement.set('src', this.media.url + '&dim=' + this.mode);
+				this.mediaElement.set('src', src);
 			break;
 			case 'video' :
-				new Element('source', {src: this.media.url, type: 'video/webm'}).inject(this.mediaElement);
+				new Element('source', {src: src, type: 'video/webm'}).inject(this.mediaElement);
 				this.mediaElement.load();
 			break;
 		}

@@ -135,7 +135,8 @@
 			"update-nothing":"No thumbnail to update",
 			"update-start":"Update \"%1\" ...",
 			"update-sprite":"thumbnail generated in \"%1\"",
-			"update-file":"\"%1\" generated"
+			"update-file":"\"%1\" generated",
+			"update-video":"ffmpeg conversion"
 		}
 	},
 	"mail": {

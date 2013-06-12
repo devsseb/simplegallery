@@ -1,5 +1,7 @@
 <?
 
+include_once(__DIR__ . '/Ffmpeg.class.php');
+
 class Simplegallery
 {
 	private $lastId, $passwordLostTimeOut = 'PT2H';
@@ -286,7 +288,8 @@ class Simplegallery
 		foreach ($album->medias as $media) {
 
 			$needUpdate = get($media->data, k('md5')) != md5_file($media->file);
-		
+			$videosDeleted = array();
+
 			foreach ($this->dimensions as $dimension) {
 			
 				if ($dimension->type == 'sprite') {
@@ -311,22 +314,36 @@ class Simplegallery
 
 				} else {
 
-					$thumb = $media->name . '.' . $dimension->size . '-' . $dimension->type . '.jpg';				
-
-					if (!$needUpdate)
-						$needUpdate = !exists($delete, $thumb);
+					if ($media->type == 'image') {
+						$thumb = $media->name . '.' . $dimension->size . '-' . $dimension->type . '.jpg';
+						if (!$needUpdate)
+							$needUpdate = !exists($delete, $thumb);
+					} else {
+						$thumb = $media->name . '.webm';
+						if ('webm' == strtolower(pathinfo($media->name, PATHINFO_EXTENSION)))
+							$needUpdate = false;
+						else {
+							$dimension = 'convert';
+							if (!$needUpdate and !exists($videosDeleted, $thumb))
+								$needUpdate = !exists($delete, $thumb);
+						}
+					}
 				
 				}
 
-				if (!get($delete, k($thumb, 'medias')))
+				if (!get($delete, k($thumb, 'medias'))) {
 					unset($delete[$thumb]);
-				
+					if ($media->type == 'video')
+						$videosDeleted[$thumb] = true;
+				}
+
 				if (!$needUpdate)
 					continue;
 
 				if (!exists($update, $media->name))
 					$update[$media->name] = object('media', $media, 'dimensions', array());
-				$update[$media->name]->dimensions[] = $dimension;
+				if (!in_array($dimension, $update[$media->name]->dimensions))
+					$update[$media->name]->dimensions[] = $dimension;
 
 			}
 		}
@@ -423,80 +440,129 @@ class Simplegallery
 				// Progression
 				resetTimout();
 				$progress->percent = round(++$progress->now * 100 / $progress->total);
-
-				// Create or load thumb image
-				$file = ($dimension->type == 'sprite' ? '' : $media->name . '.') . $dimension->size . '-' . $dimension->type . '.jpg';
-				$fileThumb = $album->pathThumbs . $file;
-				$new = true;
-				if ($dimension->type == 'sprite' and !$new = !is_file($fileThumb))
-					// Load existant sprite
-					$imgThumb = imagecreatefromstring(file_get_contents($fileThumb));
-
-				// Create thumbs entry for album data
-				if (!exists($album->data->thumbs, $file))
-					$album->data->thumbs->$file = object('md5', '');
-
-				// Prepare vars for resize and crop image
-				$dstY = $lagX = $lagY = 0;
-				if ($dimension->type == 'sprite') {
 				
-					if ($geometry->width >= $geometry->height) {
-						$srcWidth = $geometry->height;
-						$srcHeight = $geometry->height;
-						$lagX = ($geometry->width - $geometry->height)/2;
+				if ($dimension == 'convert') {
+					
+					$options = array(
+						'-threads'	=> 0,
+						'pass' => 2,
+						'video' => array(
+							'-vcodec'	=> 'libvpx',
+							'-b:v'		=> '1500k', 
+							'-minrate'	=> 0,
+							'-maxrate'	=> '9000k',
+							'-qmin'		=> 1,
+							'-qmax'		=> 51
+						),
+						'video-vp8' => array(
+							'-rc_lookahead'	=> 16,
+							'-keyint_min'	=> 0,
+							'-g'		=> 360,
+							'-skip_threshold' => 0,
+							'-level'	=> 116
+						),
+						'audio:1' => array( //pass 1
+							'-an' => null
+						),
+						'audio:2' => array( //pass 2
+							'-acodec'	=> 'libvorbis',
+							'-ab'		=> '192k'
+						)
+					);
+
+					$file = $media->name . '.webm';
+					$fileThumb = $album->pathThumbs . $file;
+					write(chr(9) . chr(9) . l('album.generation.update-video') . ' :');
+					$lastPercent = -1;
+					Ffmpeg::convert($media->file, $fileThumb, $options, function($current, $total, $pass) use (&$lastPercent) {
+						$current = ($pass - 1) * $total + $current;
+						$percent = floor($current * 100 / ($total * 2));
+						if ($percent > $lastPercent)
+							write(' ' . $percent . '%');
+						$lastPercent = $percent;
+					});
+					write('', true);
+					
+					// Create thumbs entry for album data
+					if (!exists($album->data->thumbs, $file))
+						$album->data->thumbs->$file = object('md5', '');
+					
+				} else {
+
+					// Create or load thumb image
+					$file = ($dimension->type == 'sprite' ? '' : $media->name . '.') . $dimension->size . '-' . $dimension->type . '.jpg';
+					$fileThumb = $album->pathThumbs . $file;
+					$new = true;
+					if ($dimension->type == 'sprite' and !$new = !is_file($fileThumb))
+						// Load existant sprite
+						$imgThumb = imagecreatefromstring(file_get_contents($fileThumb));
+
+					// Create thumbs entry for album data
+					if (!exists($album->data->thumbs, $file))
+						$album->data->thumbs->$file = object('md5', '');
+
+					// Prepare vars for resize and crop image
+					$dstY = $lagX = $lagY = 0;
+					if ($dimension->type == 'sprite') {
+				
+						if ($geometry->width >= $geometry->height) {
+							$srcWidth = $geometry->height;
+							$srcHeight = $geometry->height;
+							$lagX = ($geometry->width - $geometry->height)/2;
+						} else {
+							$srcWidth = $geometry->width;
+							$srcHeight = $geometry->width;
+							$lagY = ($geometry->height - $geometry->width)/2;
+						}
+						$dstWidth = $dstHeight = $dimension->size;
+					
+						if (!exists($album->data->thumbs->$file, 'index'))
+							$album->data->thumbs->$file->index = array();
+					
+						// Retrieve index for sprite
+						$index = $new ? 0 : array_search($media->name, $album->data->thumbs->$file->index);
+						//Insert
+						if ($index === false) {
+							$spriteHeight = imagesy($imgThumb);
+							$index = $spriteHeight / $dimension->size;
+								$imgNewThumb = imagecreatetruecolor($dimension->size, $spriteHeight + $dimension->size);
+							imagecopy($imgNewThumb, $imgThumb, 0, 0, 0, 0, $dimension->size, $spriteHeight);
+							imagedestroy($imgThumb);
+							$imgThumb = $imgNewThumb;
+						}
+						// Save index for thumb sprite
+						$album->data->thumbs->$file->index[$index] = $media->name;
+
+						$dstY = $index * $dimension->size;
 					} else {
 						$srcWidth = $geometry->width;
-						$srcHeight = $geometry->width;
-						$lagY = ($geometry->height - $geometry->width)/2;
+						$srcHeight = $geometry->height;
+						if ($geometry->width >= $geometry->height) {
+							$dstWidth = $dimension->size;
+							$dstHeight = floor($dimension->size * $geometry->height / $geometry->width);
+						} else {
+							$dstWidth = floor($dimension->size * $geometry->width / $geometry->height);
+							$dstHeight = $dimension->size;
+						}
 					}
-					$dstWidth = $dstHeight = $dimension->size;
-					
-					if (!exists($album->data->thumbs->$file, 'index'))
-						$album->data->thumbs->$file->index = array();
-					
-					// Retrieve index for sprite
-					$index = $new ? 0 : array_search($media->name, $album->data->thumbs->$file->index);
-					//Insert
-					if ($index === false) {
-						$spriteHeight = imagesy($imgThumb);
-						$index = $spriteHeight / $dimension->size;
-							$imgNewThumb = imagecreatetruecolor($dimension->size, $spriteHeight + $dimension->size);
-						imagecopy($imgNewThumb, $imgThumb, 0, 0, 0, 0, $dimension->size, $spriteHeight);
-						imagedestroy($imgThumb);
-						$imgThumb = $imgNewThumb;
-					}
-					// Save index for thumb sprite
-					$album->data->thumbs->$file->index[$index] = $media->name;
+				
+					if ($new)
+						$imgThumb = imagecreatetruecolor($dstWidth, $dstHeight);
+				
+					imagecopyresampled($imgThumb, $imgMedia, 0, $dstY, $lagX, $lagY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
 
-					$dstY = $index * $dimension->size;
-				} else {
-					$srcWidth = $geometry->width;
-					$srcHeight = $geometry->height;
-					if ($geometry->width >= $geometry->height) {
-						$dstWidth = $dimension->size;
-						$dstHeight = floor($dimension->size * $geometry->height / $geometry->width);
-					} else {
-						$dstWidth = floor($dimension->size * $geometry->width / $geometry->height);
-						$dstHeight = $dimension->size;
-					}
+					imagejpeg($imgThumb, $fileThumb);
+					imagedestroy($imgThumb);
 				}
-				
-				if ($new)
-					$imgThumb = imagecreatetruecolor($dstWidth, $dstHeight);
-				
-				imagecopyresampled($imgThumb, $imgMedia, 0, $dstY, $lagX, $lagY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
-
-				imagejpeg($imgThumb, $fileThumb);
-				imagedestroy($imgThumb);
 
 				// Save md5 of thumb (for cache management)
 				$album->data->thumbs->$file->md5 = md5_file($fileThumb);
 			
 				write(chr(9) . str_pad($progress->percent, 3, ' ', STR_PAD_LEFT) . ' % - ' . str_pad($progress->now, strlen($progress->total), ' ', STR_PAD_LEFT) . ' / ' . $progress->total . ' - ');
-				if ($dimension->type == 'sprite')
-					write(l('album.generation.update-sprite', $file), true);
-				else
+				if ($dimension == 'convert' or $dimension->type != 'sprite')
 					write(l('album.generation.update-file', $file), true);
+				else
+					write(l('album.generation.update-sprite', $file), true);
 
 			}
 			
@@ -523,12 +589,19 @@ class Simplegallery
 		if ($dim and !$dim = get($this->dimensions, k($dim)))
 			die(l('album.media.not-found'));
 			
+		$mediaType = $this->getMediaType($media);
+		if ($mediaType == 'video' and 'webm' == strtolower(pathinfo($media, PATHINFO_EXTENSION)))
+			$dim = null;
 			
 		if ($dim) {
 			if ($dim->type == 'sprite')
 				$file = $dim->size . '-' . $dim->type . '.jpg';
-			else
-				$file = $media . '.' . $dim->size . '-' . $dim->type . '.jpg';
+			else {
+				if ($mediaType == 'image')
+					$file = $media . '.' . $dim->size . '-' . $dim->type . '.jpg';
+				else
+					$file = $media . '.webm';
+			}
 			$md5 = get($album, k('data', 'thumbs', $file, 'md5'));
 			$file = $album->pathThumbs . $file;
 		} else {
@@ -660,7 +733,7 @@ class Simplegallery
 		$ext = strtolower(pathinfo($media, PATHINFO_EXTENSION));
 		if (in_array($ext, array('jpg', 'jpeg', 'png')))
 			return 'image';
-		elseif (in_array($ext, array('webm', 'mp4')))
+		elseif (in_array($ext, array('webm', 'mp4', 'mts', 'mpg', 'avi')))
 			return 'video';
 
 		return false;

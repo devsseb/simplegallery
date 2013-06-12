@@ -10,7 +10,7 @@
 	"admin": {
 		"_":"Administration",
 		"message": {
-			"parameters-update-success":"Les paramètres ont été modifié avec succès.",
+			"parameters-update-success":"Les paramètres ont été modifiés avec succès.",
 			"user-delete-success":"L'utilisateur a été supprimé avec succès.",
 			"user-add-empty-name":"Le nom ne peut être vide.",
 			"user-add-empty-mail":"Le mail ne peut être vide."
@@ -83,7 +83,7 @@
 		"message": {
 			"welcome":"Vous pouvez maintenant ajouter des albums et des médias dans %1.",
 			"error":"Album introuvable.",
-			"update-success":"Les paramètres de l'album on été modifier avec succès.",
+			"update-success":"Les paramètres de l'album ont été modifiés avec succès.",
 			"download-error":"Impossible de créer l'archive pour l'album : %1.",
 			"generate-success":"Les vignettes ont été générées avec succès.",
 			"generate-update":"Des miniatures sont manquantes ou obsolètes pour cet album.",
@@ -135,7 +135,8 @@
 			"update-nothing":"Aucune minitaure à mettre à jour",
 			"update-start":"Mise à jour de \"%1\" ...",
 			"update-sprite":"miniature générée dans  \"%1\"",
-			"update-file":"\"%1\" généré"
+			"update-file":"\"%1\" généré",
+			"update-video":"conversion ffmpeg"
 		}
 	},
 	"mail": {
