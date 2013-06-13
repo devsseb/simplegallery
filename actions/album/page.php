@@ -71,6 +71,9 @@
 		<? endforeach; ?>
 		</table>
 		<div class="album-admin-button"><input type="submit" value="<?=l('apply')?>" /></div>
+		<div class="album-admin-links">
+			<a href="?album&amp;id=<?=$album->id?>&amp;generate-data"><?=l('album.generate-data')?></a>
+		</div>
 	</form>
 	<? endif; ?>
 	<? if (exists($album->data, 'thumbs') or !$album->medias) : ?>

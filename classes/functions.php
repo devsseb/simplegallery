@@ -138,8 +138,10 @@ function httpUrl()
 	return $url;
 }
 
-function object($x)
+function object($x = null)
 {
+	if ($x == null)
+		return new StdClass();
 	if (is_array($x))
 		return (object)$x;
 	$args = func_get_args();

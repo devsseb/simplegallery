@@ -13,7 +13,7 @@ class Simplegallery
 		$this->pathAlbums = $this->root . 'albums/';
 		$this->pathThumbs = $this->root . 'thumbs/';
 
-		$this->config = new StdClass();
+		$this->config = object();
 		$files = getDir($this->pathConfig);
 		foreach ($files as $file) {
 			$name = basename($file, '.json');
@@ -83,7 +83,7 @@ class Simplegallery
 			}
 
 			if (!is_object($album->data))
-				$album->data = new StdClass();
+				$album->data = object();
 
 			if (!exists($album->data->name))
 				$album->data->name = $album->name;
@@ -189,7 +189,7 @@ class Simplegallery
 				continue;
 			}
 
-			$mediaData = get($album->data, k('medias', $media), new StdClass());
+			$mediaData = get($album->data, k('medias', $media), object());
 			if (!exists($mediaData, 'md5'))
 				$mediaData->md5 = '';
 			if (!exists($mediaData, 'order'))
@@ -374,9 +374,9 @@ class Simplegallery
 
 		// Create medias data and thumbs
 		if (!exists($album->data, 'medias'))
-			$album->data->medias = new StdClass();
+			$album->data->medias = object();
 		if (!exists($album->data, 'thumbs'))
-			$album->data->thumbs = new StdClass();
+			$album->data->thumbs = object();
 
 		// Delete files not required
 		write('<h4>' . l('album.generation.delete') . '</h4>');
@@ -497,10 +497,6 @@ class Simplegallery
 						// Load existant sprite
 						$imgThumb = imagecreatefromstring(file_get_contents($fileThumb));
 
-					// Create thumbs entry for album data
-					if (!exists($album->data->thumbs, $file))
-						$album->data->thumbs->$file = object('md5', '');
-
 					// Prepare vars for resize and crop image
 					$dstY = $lagX = $lagY = 0;
 					if ($dimension->type == 'sprite') {
@@ -573,6 +569,47 @@ class Simplegallery
 		write('</pre>');
 
 		success(l('album.message.generate-success'), '?album&id=' . $album->id);
+	}
+	
+	public function albumGenerateData($id)
+	{
+		// Retrieve album
+		$album = $this->getAlbum($id);
+
+		if (!exists($album->data, 'thumbs'))
+			$album->data->thumbs = object();
+
+		foreach ($album->medias as $media) {
+
+			foreach ($this->dimensions as $dimension) {
+			
+				if ($dimension->type == 'sprite')
+					// Can't regenerate index of sprite
+					continue;
+
+				if ($media->type == 'image')
+					$thumb = $media->name . '.' . $dimension->size . '-' . $dimension->type . '.jpg';
+				else {
+					if ('webm' == strtolower(pathinfo($media->name, PATHINFO_EXTENSION)))
+						// No need thumb file
+						continue; 
+						
+					$thumb = $media->name . '.webm';
+				}
+
+				if (!is_file($file = $album->pathThumbs . $thumb))
+					continue;
+					
+					
+					
+				$album->data->thumbs->$thumb = object('md5', md5_file($file));
+
+			}
+		}
+
+		$this->albumSaveConfig($album->id);
+		
+		success(l('album.message.generate-data-success'), '?album&id=' . $album->id);
 	}
 	
 	public function getMedia($albumId, $media = null, $dim = null)
@@ -800,7 +837,7 @@ class Simplegallery
 		if (!is_null($password) and $password !== $passwordCheck)
 			error(l('user.message.password-update-error'), $errorLink);
 
-		$user = new StdClass();
+		$user = object();
 		$user->name = $name;
 		$user->mail = $mail;
 		$user->password = $password ? $this->userCryptPassword($password) : null;
@@ -810,7 +847,7 @@ class Simplegallery
 			$user->groups[] = 'admins';
 
 		if (!is_object($this->config->users))
-			$this->config->users = new StdClass();
+			$this->config->users = object();
 
 		$this->config->users->$mail = $user;
 		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));

@@ -17,3 +17,4 @@
 * ~~Sort medias manually~~
 * ~~Send mail to administrator at user registration~~
 * ~~Convert video medias to webm~~
+* ~~Add options for regenerate data.json for an album~~

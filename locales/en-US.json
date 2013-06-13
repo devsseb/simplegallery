@@ -86,6 +86,7 @@
 			"update-success":"The parameters of the album have been updated successfully.",
 			"download-error":"Unable to create archive for album : %1.",
 			"generate-success":"The thumbnails have been generated successfully.",
+			"generate-data-success":"The data.json file have been generated successfully.",
 			"generate-update":"Some thumbnails are missing or outdated for this album.",
 			"generate-update-link":"You can click here to generate it.",
 			"generate-delete":"Some files on the \"thumbs\" folder in this album are not neccessary.",
@@ -106,6 +107,7 @@
 		"inherited":"I",
 		"forbidden":"F",
 		"granted":"G",
+		"generate-data":"regenerate the data.json",
 		"download":"Download album",
 		"loading":"Loading",
 		"media": {

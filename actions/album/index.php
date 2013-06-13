@@ -12,6 +12,9 @@
 	
 	if ($id = get($_GET, k('id'))) {
 		if ($sg->user->admin) {
+
+			if (exists($_GET, 'generate-data'))
+				$sg->albumGenerateData($id);
 			
 			if (exists($_GET, 'generate'))
 				$sg->albumGenerate($id);
