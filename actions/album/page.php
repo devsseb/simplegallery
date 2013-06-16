@@ -4,10 +4,44 @@
 <!-- Navigation zone -->
 <div class="albums-menu-background"></div>
 <div class="albums-menu">
-	<ul class="albums">
+
+	<? if (!get($sg->config->parameters, k('albums-calendar-disable'))) : ?>
+<!-- Calendar zone -->
+	<div class="albums-calendar">
+		<input id="albumsCalendarAlbumDate" type="hidden" value="<?=toHtml($album->data->date->start | $album->data->date->end)?>" />
+		<input id="albumsCalendarAlbumDates" type="hidden" value="<?=toHtml($dates)?>" />
+		<table id="albumsCalendar">
+			<thead>
+				<tr>
+					<th id="albumsCalendarYearPrevious">&lt;&lt;</th>
+					<th id="albumsCalendarMonthPrevious">&lt;</th>
+					<th colspan="4">
+						<span id="albumsCalendarYear"></span><br/>
+		<? for($i = 1 ; $i < 13 ; $i++) : ?>
+						<span class="albums-calendar-month albums-calendar-month-<?=$i?>"><?=l('date.month.' . $i)?></span>
+		<? endfor; ?>
+						
+					</th>
+					<th id="albumsCalendarMonthNext">&gt;</th>
+					<th id="albumsCalendarYearNext">&gt;&gt;</th>
+				</tr>
+				<tr>
+					<th></th>
+		<? for($i = 1 ; $i < 8 ; $i++) : ?>
+					<th><?=substr(l('date.week.' . $i), 0, 1)?></th>
+		<? endfor; ?>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		<div id="albumsCalendarLinks"></div>
+	</div>
+	<? endif; ?>
+	<ul id="albums">
 	<? foreach ($sg->albums as $albumMenu) : ?>
+<!-- Albums list zone -->
 		<li>
-			<a
+			<a class="album-link"
 				style="padding-left:<?=$albumMenu->depth * 15 + 5?>px;<?=get($_GET, k('id')) == $albumMenu->id ? 'background-color:rgba(119, 167, 197, 0.5);' : ''?>"
 				href="?album&id=<?=toHtml($albumMenu->id)?>"
 				title="<?
@@ -24,6 +58,9 @@
 					echo toHtml($albumMenu->data->description);
 					?>"
 			><?=toHtml($albumMenu->data->name)?></a>
+		<? if ($sg->user->admin) : ?>
+			<a class="album-admin-link" href="?album=admin&id=<?=toHtml($albumMenu->id)?>"></a>
+		<? endif; ?>
 		</li>
 	<? endforeach; ?>
 	</ul>
@@ -36,7 +73,7 @@
 <? if ($id) : ?>
 <div id="album">
 	<div id="albumId" style="display:none;"><?=toHtml($album->id)?></div>
-	<? if ($sg->user->admin) : ?>
+	<? if ($admin) : ?>
 	<!-- Update zone -->
 	<form class="album-admin" method="post" action="?album&id=<?=toUrl($album->id)?>">
 		<input type="hidden" name="id" value="<?=toHtml($album->id)?>" />
@@ -139,7 +176,7 @@
 			<a href="#" id="mediaSlideshowPause" title="<?=l('album.media.slideshow-pause')?>"></a>
 			<a href="#" id="mediaSlideshowStop" title="<?=l('album.media.slideshow-stop')?>"></a>
 		</div>
-		<? if ($sg->user->admin) : ?>
+		<? if ($admin) : ?>
 		<div id="mediaUpdate">
 			<ul>
 				<li id="mediaRotateLeft" title="<?=l('album.media.rotate-left')?>"></li>

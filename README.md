@@ -1,11 +1,10 @@
 **TODO :**
-* Browse albums by date with calendar
-* Add description and comments for medias
-* Tag medias
-* Comment code
+* Add description, date and comments for medias
+* Add possibilite to tag medias
+* Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
-* ~~Manage cache for pictures~~
+* ~~Manage cache for medias~~
 * ~~Option for disable registration~~
 * ~~Apply virtual roation on pircture~~
 * ~~Add users from the administration~~
@@ -18,3 +17,4 @@
 * ~~Send mail to administrator at user registration~~
 * ~~Convert video medias to webm~~
 * ~~Add options for regenerate data.json for an album~~
+* ~~Browse albums by date with calendar~~

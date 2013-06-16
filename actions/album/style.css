@@ -1,9 +1,11 @@
 .albums-menu-background{position:fixed;top:0px;left:0px;background-color:#323232;background-color:rgba(0,0,0,0.7);width:200px;height:100%;z-index:1;}
 .albums-menu{position:relative;float:left;width:200px;padding:15px 0px;color:#1b1b1b;z-index:3;}
-.albums{list-style-type:none;margin:0px;padding:0px;}
-.albums a{color:#fff;text-decoration:none;display:block;padding:3px 0px;font-weight:bold;background-color:#6f6f6f;background-color:rgba(255,255,255,0.1);border-top:1px dotted #323232;}
-.albums-menu>.albums>li:first-of-type>a{border-top:none;}
-.albums a:hover{background-color:#546c7b;background-color:rgba(255,255,255,0.3);}
+#albums{list-style-type:none;margin:0px;padding:0px;}
+#albums li{position:relative;}
+#albums a.album-link{color:#fff;text-decoration:none;display:block;padding:3px 0px;font-weight:bold;background-color:#6f6f6f;background-color:rgba(255,255,255,0.1);border-top:1px dotted #323232;}
+.albums-menu>#albums>li:first-of-type>a{border-top:none;}
+#albums a.album-link:hover{background-color:#546c7b;background-color:rgba(255,255,255,0.3);}
+.album-admin-link{display:none;position:absolute;width:21px;height:21px;background:#9cc8e4 url('images/album_admin.png') no-repeat center center;top:0px;left:200px;}
 
 #albumLocales{display:none;}
 #noAlbum{text-align:center;padding-top:20px;font-size:50px;color:#575757;}
@@ -65,4 +67,23 @@
 
 #reorderMarker{position:absolute;width:0px;height:75px;border:2px solid #fff;display:none;}
 
-
+.albums-calendar{position:relative;margin-bottom:15px;}
+#albumsCalendar{width:100%;table-layout:fixed;border-collapse:collapse;}
+#albumsCalendar th{color:#ccc;font-style:italic;text-transform:uppercase;}
+#albumsCalendar td{color:#fff;text-align:center;}
+.albums-calendar-month{display:none;color:#ccc;font-weight:bold;}
+#albumsCalendar th.albums-calendar-week-number{font-style:italic;color:#ccc;font-size:10px;border-right:1px solid #ccc;}
+#albumsCalendar td.albums-calendar-day-month-previous,
+#albumsCalendar td.albums-calendar-day-month-next{color:#929292;}
+#albumsCalendar td.albums-calendar-day-month-previous a,
+#albumsCalendar td.albums-calendar-day-month-next a{font-weight:normal;}
+#albumsCalendar td a{text-decoration:none;font-weight:bold;color:#9cc8e4;}
+#albumsCalendar td.albums-calendar-day-current{background-color:#b34d4d;}
+#albumsCalendar td.albums-calendar-day-album{background-color:#fff;}
+#albumsCalendarMonthPrevious,
+#albumsCalendarMonthNext,
+#albumsCalendarYearPrevious,
+#albumsCalendarYearNext{cursor:pointer;}
+#albumsCalendarLinks{position:absolute;display:none;background-color:#9cc8e4;padding:5px;white-space:nowrap;}
+#albumsCalendarLinks a{color:#323232;font-weight:bold;text-decoration:none;}
+#albumsCalendarLinks a:hover{text-decoration:underline;}

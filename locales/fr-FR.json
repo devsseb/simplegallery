@@ -19,7 +19,8 @@
 			"name":"Nom de la galerie",
 			"locale":"Langue",
 			"locale-auto":"Auto",
-			"registration-disable":"Inscription désactivée"
+			"registration-disable":"Inscription désactivée",
+			"albums-calendar-disable":"Calendrier désactivé"
 		},
 		"groups":"Groupes",
 		"users":"Utilisateurs",

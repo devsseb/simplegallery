@@ -19,7 +19,8 @@
 			"name":"Gallery name",
 			"locale":"Language",
 			"locale-auto":"Auto",
-			"registration-disable":"Registration disable"
+			"registration-disable":"Registration disable",
+			"albums-calendar-disable":"Calendar disable"
 		},
 		"groups":"Groups",
 		"users":"Users",

@@ -286,6 +286,8 @@ class Simplegallery
 		// Retrieve list of medias files who need update
 		$update = array();
 		foreach ($album->medias as $media) {
+		
+			resetTimout();
 
 			$needUpdate = get($media->data, k('md5')) != md5_file($media->file);
 			$videosDeleted = array();
@@ -982,6 +984,7 @@ class Simplegallery
 		$this->config->parameters->name = $data['name'];
 		$this->config->parameters->locale = $data['locale'];
 		$this->config->parameters->{'registration-disable'} = get($data, k('registration-disable'));
+		$this->config->parameters->{'albums-calendar-disable'} = get($data, k('albums-calendar-disable'));
 		file_put_contents($this->pathConfig . 'parameters.json', json_encode($this->config->parameters));
 	
 		$this->config->groups = preg_split('/\W+/', $data['groups']);

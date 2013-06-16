@@ -43,7 +43,33 @@ Element.NativeEvents = Object.merge(Element.NativeEvents, {
 });
 
 window.addEvent('domready', function() {
+
+	if ($$('.album-admin-link').length)
+		$$('.album-link,.album-admin-link').addEvents({
+			mouseenter: function(e)
+			{
+				if (e.target.hasClass('album-admin-link'))
+					var link = e.target.getPrevious('.album-link');
+				else
+					var link = e.target;
+				if (link.linkHide)
+					clearTimeout(link.linkHide);
+				link.getNext('.album-admin-link').setStyle('display', 'block');
+			},
+			mouseout: function(e)
+			{
+				if (e.target.hasClass('album-admin-link'))
+					var link = e.target.getPrevious('.album-link');
+				else
+					var link = e.target;
+		
+				var linkAdmin = link.getNext('.album-admin-link');
+				link.linkHide = linkAdmin.setStyle.delay(0, linkAdmin, ['display', 'none']);
+			}
+		});
+
 	new Simplegallery();
+	new Simplegallery.Calendar();
 });
 
 var Simplegallery = new Class({
@@ -759,5 +785,147 @@ var Simplegallery = new Class({
 		
 		if (this.mode == 'slideshow')
 			this.mediaSetSize();
+	}
+});
+
+Simplegallery.Calendar = new Class({
+	initialize: function()
+	{
+
+		this.dom = {};
+		if (!(this.dom.container = $$('.albums-calendar')[0]))
+			return;
+		
+		this.dom.albumDate = $('albumsCalendarAlbumDate');
+		this.dom.tbody = $('albumsCalendar').getElement('tbody');
+		this.dom.monthPrevious = $('albumsCalendarMonthPrevious');
+		this.dom.monthNext = $('albumsCalendarMonthNext');
+		this.dom.yearPrevious = $('albumsCalendarYearPrevious');
+		this.dom.yearNext = $('albumsCalendarYearNext');
+		this.dom.links = $('albumsCalendarLinks');
+		this.dom.months = $$('.albums-calendar-month');
+		this.dom.year = $('albumsCalendarYear');
+
+		this.initEvents();
+		
+		this.albumDate = this.dom.albumDate.get('value') || new Date().format('%Y-%m-%d');
+		this.albumsDates = JSON.decode($('albumsCalendarAlbumDates').get('value'));
+		
+		this.goDate = new Date(this.albumDate);
+		this.go();
+	},
+	initEvents: function()
+	{
+	
+		this.dom.monthPrevious.addEvent('click', function() {
+			this.go('previousMonth');
+		}.bind(this));
+		this.dom.monthNext.addEvent('click', function() {
+			this.go('nextMonth');
+		}.bind(this));
+		this.dom.yearPrevious.addEvent('click', function() {
+			this.go('previousYear');
+		}.bind(this));
+		this.dom.yearNext.addEvent('click', function() {
+			this.go('nextYear');
+		}.bind(this));
+		
+		this.dom.links.addEvents({
+			mouseenter: function(e) {
+				clearTimeout(this.linksHide);
+			}.bind(this),
+			mouseleave: function(e) {
+				this.linksHide = this.dom.links.setStyle.delay(500, this.dom.links, ['display', 'none']);
+			}.bind(this)
+		});
+
+	},
+	go: function(action)
+	{
+		this.dom.tbody.empty();
+	
+		if (action == 'previousMonth')
+			this.goDate.decrement('month');
+		else if (action == 'nextMonth')
+			this.goDate.increment('month');
+		else if (action == 'previousYear')
+			this.goDate.decrement('year');
+		else if (action == 'nextYear')
+			this.goDate.increment('year');
+
+		var month = this.goDate.get('month') + 1;
+		var firstDate = new Date(this.goDate.get('year') + '-' + month + '-01');
+		var firstDay = firstDate.get('day');
+		if (firstDay == 0)
+			firstDay = 7;
+		var week = firstDate.get('week');
+		var lastDay = firstDate.get('lastDayOfMonth');
+	
+		this.dom.months.setStyle('display', 'none');
+		$$('.albums-calendar-month-' + month).setStyle('display', 'inline');
+		this.dom.year.set('html', this.goDate.get('year'));
+
+		var day = 1;	
+		while (day <= lastDay) {
+			var tr = new Element('tr').inject(this.dom.tbody);
+			new Element('th[class=albums-calendar-week-number][html=' + week + ']').inject(tr);
+			for (var i = 1; i < 8; i++) {
+				var dayCurrent;
+				var dateCurrent = new Date(firstDate);
+				var classes = [];
+				if (i < firstDay) {
+					classes.push('albums-calendar-day-month-previous');
+					dateCurrent.decrement('day', firstDay - i);
+				} else if (day > lastDay) {
+					classes.push('albums-calendar-day-month-next');
+					dateCurrent.increment('month');
+					dateCurrent.increment('day', day++ -lastDay - 1);
+				} else {
+					classes.push('day');
+					dateCurrent.increment('day', day++ - 1);
+				}
+
+				var dateCurrentString = dateCurrent.format('%Y-%m-%d');
+				if (dateCurrentString == new Date().format('%Y-%m-%d'))
+					classes.push('albums-calendar-day-current');
+				if (dateCurrentString == this.albumDate)
+					classes.push('albums-calendar-day-album');
+
+				var albums = this.albumsDates[dateCurrent.format('%Y-%m-%d')];
+				var td = new Element('td[class=' + classes.join(' ') + ']').inject(tr);
+				td.store('albums', albums);
+
+				if (albums) {
+					new Element('a[href=?album&id=' + albums[0].id + '][title=' + albums.length + ' album' + (albums.length > 1 ? 's' : '') + '][html=' + dateCurrent.get('date') + ']').inject(td);
+					td.addEvents({
+						mouseenter: function(e) {
+							var albums = e.target.retrieve('albums');
+							if (!albums)
+								return;
+
+							clearTimeout(this.linksHide);
+							this.dom.links.empty();
+							for (var i = 0, album; album = albums[i]; i++)
+								new Element('a[html=' + album.name + '][href=?album&id=' + album.id + ']').inject(this.dom.links)
+							
+							var position = e.target.getPosition(this.dom.container);
+							var size = e.target.getSize();
+							
+							this.dom.links.setStyles({
+								display: 'block',
+								left: position.x,
+								top: position.y + size.y
+							});
+						}.bind(this),
+						mouseleave: function() {
+							this.linksHide = this.dom.links.setStyle.delay(500, this.dom.links, ['display', 'none']);
+						}.bind(this)
+					});
+				} else
+					new Element('span[html=' + dateCurrent.get('date') + ']').inject(td);
+			}
+			firstDay = 0;
+			week++;
+		}
 	}
 });
