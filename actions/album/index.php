@@ -15,7 +15,7 @@
 	
 	if ($id = get($_GET, k('id'))) {
 
-		if ($admin = ($_GET['album'] == 'admin' and $sg->user->admin)) {
+		if ($sg->user->admin) {
 			
 			// data.json regeneration
 			if (exists($_GET, 'generate-data'))
@@ -37,6 +37,8 @@
 		
 			// Retrieve album $id
 			$album = $sg->getAlbum($id);
+
+		$admin = ($_GET['album'] == 'admin' and $sg->user->admin);
 
 		// Prepare css transformation for medias
 		foreach($album->medias as $media) {

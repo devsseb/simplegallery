@@ -15,25 +15,6 @@ Element.implement({
 	}
 });
 
-Document.implement({
-	elementsFromPoint: function(x, y){
-		var elements = new Elements();
-		for(var i = 0, el; el = document.all[i]; i++) {
-			var position = el.getPosition();
-			var size = el.getSize();
-			if(
-				x < position.x ||
-				x > (position.x + size.x) ||
-				y < position.y ||
-				y > (position.y + size.y)
-			)
-				continue;
-			elements.push(el);
-		}
-		return elements.reverse();
-	}
-});
-
 // Add html5 video tag events on Mootools
 Element.NativeEvents = Object.merge(Element.NativeEvents, {
 	loadstart: 2, progress: 2, suspend: 2, abort: 2, error: 2, emptied: 2,
@@ -99,6 +80,7 @@ var Simplegallery = new Class({
 		
 		this.album = $('albumId').get('text');
 		this.thumbCurrent = $('thumbCurrent');
+		this.thumbShadow = $('thumbShadow');
 		this.mediaAction = $('mediaAction');
 			this.mediaSlideshowStart = $('mediaSlideshowStart');
 			this.mediaSlideshowEnd = $('mediaSlideshowEnd');
@@ -121,8 +103,13 @@ var Simplegallery = new Class({
 		this.mediaImage = $('mediaImage');
 		this.mediaVideo = $('mediaVideo');
 		
-		if (this.albumAdminReorder = $('albumAdminReorder'))
+		this.albumsMenu = $('albumsMenu');
+		this.albumsMenu.distanceTop = this.albumsMenu.getPosition().y + 10;
+		if (this.albumAdmin = $('albumAdmin')) {
+			this.albumAdminReorder = $('albumAdminReorder');
 			this.albumAdminReorderValue = $('albumAdminReorderValue');
+			this.albumAdmin.distanceTop = this.albumAdmin.getPosition().y;
+		}
 		
 		if (!this.mediaVideo.pause)
 			this.mediaVideo.pause = function(){};
@@ -152,7 +139,7 @@ var Simplegallery = new Class({
 	initEvents: function()
 	{
 		this.thumbs = $$('.thumb').addEvent('click', function(e) {
-			this.mediaLoad(e.target);
+				this.mediaLoad(e.target);
 		}.bind(this));
 
 		this.mediaImage.fadeIn = new Fx.Tween(this.mediaImage, {
@@ -168,10 +155,10 @@ var Simplegallery = new Class({
 		});
 		
 		$$(this.mediaImage, this.mediaVideo).addEvents({
-			load: function(e, src) {
+			load: function(src) {
 
-				if (!src && e)
-					src = e.target.get('src');
+				if (src.target)
+					src = src.target.get('src');
 				if (src && src[0] != '?')
 					return;
 
@@ -189,7 +176,7 @@ var Simplegallery = new Class({
 				this.mediaAction.setStyle('display', 'block');
 			}.bind(this),
 			loadeddata: function(e) {
-				e.target.fireEvent('load', [e, e.target.getElement('source').get('src')]);
+				e.target.fireEvent('load', [e.target.getElement('source').get('src')]);
 			},
 			ended: function() {
 				if (this.slideshow.play && this.mode == 'slideshow')
@@ -267,19 +254,7 @@ var Simplegallery = new Class({
 		}
 
 		window.addEvents({
-			scroll: function() {
-				if (window.getScroll().y >= this.preview.distanceTop)
-					this.preview.setStyles({
-						position: 'fixed', 
-						top: -10
-					});
-				else
-					this.preview.setStyles({
-						position: 'absolute', 
-						top: 0
-					});
-				this.setMediaActionPosition();
-			}.bind(this),
+			scroll: this.scroll.bind(this),
 			keydown: function(e) {
 				if (['input', 'textarea'].contains(e.target.get('tag')))
 					return;
@@ -400,11 +375,15 @@ var Simplegallery = new Class({
 
 		this.mediaImage.set('src', this.blank);
 		this.mediaVideo.getElements('source').destroy();
+		this.mediaVideo.load();
 
 		this.mediaElement = this[this.media.type == 'image' ? 'mediaImage' : 'mediaVideo'];
 
 		this[this.media.type == 'image' ? 'mediaVideo' : 'mediaImage'].setStyle('display', 'none');
-		this.mediaElement.setStyle('display', 'block');
+		this.mediaElement.setStyles({
+			display: 'block',
+			opacity: 0
+		});
 
 		this.mediaSetTransform()
 
@@ -459,7 +438,7 @@ var Simplegallery = new Class({
 			
 			this.mediaSetTransform();
 			
-			this.mediaElement.fireEvent('load');
+			this.mediaElement.fireEvent('load', this.mediaElement.get('src'));
 		}
 		
 		if (update == 'delete') {
@@ -481,26 +460,43 @@ var Simplegallery = new Class({
 		var mode = this[this.mode];
 
 		var size = mode.getSize();
-		var x = this.media.width / this.media.height > size.x / size.y;
 		var angle = this.mediaGetRotation();
-		var horizontal = (this.media.width > this.media.height && (angle == 0 || angle == 180));	
-		if (horizontal)
-			x = !x;
-		mode.size = size[x ? 'x' : 'y'];
-		if (mode.size > 1000)
-			mode.size = 1000;
+		
+		var mediaRatio = (angle == 0 || angle == 180) ? this.media.width / this.media.height : this.media.height / this.media.width
+		var x = mediaRatio > size.x / size.y;
+		size = mode.size = size[x ? 'x' : 'y'];
+	
+		if (
+			this.mode == 'slideshow' &&
+			(this.media.width > this.media.height && (angle == 0 || angle == 180)) ||
+			(this.media.height > this.media.width && (angle == 90 || angle == 270))
+		) {
+			size*= this.media.width / this.media.height;
+		}
+
+		if (size > 1000)
+			size = 1000;
 
 		this.mediaElement.size = {
-			width: this.media.width > this.media.height ? mode.size : mode.size * this.media.width / this.media.height,
-			height: this.media.width > this.media.height ? mode.size * this.media.height / this.media.width : mode.size
+			width: this.media.width > this.media.height ? size : size * this.media.width / this.media.height,
+			height: this.media.width > this.media.height ? size * this.media.height / this.media.width : size
 		};
+
+		if (this.mode == 'slideshow') {
+			if (angle == 0 || angle == 180)
+				var sizeRef = this.mediaElement.size.height;
+			else
+				var sizeRef = this.mediaElement.size.width;
+			this.mediaElement.size.marginTop = (mode.size - sizeRef) / 2;
+		}
+
 		var transform = this.media.type == 'image' ? this.media.transform + ' translateX(' + this.mediaGetTransformLag() + 'px)' : 'none';
 
 		this.mediaBackground.setStyles(this.mediaElement.size).setStyle3('transform', transform);
+
 		this.mediaElement.setStyles({
 			width: this.mediaElement.size.width,
-			height: this.mediaElement.size.height,
-			opacity: 0
+			height: this.mediaElement.size.height
 		});
 
 		this.setMediaActionPosition();
@@ -693,12 +689,12 @@ var Simplegallery = new Class({
 	{
 		if (!this.reorderActive)
 			return false;
-			
-		this.reorderThumb = e.target.setStyles({
-			position: 'absolute',
+		
+		this.reorderThumb = e.target;
+		this.thumbShadow.setStyles({
 			opacity: 0.7,
-			zIndex: 20
-		});
+			display: 'block'
+		}).grab(this.reorderThumb.clone());
 		this.reorderMove(e);
 	},
 	reorderEnd: function()
@@ -709,11 +705,7 @@ var Simplegallery = new Class({
 		if (this.reorderTarget)
 			this.reorderThumb.inject(this.reorderTarget, this.reorderTargetLeft ? 'before' : 'after');
 		
-		this.reorderThumb.setStyles({
-			position: 'static',
-			opacity: 1,
-			zIndex: 'auto'
-		});
+		this.thumbShadow.setStyle('display', 'none').empty();
 		this.reorderThumb = this.reorderTarget = false;
 		this.thumbCurrent.setStyle('display', 'none');
 		
@@ -725,6 +717,8 @@ var Simplegallery = new Class({
 	{
 		if (!this.reorderActive || !this.reorderThumb)
 			return;
+
+		e.preventDefault();
 		
 		var position = this.mediaThumbs.getPosition();
 		var size = this.mediaThumbs.getSize();
@@ -743,23 +737,26 @@ var Simplegallery = new Class({
 		else if (position.y > size.y - 75)
 			position.y = size.y - 75
 		
-		this.reorderThumb.setStyles({
+		this.thumbShadow.setStyles({
 			left: position.x,
 			top: position.y
 		});
 		
-		var overs = document.elementsFromPoint(e.page.x, e.page.y);
-		for (var i = 0, el; el = overs[i]; i++) {
-			if (!el.hasClass('thumb'))
-				break;
-			
-			if (el.getStyle('position') == 'absolute')
+		// Get media under mouse
+		for (var i = 0, thumb; thumb = this.thumbs[i]; i++) {
+		
+			var position = thumb.getPosition();
+			if (
+				e.page.x < position.x ||
+				e.page.y < position.y ||
+				e.page.x > position.x + 75 ||
+				e.page.y > position.y + 75 ||
+				thumb.getStyle('position') == 'absolute'
+			)
 				continue;
-			
-			this.reorderTarget = el;
-			this.reorderTargetLeft = e.page.x <= this.reorderTarget.getPosition().x + 37;
-			
-			var position = this.reorderTarget.getPosition(this.mediaThumbs);
+
+			this.reorderTargetLeft = e.page.x <= position.x + 37;
+			var position = (this.reorderTarget = thumb).getPosition(this.mediaThumbs);
 			this.thumbCurrent.setStyles({
 				left: position.x + (this.reorderTargetLeft ? 0 : 75) - 2,
 				top: position.y - 2,
@@ -767,7 +764,9 @@ var Simplegallery = new Class({
 			});
 			
 			break;
+		
 		}
+
 	},
 	resize: function()
 	{
@@ -782,9 +781,62 @@ var Simplegallery = new Class({
 				display: 'block'
 			});
 		}
-		
+
 		if (this.mode == 'slideshow')
 			this.mediaSetSize();
+			
+		this.scroll();
+	},
+	scroll: function()
+	{
+		var documentHeight = document.getSize().y;
+		
+		var overflow = this.albumsMenu.getSize().y - documentHeight;
+		if (overflow < 0)
+			overflow = 0;
+		if (window.getScroll().y - overflow > this.albumsMenu.distanceTop)
+			this.albumsMenu.setStyles({
+				position: 'fixed', 
+				top: -overflow
+			});
+		else
+			this.albumsMenu.setStyles({
+				position: 'absolute', 
+				top: 0
+			});
+		
+		if (this.thumb) {
+			overflow = this.preview.getSize().y - documentHeight;
+			if (overflow < 0)
+				overflow = 0;
+			if (window.getScroll().y - overflow > this.preview.distanceTop)
+				this.preview.setStyles({
+					position: 'fixed', 
+					top: -10 - overflow
+				});
+			else
+				this.preview.setStyles({
+					position: 'absolute', 
+					top: 0
+				});
+			this.setMediaActionPosition();
+		}
+		
+		if (this.albumAdmin) {
+			overflow = this.albumAdmin.getSize().y - documentHeight;
+			if (overflow < 0)
+				overflow = 0;
+			if (window.getScroll().y - overflow > this.albumAdmin.distanceTop)
+				this.albumAdmin.setStyles({
+					position: 'fixed', 
+					top: -overflow
+				});
+			else
+				this.albumAdmin.setStyles({
+					position: 'absolute', 
+					top: 0
+				});
+		}
 	}
 });
 

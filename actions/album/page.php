@@ -3,7 +3,7 @@
 <? if ($sg->albums) : ?>
 <!-- Navigation zone -->
 <div class="albums-menu-background"></div>
-<div class="albums-menu">
+<div id="albumsMenu">
 
 	<? if (!get($sg->config->parameters, k('albums-calendar-disable'))) : ?>
 <!-- Calendar zone -->
@@ -75,7 +75,7 @@
 	<div id="albumId" style="display:none;"><?=toHtml($album->id)?></div>
 	<? if ($admin) : ?>
 	<!-- Update zone -->
-	<form class="album-admin" method="post" action="?album&id=<?=toUrl($album->id)?>">
+	<form id="albumAdmin" method="post" action="?album=admin&id=<?=toUrl($album->id)?>">
 		<input type="hidden" name="id" value="<?=toHtml($album->id)?>" />
 		<label for="albumAdminName"><?=l('album.name')?> :</label>
 		<input id="albumAdminName" type="text" name="name" value="<?=toHtml(get($album->data, k('name')))?>" />
@@ -126,12 +126,12 @@
 	<div id="preview">
 		<div id="mediaBackground" class="mediaBackgroundPreview">
 			<img id="mediaImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-			<video id="mediaVideo" controls></video>
+			<video id="mediaVideo" preload="metadata" controls></video>
 		</div>
 	</div>
 	
 	<!-- Thumbnails zone -->
-	<div id="thumbs">
+	<div id="thumbs"<?=$admin ? ' class="thumbs-adminactive"' : ''?>>
 		<?
 		$thumbs = array_flip($album->data->thumbs->{'75-sprite.jpg'}->index);
 		foreach ($album->medias as $media) :
@@ -159,6 +159,9 @@
 		></a>
 		<? endforeach; ?>
 		<div id="thumbCurrent"></div>
+		<? if ($admin) : ?>
+		<div id="thumbShadow"></div>
+		<? endif; ?>
 	</div>
 	
 	<!-- Slideshow zone -->

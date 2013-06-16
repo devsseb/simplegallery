@@ -255,7 +255,7 @@ class Simplegallery
 		
 		$this->albumSaveConfig($album->id);
 		
-		success(l('album.message.update-success'), '?album&id=' . $album->id);
+		success(l('album.message.update-success'), '?album=admin&id=' . $album->id);
 	}
 	
 	public function albumSaveConfig($id)
@@ -570,7 +570,7 @@ class Simplegallery
 		
 		write('</pre>');
 
-		success(l('album.message.generate-success'), '?album&id=' . $album->id);
+		success(l('album.message.generate-success'), '?album=admin&id=' . $album->id);
 	}
 	
 	public function albumGenerateData($id)
@@ -611,7 +611,7 @@ class Simplegallery
 
 		$this->albumSaveConfig($album->id);
 		
-		success(l('album.message.generate-data-success'), '?album&id=' . $album->id);
+		success(l('album.message.generate-data-success'), '?album=admin&id=' . $album->id);
 	}
 	
 	public function getMedia($albumId, $media = null, $dim = null)
