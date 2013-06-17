@@ -781,6 +781,9 @@ class Simplegallery
 	public function getUser()
 	{
 
+		if ($mail = get($_COOKIE, k('user-mail')))
+			$this->userLogin($mail, get($_COOKIE, k('user-password')), true, true);
+
 		if (!$mail = get($_SESSION, k('user')))
 			return false;
 
@@ -793,27 +796,53 @@ class Simplegallery
 		return true;
 	}
 	
-	public function userLogin($mail, $password)
+	public function userLogin($mail, $password, $keep, $system = false)
 	{
 		$mail = trim(strtolower($mail));
-		
-		if (!$this->user = get($this->config->users, k($mail)))
-			error(l('user.message.login-error'), '?');
-			
-		if ($this->user->active != 1)
-			error(l('user.message.login-error'), '?');
 
-		if ($this->user->password != crypt($password, $this->user->password))
+		if (!$this->user = get($this->config->users, k($mail))) {
+			if ($system)
+				return;
 			error(l('user.message.login-error'), '?');
+		}
+			
+		if ($this->user->active != 1) {
+			error(l('user.message.login-error'), '?');
+			if ($system)
+				return;
+		}
+
+		if (!$system)
+			$password = crypt($password, $this->user->password);
+
+		if ($this->user->password != $password) {
+			if ($system)
+				return;
+			error(l('user.message.login-error'), '?');
+		}
 
 		$_SESSION['user'] = $mail;
 		
+		$time = time()+60*60*24*30;
+		if ($keep) {
+			setcookie('user-mail', $mail, $time);
+			setcookie('user-password', $password, $time);
+		} else {
+			setcookie('user-mail', '');
+			setcookie('user-password', '');
+		}
+		
+		if ($system)
+			return;
 		success(l('user.message.login-success', $this->user->name), '?');
 	}
 	
 	public function userLogout()
 	{
 		unset($_SESSION['user']);
+		
+		setcookie('user-mail', '');
+		setcookie('user-password', '');
 		
 		success(l('user.message.logout'), '?');
 	}

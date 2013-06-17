@@ -56,7 +56,8 @@
 			"_":"Authentification",
 			"mail":"Adresse mail",
 			"password":"Mot de passe",
-			"submit":"Connexion"
+			"submit":"Connexion",
+			"keep-connection":"Rester connecté"
 		},
 		"lost-password": {
 			"_":"Mot de passe perdu",

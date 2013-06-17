@@ -1,5 +1,4 @@
 **TODO :**
-* Add possibilite to keep connect
 * Add description, date and comments for medias
 * Add possibilite to tag medias
 * Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
@@ -19,3 +18,4 @@
 * ~~Convert video medias to webm~~
 * ~~Add options for regenerate data.json for an album~~
 * ~~Browse albums by date with calendar~~
+* ~~Add possibilite to keep user connection~~

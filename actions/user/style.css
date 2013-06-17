@@ -5,8 +5,8 @@
 .user-field input{border:1px solid #707070;width:150px;}
 .user-submit{text-align:center;}
 .user-submit input{border:1px solid #323232;font-weight:bold;}
-.user-links{text-align:right;}
+.user-keep{text-align:center;font-weight:bold;}
+.user-keep input{vertical-align:middle;}
+.user-links{text-align:right;margin:0px;padding:0px;list-style-type:none;}
 .user-info{font-style:italic;}
-.user-lost{text-align:center;font-size:11px;line-height:0px;}
-.user-lost a{text-decoration:none;}
 .user-awaiting-mail{text-align:right;color:#775632;font-size:11px;vertical-align:top;line-height:0px;padding-bottom:12px;}

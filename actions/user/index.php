@@ -14,7 +14,7 @@
 				go('?album');
 			
 			if (exists($_POST, 'mail') and exists($_POST, 'password'))
-				$sg->userLogin($_POST['mail'], $_POST['password']);
+				$sg->userLogin($_POST['mail'], $_POST['password'], get($_POST, k('keep-connection')));
 			
 		break;
 		case 'logout' :
