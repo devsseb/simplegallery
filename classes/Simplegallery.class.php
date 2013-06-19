@@ -499,6 +499,10 @@ class Simplegallery
 						// Load existant sprite
 						$imgThumb = imagecreatefromstring(file_get_contents($fileThumb));
 
+					// Create thumbs entry for album data
+					if (!exists($album->data->thumbs, $file))
+						$album->data->thumbs->$file = object('md5', '');
+
 					// Prepare vars for resize and crop image
 					$dstY = $lagX = $lagY = 0;
 					if ($dimension->type == 'sprite') {
@@ -563,7 +567,7 @@ class Simplegallery
 					write(l('album.generation.update-sprite', $file), true);
 
 			}
-			
+
 			imagedestroy($imgMedia);
 			$this->albumSaveConfig($album->id);
 		}

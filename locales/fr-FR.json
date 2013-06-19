@@ -50,7 +50,7 @@
 			"mail-update-link-sent":"Merci de vérifier votre boite mail afin de valider la modification de votre adresse email.",
 			"mail-update-invalid-code":"Le code est invalide.",
 			"mail-update-success":"Votre adresse email a été activée avec succès.",
-			"user-add-success":"L'utilisateur \"%1\" a été ajouter avec succès, un email d'activation lui a été envoyé."
+			"user-add-success":"L'utilisateur \"%1\" a été ajouté avec succès, un email d'activation lui a été envoyé."
 		},
 		"login": {
 			"_":"Authentification",
@@ -96,6 +96,7 @@
 		},
 		"no-album":"Aucun album trouvé",
 		"no-media":"Aucun média trouvé dans l'album",
+		"no-thumb":"Aucune miniature n'a encore été générée pour cet album",
 		"generate":"Cet album doit être généré",
 		"name":"Nom de l'album",
 		"date":{

@@ -96,6 +96,7 @@
 		},
 		"no-album":"No album found",
 		"no-media":"No media found in this album",
+		"no-thumb":"No thumb did yet been generated for this album",
 		"generate":"This album need a generation",
 		"name":"Album name",
 		"date":{

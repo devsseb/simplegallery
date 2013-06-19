@@ -2,6 +2,7 @@
 * Add description, date and comments for medias
 * Add possibilite to tag medias
 * Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
+* Must be able to verify all albums in the administration 
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
 * ~~Manage cache for medias~~

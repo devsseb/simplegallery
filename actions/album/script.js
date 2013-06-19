@@ -63,9 +63,12 @@ var Simplegallery = new Class({
 	{
 		this.mediaThumbs = $('thumbs');
 		this.noMedia = $('noMedia');
+		this.noThumb = $('noThumb');
 	
 		if (!this.mediaThumbs && this.noMedia)
 			return this.noMedia.setStyle('display', 'block');
+		if (this.noThumb)
+			return;
 		
 		this.setOptions(options);
 		
@@ -488,7 +491,8 @@ var Simplegallery = new Class({
 			else
 				var sizeRef = this.mediaElement.size.width;
 			this.mediaElement.size.marginTop = (mode.size - sizeRef) / 2;
-		}
+		} else
+			this.mediaElement.size.marginTop = 0;
 
 		var transform = this.media.type == 'image' ? this.media.transform + ' translateX(' + this.mediaGetTransformLag() + 'px)' : 'none';
 
@@ -860,10 +864,12 @@ Simplegallery.Calendar = new Class({
 
 		this.initEvents();
 		
-		this.albumDate = this.dom.albumDate.get('value') || new Date().format('%Y-%m-%d');
+		this.albumDate = this.dom.albumDate.get('value');
 		this.albumsDates = JSON.decode($('albumsCalendarAlbumDates').get('value'));
 		
 		this.goDate = new Date(this.albumDate);
+		if (isNaN(this.goDate.getTime()))
+			this.goDate = new Date()
 		this.go();
 	},
 	initEvents: function()
@@ -895,7 +901,7 @@ Simplegallery.Calendar = new Class({
 	go: function(action)
 	{
 		this.dom.tbody.empty();
-	
+
 		if (action == 'previousMonth')
 			this.goDate.decrement('month');
 		else if (action == 'nextMonth')
@@ -906,13 +912,13 @@ Simplegallery.Calendar = new Class({
 			this.goDate.increment('year');
 
 		var month = this.goDate.get('month') + 1;
-		var firstDate = new Date(this.goDate.get('year') + '-' + month + '-01');
+		var firstDate = new Date(this.goDate.get('year') + '-' + String.from(month).pad(2, '0', 'left') + '-01');
 		var firstDay = firstDate.get('day');
 		if (firstDay == 0)
 			firstDay = 7;
 		var week = firstDate.get('week');
 		var lastDay = firstDate.get('lastDayOfMonth');
-	
+
 		this.dom.months.setStyle('display', 'none');
 		$$('.albums-calendar-month-' + month).setStyle('display', 'inline');
 		this.dom.year.set('html', this.goDate.get('year'));

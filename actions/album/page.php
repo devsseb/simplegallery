@@ -192,6 +192,10 @@
 		<? endif; ?>
 	</div>
 		<? endif; ?>
+	<? else : ?>
+	<div id="noThumb">
+		<?=l('album.no-thumb')?>
+	</div>
 	<? endif; ?>
 </div>
 <? endif; ?>

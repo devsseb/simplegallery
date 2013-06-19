@@ -19,7 +19,6 @@ class Locale
 				$langs = $lang;
 		
 		} else {
-		
 			$langs = get($_SERVER, k('HTTP_ACCEPT_LANGUAGE'));//fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3
 			$langs = preg_split('/[,;]/', $langs);
 			foreach ($langs as &$lang) {
@@ -37,10 +36,11 @@ class Locale
 		unset($lang);
 
 		$this->lang = false;
-		foreach ($langs as $lang) {
-			if (inDir($this->dir, $this->dir . $lang . '.json', true))
+		foreach ($langs as $lang)
+			if (inDir($this->dir, $this->dir . $lang . '.json', true)) {
 				$this->lang = $lang;
-		}
+				break;
+			}
 		
 		if (!$this->lang)
 			$this->lang = $this->langDefault;

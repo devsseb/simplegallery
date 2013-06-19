@@ -34,7 +34,6 @@ document.createElement('footer');
  			</div>
 <? endif; ?>
  		</header>
-	 	<div class="page">
 <? if ($message = get($_SESSION, k('messages' ,'success'))) : ?>
 			<div class="message_success"><?=$message?></div>
 	<? unset($_SESSION['messages']['success'])?>
@@ -46,9 +45,9 @@ document.createElement('footer');
 	if ($message = get($_SESSION, k('messages' ,'information'))) : ?>
 			<div class="message_information"><?=$message?></div>
 	<? unset($_SESSION['messages']['information'])?>
-<? endif;
-		include($actionPath . $actionPage);
-?>
+<? endif; ?>
+	 	<div class="page">
+			<? include($actionPath . $actionPage); ?>
 		</div>
 		<footer>
 			<?=l('structure.time-generation', round(chronoGet('phptime'), 3))?> |

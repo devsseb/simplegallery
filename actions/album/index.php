@@ -15,6 +15,8 @@
 	
 	if ($id = get($_GET, k('id'))) {
 
+		$admin = ($_GET['album'] == 'admin' and $sg->user->admin);
+
 		if ($sg->user->admin) {
 			
 			// data.json regeneration
@@ -24,7 +26,9 @@
 			// Thumbs generation
 			if (exists($_GET, 'generate'))
 				$sg->albumGenerate($id);
+		}
 		
+		if ($admin) {		
 			// Check thumbs
 			$check = $sg->albumCheck($id);
 			$album = $check->album;
@@ -37,8 +41,6 @@
 		
 			// Retrieve album $id
 			$album = $sg->getAlbum($id);
-
-		$admin = ($_GET['album'] == 'admin' and $sg->user->admin);
 
 		// Prepare css transformation for medias
 		foreach($album->medias as $media) {
@@ -122,15 +124,16 @@
 		}
 		$dates = json_encode($dates);
 
-		function dates_add(&$dates, $date, $album)
-		{
-			if (!exists($dates, $date))
-				$dates[$date] = array();
-			$dates[$date][] = object(
-				'id', $album->id,
-				'name', get($album->data, k('name'), $album->name)
-			);
-		}
+	}
+	
+	function dates_add(&$dates, $date, $album)
+	{
+		if (!exists($dates, $date))
+			$dates[$date] = array();
+		$dates[$date][] = object(
+			'id', $album->id,
+			'name', get($album->data, k('name'), $album->name)
+		);
 	}
 
 ?>

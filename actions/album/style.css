@@ -10,6 +10,7 @@
 #albumLocales{display:none;}
 #noAlbum{text-align:center;padding-top:20px;font-size:50px;color:#575757;}
 #noMedia{text-align:center;padding-top:20px;font-size:50px;color:#575757;display:none;}
+#noThumb{text-align:center;padding-top:20px;font-size:50px;color:#575757;}
 #album{position:relative;margin-left:200px;min-height:520px;}
 #preview{width:500px;height:500px;position:absolute;top:0px;margin:10px;text-align:center;}
 
