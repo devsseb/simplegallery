@@ -91,6 +91,8 @@ class Simplegallery
 				$album->data->date = object('start', '', 'end', '');
 			if (!exists($album->data->description))
 				$album->data->description = '';
+			if (!exists($album->data->{'comments-disable'}))
+				$album->data->{'comments-disable'} = false;
 			
 			$groupsAllow = array('admins');
 			foreach ($this->config->groups as $group) {
@@ -204,6 +206,10 @@ class Simplegallery
 				$mediaData->rotation = 0;
 			if (!exists($mediaData, 'flip'))
 				$mediaData->flip = '';
+			if (!exists($mediaData, 'description'))
+				$mediaData->description = '';
+			if (!exists($mediaData, 'comments'))
+				$mediaData->comments = array();
 			
 			if (!exists($mediasOrder, $mediaData->order))
 				$mediasOrder[$mediaData->order] = array();
@@ -236,6 +242,7 @@ class Simplegallery
 			'end', $data['date-end']
 		);
 		$album->data->description = $data['description'];
+		$album->data->{'comments-disable'} = get($data, k('comments-disable'));
 		
 		$reorder = $data['reorder'];
 		if ($reorder) {
@@ -1018,6 +1025,7 @@ class Simplegallery
 		$this->config->parameters->locale = $data['locale'];
 		$this->config->parameters->{'registration-disable'} = get($data, k('registration-disable'));
 		$this->config->parameters->{'albums-calendar-disable'} = get($data, k('albums-calendar-disable'));
+		$this->config->parameters->{'albums-comments-disable'} = get($data, k('albums-comments-disable'));
 		file_put_contents($this->pathConfig . 'parameters.json', json_encode($this->config->parameters));
 	
 		$this->config->groups = preg_split('/\W+/', $data['groups']);
@@ -1045,41 +1053,74 @@ class Simplegallery
 
 	}
 	
-	public function mediaUpdate($albumId, $media, $update)
+	public function mediaUpdate($albumId, $media, $updates)
 	{
 		$this->loadAlbums();
 
 		$album = $this->getAlbum($albumId);
 		if (!$media = get($album->medias, k($media)))
 			die(l('album.media.not-found'));
+
+		foreach ($updates as $update => $value) {
 			
-		switch ($update) {
-			case 'rotateLeft' :
-			case 'rotateRight' :
-				$direction = $update == 'rotateLeft' ? -1 : 1;
+			if (!$this->user->admin and $update != 'comments')
+				continue;
+			
+			switch ($update) {
+				case 'rotateLeft' :
+				case 'rotateRight' :
+					$direction = $update == 'rotateLeft' ? -1 : 1;
 				
-				$media->data->rotation+= $direction * 90;
-				if ($media->data->rotation < 0)
-					$media->data->rotation = 270;
-				elseif ($media->data->rotation > 270)
-					$media->data->rotation = 0;
-				$this->albumSaveConfig($album->id);
-			break;
-			case 'flipVertical' :
-			case 'flipHorizontal' :
-				$orientation = $update == 'flipVertical' ? 'vertical' : 'horizontal';
+					$media->data->rotation+= $direction * 90;
+					if ($media->data->rotation < 0)
+						$media->data->rotation = 270;
+					elseif ($media->data->rotation > 270)
+						$media->data->rotation = 0;
+					$this->albumSaveConfig($album->id);
+				break;
+				case 'flipVertical' :
+				case 'flipHorizontal' :
+					$orientation = $update == 'flipVertical' ? 'vertical' : 'horizontal';
 			
-				$media->data->flip = explode(' ', $media->data->flip);
-				 if (false === $index = in_array($orientation, $media->data->flip))
-				 	$media->data->flip[] = $orientation;
-				 else
-				 	unset($media->data->flip[$index]);
-				 $media->data->flip = implode(' ', $media->data->flip);
-				 $this->albumSaveConfig($album->id);
-			break;
-			case 'delete' :
-				$this->mediaDelete($album->id, $media->name);
-			break;
+					$media->data->flip = explode(' ', $media->data->flip);
+					 if (false === $index = in_array($orientation, $media->data->flip))
+					 	$media->data->flip[] = $orientation;
+					 else
+					 	unset($media->data->flip[$index]);
+					 $media->data->flip = implode(' ', $media->data->flip);
+					 $this->albumSaveConfig($album->id);
+				break;
+				case 'delete' :
+					$this->mediaDelete($album->id, $media->name);
+				break;
+				case 'description' :
+					$media->data->$update = $value;
+					$this->albumSaveConfig($album->id);
+				break;
+				case 'comments' :
+					$value = nl2br(toHtml($value));
+					$media->data->{$update}[] = object(
+						'date', date('Y-m-d h:i:s'),
+						'user', $this->user->mail,
+						'text', $value
+					);
+					$this->albumSaveConfig($album->id);
+
+					// Send mail to administrators
+					foreach ($this->config->users as $admin) {
+
+						if (!in_array('admins', $admin->groups))
+							continue;
+
+						$this->mail(
+							$admin->mail,
+							l('mail.media-new-comment.object', $this->config->parameters->name, $this->user->name, $media->name, $album->data->name),
+							l('mail.media-new-comment.message', $admin->name, $this->user->name, $this->user->mail, $media->name, $album->data->name) . $value . l('mail.signature', $this->config->parameters->name)
+						);
+					}
+					
+				break;
+			}
 		}
 		
 		exit(json_encode(array('success' => 'Update success')));

@@ -42,6 +42,9 @@
 			// Retrieve album $id
 			$album = $sg->getAlbum($id);
 
+
+		$album->{'comments-disable'} = (get($sg->config->parameters, k('albums-comments-disable')) or $album->data->{'comments-disable'});
+
 		// Prepare css transformation for medias
 		foreach($album->medias as $media) {
 			$media->styles = '';
@@ -96,8 +99,12 @@
 					$flip->v = $flip->v ? -1 : 1;
 				break;
 			}
-			foreach (array('', '-webkit-', '-moz-', '-o-', '-ms-') as $cssPrefix)
+			foreach (array('', '-webkit-', '-moz-', '-o-', '-ms-', 'ms') as $cssPrefix)
 				$media->styles.= $cssPrefix . 'transform:rotate(' . $rotation . 'deg) scaleX(' . $flip->h . ') scaleY(' . $flip->v . ');';
+
+			foreach ($media->data->comments as $comment)
+				$comment->user = $comment->user == $sg->user->mail ? l('album.media.me') : get($sg->config->users, k($comment->user, 'name'));
+
 		}
 		
 	}

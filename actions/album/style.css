@@ -29,6 +29,7 @@
 #mediaSlideshowStop{display:block;position:absolute;top:0px;right:0px;width:30px;height:30px;background:transparent url('images/media_stop.png') no-repeat center center;}
 #mediaSlideshowStart{display:block;position:absolute;left:35px;top:1px;width:24px;height:24px;background:transparent url('images/media_start.png') no-repeat center center;}
 #mediaSlideshowEnd{display:block;position:absolute;left:35px;top:1px;width:24px;height:24px;background:transparent url('images/media_end.png') no-repeat center center;display:none;}
+#mediaCount{position:absolute;right:70px;top:5px;color:#fff;font-size:15px;}
 #mediaDownload{display:block;position:absolute;right:35px;top:1px;width:24px;height:24px;background:transparent url('images/media_download.png') no-repeat center center;}
 #mediaUpdate{position:absolute;left:66px;top:1px;width:24px;height:24px;background:transparent url('images/media_update.png') no-repeat center center;}
 #mediaUpdate ul{position:absolute;top:24px;left:2px;list-style-type:none;margin:0px;padding:0px;display:none;background-color:rgba(0,0,0,0.5);}
@@ -38,6 +39,21 @@
 #mediaFlipHorizontal{background-image:url('images/media_flip_horizontal.png');}
 #mediaFlipVertical{background-image:url('images/media_flip_vertical.png');}
 #mediaDelete{background-image:url('images/media_delete.png');}
+#mediaBalloon{background-color:rgba(255,255,255,0.8);position:absolute;padding:8px;font-size:11px;display:none;}
+#mediaBalloonPointer{position:absolute;left:-15px;top:0px;width:0px;height:0px;border-top:15px solid rgba(255,255,255,0.8);border-left:15px solid transparent;}
+#mediaBalloon label{font-weight:bold;}
+p#mediaDescription{margin:10px 2px;}
+.media-no-description{color:#aaa;font-style:italic;text-align:center;}
+.media-balloon-separator{border-bottom:1px solid #9cc8e4;margin:10px 20px;}
+#mediaBalloon input,
+#mediaBalloon textarea{font-size:11px;font-family:Arial;}
+#mediaComment{border:1px solid #ccc;width:97%;width:calc(100% - 6px);width:-webkit-calc(100% - 6px);width:-moz-calc(100% - 6px);width:-o-calc(100% - 6px);width:-ms-calc(100% - 6px);width:ms-calc(100% - 6px);}
+#mediaComments{list-style-type:none;margin:0px;padding:5px;border:1px solid #ccc;}
+.media-comment-author{color:#555;font-weight:bold;}
+.media-comment-date{color:#555;font-style:italic;float:right;}
+.media-comment-text{margin:0px;}
+
+.media-balloon-submit{text-align:right;margin:0px;}
 #thumbs{margin-left:520px;padding:10px 0px 10px 5px;overflow:hidden;position:relative;}
 .thumbs-adminactive{margin-right:170px;}
 .thumb{width:75px;height:75px;float:left;background-position:center center;display:block;}

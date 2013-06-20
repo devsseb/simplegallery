@@ -13,7 +13,9 @@
 		<label for="parameters-registration-disable"><?=l('admin.parameters.registration-disable')?> : </label>
 		<input type="checkbox" id="parameters-registration-disable" name="registration-disable" value="1"<?=get($sg->config->parameters, k('registration-disable')) ? ' checked="checked"' : ''?> /><br />
 		<label for="parameters-albums-calendar-disable"><?=l('admin.parameters.albums-calendar-disable')?> : </label>
-		<input type="checkbox" id="parameters-albums-calendar-disable" name="albums-calendar-disable" value="1"<?=get($sg->config->parameters, k('albums-calendar-disable')) ? ' checked="checked"' : ''?> />
+		<input type="checkbox" id="parameters-albums-calendar-disable" name="albums-calendar-disable" value="1"<?=get($sg->config->parameters, k('albums-calendar-disable')) ? ' checked="checked"' : ''?> /><br />
+		<label for="parameters-albums-comments-disable"><?=l('admin.parameters.albums-comments-disable')?> : </label>
+		<input type="checkbox" id="parameters-albums-comments-disable" name="albums-comments-disable" value="1"<?=get($sg->config->parameters, k('albums-comments-disable')) ? ' checked="checked"' : ''?> />
 	</div>
 	<label><?=l('admin.users')?> <span class="admin-user-add">(<a href="#" id="user-add-link"><?=l('admin.user-add-link')?></a>)</a>:</label>
 	<div id="user-add">

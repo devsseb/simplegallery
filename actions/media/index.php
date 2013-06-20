@@ -6,7 +6,7 @@
 	if (exists($_GET, 'download'))
 		$sg->mediaDownload($albumId, $media);
 
-	if ($sg->user->admin and $update = get($_GET, k('update')))
+	if ($sg->user->admin and $update = get($_POST, k('update')))
 		$sg->mediaUpdate($albumId, $media, $update);
 	
 	$album = $sg->getMedia($albumId, $media, $dim);

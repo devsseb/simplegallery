@@ -1,4 +1,9 @@
-<div id="albumLocales"><?=json_encode(array('delete-confirm' => l('album.media.delete-confirm')))?></div>
+<div id="albumLocale"><?=toHtml($sg->locale->lang)?></div>
+<div id="albumLocales"><?=json_encode(array(
+	'delete-confirm' => l('album.media.delete-confirm'),
+	'me' => l('album.media.me'),
+	'no-description' => l('album.media.no-description')
+))?></div>
 
 <? if ($sg->albums) : ?>
 <!-- Navigation zone -->
@@ -78,13 +83,17 @@
 	<form id="albumAdmin" method="post" action="?album=admin&id=<?=toUrl($album->id)?>">
 		<input type="hidden" name="id" value="<?=toHtml($album->id)?>" />
 		<label for="albumAdminName"><?=l('album.name')?> :</label>
-		<input id="albumAdminName" type="text" name="name" value="<?=toHtml(get($album->data, k('name')))?>" />
+		<input id="albumAdminName" type="text" name="name" value="<?=toHtml($album->data->name)?>" />
 		<label for="albumAdminDateStart"><?=l('album.date.start')?> :</label>
 		<input id="albumAdminDateStart" type="date" name="date-start" value="<?=toHtml($album->data->date->start)?>" />
 		<label for="albumAdminDateEnd"><?=l('album.date.end')?> :</label>
 		<input id="albumAdminDateEnd" type="date" name="date-end" value="<?=toHtml($album->data->date->end)?>" />
 		<label for="albumAdminDescription"><?=l('album.description')?> :</label>
-		<textarea id="albumAdminDescription" name="description"><?=toHtml(get($album->data, k('description')))?></textarea>
+		<textarea id="albumAdminDescription" name="description"><?=toHtml($album->data->description)?></textarea>
+		<? if (!get($sg->config->parameters, k('albums-comments-disable'))) : ?>
+		<label for="albumAdminComments"><?=l('admin.parameters.albums-comments-disable')?> : </label>
+		<input id="albumAdminComments" name="comments-disable" type="checkbox"<?=$album->data->{'comments-disable'} ? ' checked="checked"' : ''?>/>
+		<? endif; ?>
 		<label for="albumAdminReorder"><?=l('album.reorder')?> : </label>
 		<input id="albumAdminReorder" type="checkbox" />
 		<input type="hidden" name="reorder" id="albumAdminReorderValue" />
@@ -156,6 +165,10 @@
 			mediaOrientation="<?=toHtml($media->data->orientation)?>"
 			mediaRotation="<?=toHtml($media->data->rotation)?>"
 			mediaFlip="<?=toHtml($media->data->flip)?>"
+			mediaDescription="<?=toHtml($media->data->description)?>"
+			<? if (!$album->{'comments-disable'}) : ?>
+			mediaComments="<?=toHtml(json_encode($media->data->comments))?>"
+			<? endif; ?>
 		></a>
 		<? endforeach; ?>
 		<div id="thumbCurrent"></div>
@@ -174,6 +187,7 @@
 		<a href="#" id="mediaSlideshowPlay" title="<?=l('album.media.slideshow-play')?>"></a>
 		<a href="#" id="mediaSlideshowStart" title="<?=l('album.media.slideshow-start')?>"></a>
 		<a href="#" id="mediaSlideshowEnd" title="<?=l('album.media.slideshow-end')?>"></a>
+		<span id="mediaCount"></span>
 		<a href="#" id="mediaDownload" title="<?=l('album.media.download')?>" target="_blank"></a>
 		<div id="mediaSlideshowPauseStop">
 			<a href="#" id="mediaSlideshowPause" title="<?=l('album.media.slideshow-pause')?>"></a>
@@ -189,6 +203,23 @@
 				<li id="mediaDelete" title="<?=l('album.media.delete')?>"></li>
 			</ul>
 		</div>
+		<? endif; ?>
+	</div>
+	<div id="mediaBalloon">
+		<div id="mediaBalloonPointer"></div>
+		<? if ($admin) : ?>
+		<div>
+			<textarea id="mediaDescription" placeholder="<?=l('album.media.description')?>" cols="30" rows="2"></textarea>
+			<div class="media-balloon-submit"><input id="mediaBalloonSubmit" type="button" value="<?=l('apply')?>" /></div>
+		</div>
+		<? else : ?>
+		<p id="mediaDescription"></p>
+		<? endif; ?>
+		<? if (!$album->{'comments-disable'}) : ?>
+		<div class="media-balloon-separator"></div>
+		<label for="mediaComment"><?=l('album.media.comments')?> :</label><br />
+		<textarea id="mediaComment" cols="30" rows="1"></textarea>
+		<ul id="mediaComments"></ul>
 		<? endif; ?>
 	</div>
 		<? endif; ?>

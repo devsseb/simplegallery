@@ -20,7 +20,8 @@
 			"locale":"Language",
 			"locale-auto":"Auto",
 			"registration-disable":"Registration disable",
-			"albums-calendar-disable":"Calendar disable"
+			"albums-calendar-disable":"Calendar disable",
+			"albums-comments-disable":"Comments disable"
 		},
 		"groups":"Groups",
 		"users":"Users",
@@ -128,7 +129,11 @@
 			"slideshow-start":"View album in fullscreen",
 			"slideshow-end":"Return to normal view",
 			"slideshow-pause":"Pause",
-			"slideshow-stop":"Stop slideshow"
+			"slideshow-stop":"Stop slideshow",
+			"description":"Description",
+			"no-description":"No description",
+			"comments":"Comments",
+			"me":"Me"
 		},
 		"generation": {
 			"_":"Generation of album %1",
@@ -162,6 +167,10 @@
 			"object":"[%1] Lost password",
 			"message":"Hello %1,\n\nA reset password was requested for your mail adress.\nTo update your password, please click on the following link :\n",
 			"message2":"\n\nIf you are not the author of this request, just ignore this email."
+		},
+		"media-new-comment":{
+			"object":"[%1] New comment from %2 on media %3 of album %4",
+			"message":"Hello %1,\n\nA new comment from %2 (%3) was posted on the media %4 of album %5 : \n\n"
 		}
 	},
 	"install":{

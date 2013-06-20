@@ -23,6 +23,12 @@ Element.NativeEvents = Object.merge(Element.NativeEvents, {
 	timeupdate: 2, ended: 2, ratechange: 2, durationchange: 2, volumechange: 2
 });
 
+String.implement({
+ 	toHtml: function() {
+	    return new Element('span',{text:String(this)}).get('html');
+	}
+});
+
 window.addEvent('domready', function() {
 
 	if ($$('.album-admin-link').length)
@@ -73,6 +79,8 @@ var Simplegallery = new Class({
 		this.setOptions(options);
 		
 		this.blank = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+		Locale.use($('albumLocale').get('text'));
+
 		this.locale = JSON.decode($('albumLocales').get('text'));
 		this.mode = 'preview';
 
@@ -100,7 +108,13 @@ var Simplegallery = new Class({
 				this.mediaUpdateFlipVertical = $('mediaFlipVertical');
 				this.mediaUpdateDelete = $('mediaDelete');
 			}
+			this.mediaCount = $('mediaCount');
 			this.mediaDownload = $('mediaDownload');
+		this.mediaBalloon = $('mediaBalloon');
+		this.mediaDescription = $('mediaDescription');
+		this.mediaComment = $('mediaComment');
+		this.mediaComments = $('mediaComments');
+		this.mediaBalloonSubmit = $('mediaBalloonSubmit');
 		
 		this.mediaBackground = $('mediaBackground');
 		this.mediaImage = $('mediaImage');
@@ -174,6 +188,12 @@ var Simplegallery = new Class({
 				}
 
 			}.bind(this),
+			mouseenter: function() {
+				if (this.mediaBalloonHide)
+					clearTimeout(this.mediaBalloonHide);
+				this.mediaBalloon.setStyle('display', 'block');
+			}.bind(this),
+			mouseleave: this.setMediaBalloonHide.bind(this),
 			mousemove: function() {
 				this.setMediaActionHide();
 				this.mediaAction.setStyle('display', 'block');
@@ -236,8 +256,8 @@ var Simplegallery = new Class({
 				if (confirm(this.locale['delete-confirm']))
 					this.mediaSetUpdate('delete');
 			}.bind(this));
-			this.mediaUpdate.request = new Request.JSON();
 		}
+		this.mediaUpdateRequest = new Request.JSON();
 
 		this.slideshow.addEvents({
 			click: this.slideshowEnd.bind(this)
@@ -255,7 +275,43 @@ var Simplegallery = new Class({
 				}.bind(this)
 			});
 		}
+		
+		if (this.mediaBalloonSubmit)
+			this.mediaBalloonSubmit.addEvent('click', function() {
+				this.mediaSetUpdate({
+					description: this.mediaDescription.get('value')
+				});
+			}.bind(this));
+			
+		if (this.mediaComment)
+			this.mediaComment.addEvents({
+				keydown: function(e) {
+					if (e.key == 'enter' && !e.shift)
+						return false;
+					var nl = 1;
+					if (e.key == 'enter')
+						nl++;
+					e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + nl);
+					
+				}.bind(this),
+				keyup: function(e) {
+					if (e.key == 'enter' && !e.shift) {
+						this.mediaSetUpdate({comments:this.mediaComment.get('value')});
+						this.mediaAddComment(this.locale.me, new Date(), this.mediaComment.get('value').toHtml());
+					}
+					e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + 1);
+				}.bind(this)
+			});
 
+		this.mediaBalloon.addEvents({
+			mouseenter: function() {
+				if (this.mediaBalloonHide)
+					clearTimeout(this.mediaBalloonHide);
+				this.mediaBalloon.setStyle('display', 'block');
+			}.bind(this),
+			mouseleave: this.setMediaBalloonHide.bind(this)
+		});
+		
 		window.addEvents({
 			scroll: this.scroll.bind(this),
 			keydown: function(e) {
@@ -328,12 +384,22 @@ var Simplegallery = new Class({
 	
 		var position = this.mediaElement.getPosition(this.mode == 'preview' ? this.container : null);
 		var rotate = this.mediaGetRotation();
+		var width = this.mediaElement.size[rotate == 0 || rotate == 180 ? 'width' : 'height'] - 10;
+		position.x+= 6;
+		position.y+= 5;
 		this.mediaAction.setStyles({
 			position: this.mode == 'preview' ? 'absolute' : 'fixed',
-			width: this.mediaElement.size[rotate == 0 || rotate == 180 ? 'width' : 'height'] - 10,
-			left: position.x + 6,
-			top: position.y + 5
+			width: width,
+			left: position.x,
+			top: position.y
 		});
+		
+		this.mediaCount.set('html', (this.thumb.getAllPrevious().length + 1) + '/' + this.thumbs.length);
+		
+		this.mediaBalloon.setStyles({
+			left: position.x + width + 20,
+			top: position.y
+		}).setStyle3('border-top-right-radius', '10px').setStyle3('border-bottom-right-radius', '10px').setStyle3('border-bottom-left-radius', '10px');
 	},
 	setMediaActionHide: function()
 	{
@@ -375,10 +441,25 @@ var Simplegallery = new Class({
 			vertical: this.media.flip.contains('vertical')
 		};
 		this.media.transform = '';
+		this.media.description = this.thumb.get('mediaDescription');
+
+		this.media.comments = JSON.decode(this.thumb.get('mediaComments'), true);
 
 		this.mediaImage.set('src', this.blank);
 		this.mediaVideo.getElements('source').destroy();
 		this.mediaVideo.load();
+
+		this.mediaDescription.set('html', this.media.description || this.locale['no-description']);
+		if (this.media.description)
+			this.mediaDescription.removeClass('media-no-description');
+		else
+			this.mediaDescription.addClass('media-no-description');
+		if (this.mediaComments) {
+			this.mediaComments.empty();
+			this.mediaComments.setStyle('display', this.media.comments.length ? 'block' : 'none');
+			for (var i = 0,comment; comment = this.media.comments[i]; i++)
+				this.mediaAddComment(comment.user, comment.date, comment.text);
+		}
 
 		this.mediaElement = this[this.media.type == 'image' ? 'mediaImage' : 'mediaVideo'];
 
@@ -408,7 +489,10 @@ var Simplegallery = new Class({
 	},
 	mediaSetUpdate: function(update)
 	{
-		this.mediaUpdate.request.send({url: this.media.url + '&update=' + update});
+		if (typeof update == 'string')
+			update = JSON.decode('{' + update + ':true}');
+
+		this.mediaUpdateRequest.send({url: this.media.url, data: {update: update}});
 		
 		if (this.media.type == 'image') {
 			switch (update) {
@@ -457,6 +541,15 @@ var Simplegallery = new Class({
 			}
 		}
 		
+	},
+	mediaAddComment: function(user, date, text)
+	{
+		this.mediaComment.set('value', '');
+		new Element('li').adopt(
+			new Element('span.media-comment-author', {html: user}),
+			new Element('span.media-comment-date', {html: new Date(date).format('%x %X')}),
+			new Element('p.media-comment-text', {html: text})
+		).inject(this.mediaComments);
 	},
 	mediaSetSize: function()
 	{
@@ -841,6 +934,12 @@ var Simplegallery = new Class({
 					top: 0
 				});
 		}
+	},
+	setMediaBalloonHide: function() {
+return;
+		if (this.mediaBalloonHide)
+			clearTimeout(this.mediaBalloonHide);
+		this.mediaBalloonHide = this.mediaBalloon.setStyle.delay(500, this.mediaBalloon, ['display', 'none']);	
 	}
 });
 

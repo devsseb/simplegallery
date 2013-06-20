@@ -20,7 +20,8 @@
 			"locale":"Langue",
 			"locale-auto":"Auto",
 			"registration-disable":"Inscription désactivée",
-			"albums-calendar-disable":"Calendrier désactivé"
+			"albums-calendar-disable":"Calendrier désactivé",
+			"albums-comments-disable":"Commentaires désactivé"
 		},
 		"groups":"Groupes",
 		"users":"Utilisateurs",
@@ -128,7 +129,11 @@
 			"slideshow-start":"Voir l'album en plein écran",
 			"slideshow-end":"Revenir à l'affichage normal",
 			"slideshow-pause":"Pause",
-			"slideshow-stop":"Arrêter le diaporama"
+			"slideshow-stop":"Arrêter le diaporama",
+			"description":"Description",
+			"no-description":"Aucune description",
+			"comments":"Commentaires",
+			"me":"Moi"
 		},
 		"generation": {
 			"_":"Génération de l'album %1",
@@ -162,6 +167,10 @@
 			"object":"[%1] Mot de passe perdu",
 			"message":"Bonjour %1,\n\nUn demande de modification de mot de passe a été demandée pour votre adresse mail.\nAfin de modifier votre mot de passe, veuillez cliquer sur le lien suivant :\n",
 			"message2":"\n\nSi vous n'êtes pas l'auteur de cette demande, ignorez juste cet email."
+		},
+		"media-new-comment":{
+			"object":"[%1] Nouveau commentaire de %2",
+			"message":"Bonjour %1,\n\nUn nouveau commentaire de %2 (%3) a été posté sur le média %4 de l'album %5 : \n\n"
 		}
 	},
 	"install":{
