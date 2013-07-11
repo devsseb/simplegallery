@@ -10,7 +10,6 @@ try {
 	new Get();
 	include('./classes/Debug.class.php');
 	new Debug();
-	Debug::enable(true);
 
 	chronoStart('phptime');
 
@@ -24,7 +23,7 @@ try {
 
 		$config = new StdClass();
 		include('./config.php');
-//		Debug::enable(get($config, k('debug')));		
+		Debug::enable(get($config, k('debug')));		
 
 		$action = geta(array_keys($_GET), k('0'));
 		$action = in_array($action, array('album', 'media', 'admin')) ? $action : 'user';
