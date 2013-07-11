@@ -1,16 +1,15 @@
 <?
 
 	$state = in_array(get($_GET, k('user')), array('login', 'logout', 'lost', 'registration', 'profil')) ? $_GET['user'] : 'login';
-	
+
 	$actionPage = 'states/' . $state . '.php';
 	
 	switch ($state) {
 		case 'login' :
-
-			if (!get($sg->config, k('users')))
+			if ($sg->usersTotal() == 0)
 				go('?user=registration');
-			
-			if ($user)
+
+			if ($sg->user)
 				go('?album');
 			
 			if (exists($_POST, 'mail') and exists($_POST, 'password'))
@@ -21,7 +20,7 @@
 			$sg->userLogout();
 		break;
 		case 'lost' :
-			if ($user)
+			if ($sg->user)
 				go('?album');
 				
 			if ($mail = get($_POST, k('mail')))
@@ -33,11 +32,10 @@
 				
 		break;
 		case 'registration' :
-
-			if (get($sg->config->parameters, k('registration-disable')) and get($sg->config, k('users')))
+			if ($sg->parameters->registration_disable and $sg->usersTotal(true) > 0)
 				go('?');
 
-			if ($user)
+			if ($sg->user)
 				go('?album');
 
 			if (exists($_POST, 'name'))
@@ -53,10 +51,10 @@
 
 		break;
 		case 'profil' :
-			if (!$user)
+			if (!$sg->user)
 				go('?');
 		
-			if ($user and exists($_POST, 'profil'))
+			if (exists($_POST, 'profil'))
 				$sg->userUpdate($_POST);
 				
 			if ($code = get($_GET, k('mcode')))

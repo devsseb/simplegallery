@@ -23,10 +23,13 @@ document.createElement('footer');
  	</head>
  	<body>
  		<header>
- 			<h1><a href="?"><?=toHtml(get($sg, k('config', 'parameters', 'name'), 'SimpleGallery'))?></a></h1>
-<? if ($user) : ?>
+	 		<a href="?">
+	 			<img class="simplegallery-logo" src="structure/images/simplegallery.png" />
+	 			<h1><?=toHtml(get($sg, k('config', 'parameters', 'name'), 'SimpleGallery'))?></h1>
+ 			</a>
+<? if (get($sg, k('user'))) : ?>
  			<div class="header-menu">
-	<? if (in_array('admins', $sg->user->groups)) : ?>
+	<? if ($sg->user->admin) : ?>
 				<a href="?admin"><?=l('admin._')?></a><br />
 	<? endif; ?>
  				<?=l('structure.logged-in-as')?> <a href="?user=profil" title="Update my profil"><span class="header-login"><?=toHtml($sg->user->name)?></span></a> |

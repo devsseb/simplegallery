@@ -85,6 +85,7 @@ var Simplegallery = new Class({
 		this.mode = 'preview';
 
 		this.thumb = null;
+		this.tags = [];
 		
 		if (!(this.container = $('album')))
 			return;
@@ -119,6 +120,9 @@ var Simplegallery = new Class({
 		this.mediaBackground = $('mediaBackground');
 		this.mediaImage = $('mediaImage');
 		this.mediaVideo = $('mediaVideo');
+		this.mediaTags = $('mediaTags');
+		if (this.mediaTags)
+			this.mediaTagsList = $('mediaTagsList');
 		
 		this.albumsMenu = $('albumsMenu');
 		this.albumsMenu.distanceTop = this.albumsMenu.getPosition().y + 10;
@@ -191,7 +195,8 @@ var Simplegallery = new Class({
 			mouseenter: function() {
 				if (this.mediaBalloonHide)
 					clearTimeout(this.mediaBalloonHide);
-				this.mediaBalloon.setStyle('display', 'block');
+				if (this.mediaBalloon)
+					this.mediaBalloon.setStyle('display', 'block');
 			}.bind(this),
 			mouseleave: this.setMediaBalloonHide.bind(this),
 			mousemove: function() {
@@ -204,6 +209,27 @@ var Simplegallery = new Class({
 			ended: function() {
 				if (this.slideshow.play && this.mode == 'slideshow')
 					this.mediaLoad(this.getNextThumb());
+			}.bind(this)
+		});
+		this.mediaImage.addEvents({
+			click: function(e) {
+				
+				if (!e.target.hasClass('media-image-tag'))
+					return false;
+				
+				var position = this.mediaElement.getPosition();
+				var size = this.mediaElement.getSize();
+				var angle = this.mediaGetRotation();
+				position = {
+					x: (e.page.x - position.x) * 100/size[(angle == 0 || angle == 180) ? 'x' : 'y'] - 50,
+					y: (e.page.y - position.y) * 100/size[(angle == 0 || angle == 180) ? 'y' : 'x'] - 50
+				};
+				angle = -angle * Math.PI / 180;
+				position = {
+					x: (position.x * angle.cos() - position.y * angle.sin() + 50).round(2),
+					y: (position.x * angle.sin() + position.y * angle.cos() + 50).round(2)
+				};
+				this.mediaAddTag(position);
 			}.bind(this)
 		});
 		this.mediaSlideshowStart.addEvents({
@@ -283,7 +309,8 @@ var Simplegallery = new Class({
 				});
 			}.bind(this));
 			
-		if (this.mediaComment)
+		if (this.mediaComment) {
+			this.setTextareaHeightAuto(this.mediaComment);
 			this.mediaComment.addEvents({
 				keydown: function(e) {
 					if (e.key == 'enter' && !e.shift)
@@ -302,15 +329,17 @@ var Simplegallery = new Class({
 					e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + 1);
 				}.bind(this)
 			});
+		}
 
-		this.mediaBalloon.addEvents({
-			mouseenter: function() {
-				if (this.mediaBalloonHide)
-					clearTimeout(this.mediaBalloonHide);
-				this.mediaBalloon.setStyle('display', 'block');
-			}.bind(this),
-			mouseleave: this.setMediaBalloonHide.bind(this)
-		});
+		if (this.mediaBalloon)
+			this.mediaBalloon.addEvents({
+				mouseenter: function() {
+					if (this.mediaBalloonHide)
+						clearTimeout(this.mediaBalloonHide);
+					this.mediaBalloon.setStyle('display', 'block');
+				}.bind(this),
+				mouseleave: this.setMediaBalloonHide.bind(this)
+			});
 		
 		window.addEvents({
 			scroll: this.scroll.bind(this),
@@ -396,10 +425,11 @@ var Simplegallery = new Class({
 		
 		this.mediaCount.set('html', (this.thumb.getAllPrevious().length + 1) + '/' + this.thumbs.length);
 		
-		this.mediaBalloon.setStyles({
-			left: position.x + width + 20,
-			top: position.y
-		}).setStyle3('border-top-right-radius', '10px').setStyle3('border-bottom-right-radius', '10px').setStyle3('border-bottom-left-radius', '10px');
+		if (this.mediaBalloon)
+			this.mediaBalloon.setStyles({
+				left: position.x + width + 20,
+				top: position.y
+			}).setStyle3('border-top-right-radius', '10px').setStyle3('border-bottom-right-radius', '10px').setStyle3('border-bottom-left-radius', '10px');
 	},
 	setMediaActionHide: function()
 	{
@@ -412,6 +442,7 @@ var Simplegallery = new Class({
 		// resize and transform (rotate/flip) the thumb and element
 	mediaLoad: function(thumb)
 	{
+
 		if (this.reorderActive)
 			return;
 	
@@ -429,37 +460,26 @@ var Simplegallery = new Class({
 
 		this.media.name = this.thumb.get('title');
 		this.media.url = this.thumb.get('mediaUrl');
+		this.media.id = this.thumb.get('mediaId');
 		this.media.type = this.thumb.get('mediaType');
 		this.media.order = this.thumb.get('mediaOrder').toInt();		
 		this.media.width = this.thumb.get('mediaWidth').toInt();
 		this.media.height = this.thumb.get('mediaHeight').toInt();
 		this.media.rotation = this.thumb.get('mediaRotation').toInt();
 		this.media.orientation = this.thumb.get('mediaOrientation').toInt();
-		this.media.flip = this.thumb.get('mediaFlip').split(' ');
 		this.media.flip = {
-			horizontal: this.media.flip.contains('horizontal'),
-			vertical: this.media.flip.contains('vertical')
+			horizontal: this.thumb.get('mediaFlipHorizontal'),
+			vertical: this.thumb.get('mediaFlipVertical')
 		};
 		this.media.transform = '';
 		this.media.description = this.thumb.get('mediaDescription');
-
-		this.media.comments = JSON.decode(this.thumb.get('mediaComments'), true);
+		this.media.comments = JSON.decode(this.thumb.get('mediaComments'));
+		if (this.mediaTags)
+			this.media.tags = JSON.decode(this.thumb.get('mediaTags'));
 
 		this.mediaImage.set('src', this.blank);
 		this.mediaVideo.getElements('source').destroy();
 		this.mediaVideo.load();
-
-		this.mediaDescription.set('html', this.media.description || this.locale['no-description']);
-		if (this.media.description)
-			this.mediaDescription.removeClass('media-no-description');
-		else
-			this.mediaDescription.addClass('media-no-description');
-		if (this.mediaComments) {
-			this.mediaComments.empty();
-			this.mediaComments.setStyle('display', this.media.comments.length ? 'block' : 'none');
-			for (var i = 0,comment; comment = this.media.comments[i]; i++)
-				this.mediaAddComment(comment.user, comment.date, comment.text);
-		}
 
 		this.mediaElement = this[this.media.type == 'image' ? 'mediaImage' : 'mediaVideo'];
 
@@ -484,43 +504,64 @@ var Simplegallery = new Class({
 
 		this.mediaDownload.set('href', this.media.url + '&download');
 
+		if (this.mediaBalloon) {
+			this.mediaDescription.set('html', this.media.description || this.locale['no-description']);
+			if (this.media.description)
+				this.mediaDescription.removeClass('media-no-description');
+			else
+				this.mediaDescription.addClass('media-no-description');
+		}
+/*
+		if (this.mediaComments) {
+			this.mediaComments.empty();
+			this.mediaComments.setStyle('display', this.media.comments.length ? 'block' : 'none');
+			for (var i = 0,comment; comment = this.media.comments[i]; i++)
+				this.mediaAddComment(comment.user, comment.date, comment.text);
+		}
+		if (this.mediaTags) {
+			this.mediaTags.empty();
+			for (tag in this.media.tags) {
+				tag = this.media.tags[tag];
+				this.mediaAddTag({x: tag.x, y: tag.y}, tag.value, true);
+			}
+		}
+*/
 		this.resize();
 
 	},
 	mediaSetUpdate: function(update)
 	{
+		var url = this.media.url;
+	
 		if (typeof update == 'string')
 			update = JSON.decode('{' + update + ':true}');
 
-		this.mediaUpdateRequest.send({url: this.media.url, data: {update: update}});
-		
 		if (this.media.type == 'image') {
-			switch (update) {
-				case 'rotateLeft' :
-				case 'rotateRight' :
-					var direction = update == 'rotateLeft' ? -1 : 1;
-					this.media.rotation+= direction * 90;
-					if (this.media.rotation < 0)
-						this.media.rotation = 270;
-					else if (this.media.rotation > 270)
-						this.media.rotation = 0;
-					this.thumb.set('mediaRotation', this.media.rotation);
-				break;
-				case 'flipHorizontal' :
-				case 'flipVertical' :
-					var orientation = update == 'flipHorizontal' ? 'horizontal' : 'vertical';
-					if (this.media.flip[orientation])
-						delete this.media.flip[orientation];
-					else
-						this.media.flip[orientation] = true;
+			if (update.rotateLeft || update.rotateRight) {
+				var direction = update.rotateLeft ? -1 : 1;
+				this.media.rotation+= direction * 90;
+				if (this.media.rotation < 0)
+					this.media.rotation = 270;
+				else if (this.media.rotation > 270)
+					this.media.rotation = 0;
+				this.thumb.set('mediaRotation', this.media.rotation);
+			}
+			if (update.flipHorizontal || update.flipVertical) {
+				var angle = this.mediaGetRotation();
+				if (angle == 90 || angle == 270) {
+					if (update.flipHorizontal) {
+						delete update.flipHorizontal;
+						update.flipVertical = true;
+					} else {
+						delete update.flipVertical;
+						update.flipHorizontal = true;
+					}
+				}
 
-					var flip = [];
-					if (this.media.flip['horizontal'])
-						flip.push('horizontal');
-					if (this.media.flip['vertical'])
-						flip.push('vertical');
-					this.thumb.set('mediaFlip', flip.join(' '));
-				break;
+				var orientation = update.flipHorizontal ? 'horizontal' : 'vertical';
+
+				this.media.flip[orientation] = !this.media.flip[orientation];
+				this.thumb.set('mediaFlip' + orientation, !this.thumb.get('mediaFlip' + orientation));
 			}
 			
 			this.mediaSetTransform();
@@ -528,7 +569,7 @@ var Simplegallery = new Class({
 			this.mediaElement.fireEvent('load', this.mediaElement.get('src'));
 		}
 		
-		if (update == 'delete') {
+		if (update.delete) {
 			var media = this.getPreviousThumb();
 			if (!media)
 				media = this.getNextThumb();
@@ -541,15 +582,34 @@ var Simplegallery = new Class({
 			}
 		}
 		
+		this.mediaUpdateRequest.send({url: url, data: {update: update}});
+		
+	},
+	mediaGetOrientation: function()
+	{
+		var angle = this.mediaGetRotation();
+		if (
+			(this.media.width > this.media.width && (angle == 0 || angle == 180)) ||
+			(this.media.width < this.media.width && (angle == 90 || angle == 270))
+		)
+			return 'horizontal';
+		else
+			return 'vertical';
 	},
 	mediaAddComment: function(user, date, text)
 	{
 		this.mediaComment.set('value', '');
+		var type = /*this.albumAdmin ||  ? 'textarea' : */'p';
+		var textarea;
 		new Element('li').adopt(
-			new Element('span.media-comment-author', {html: user}),
-			new Element('span.media-comment-date', {html: new Date(date).format('%x %X')}),
-			new Element('p.media-comment-text', {html: text})
+			new Element('div').adopt(
+				new Element('span.media-comment-author', {html: user}),
+				new Element('span.media-comment-date', {html: new Date(date).format('%x %X')})
+			),
+			textarea = new Element(type+'.media-comment-text', {html: text})
 		).inject(this.mediaComments);
+/*		if (type == 'textarea')
+			this.setTextareaHeightAuto(textarea);*/
 	},
 	mediaSetSize: function()
 	{
@@ -600,7 +660,7 @@ var Simplegallery = new Class({
 	},
 	mediaGetRotation: function()
 	{
-		var reg = /rotate\(([0-9]+)deg\)/;
+		var reg = /rotate\(([-0-9]+)deg\)/;
 		var deg = reg.exec(this.media.transform);
 		if (!deg)
 			return 0;
@@ -612,6 +672,13 @@ var Simplegallery = new Class({
 		
 		return degree;
 
+	},
+	mediaGetFlip: function()
+	{
+		return flip = {
+			horizontal: /scaleX\(([-0-9]+)\)/.exec(this.media.transform)[1] == -1,
+			vertical: /scaleY\(([-0-9]+)\)/.exec(this.media.transform)[1] == -1
+		}
 	},
 	mediaGetTransformLag: function()
 	{
@@ -807,7 +874,7 @@ var Simplegallery = new Class({
 		this.thumbCurrent.setStyle('display', 'none');
 		
 		this.thumbs = $$('.thumb');
-		var reorder = this.thumbs.get('title');
+		var reorder = this.thumbs.get('mediaId');
 		this.albumAdminReorderValue.set('value', JSON.encode(reorder));
 	},
 	reorderMove: function(e)
@@ -887,11 +954,12 @@ var Simplegallery = new Class({
 	scroll: function()
 	{
 		var documentHeight = document.getSize().y;
+		var scroll = window.getScroll().y;
 		
 		var overflow = this.albumsMenu.getSize().y - documentHeight;
 		if (overflow < 0)
 			overflow = 0;
-		if (window.getScroll().y - overflow > this.albumsMenu.distanceTop)
+		if (scroll - overflow > this.albumsMenu.distanceTop)
 			this.albumsMenu.setStyles({
 				position: 'fixed', 
 				top: -overflow
@@ -903,10 +971,10 @@ var Simplegallery = new Class({
 			});
 		
 		if (this.thumb) {
-			overflow = this.preview.getSize().y - documentHeight;
+			overflow = this.mediaElement.getSize().y - documentHeight;
 			if (overflow < 0)
 				overflow = 0;
-			if (window.getScroll().y - overflow > this.preview.distanceTop)
+			if (scroll - overflow > this.preview.distanceTop)
 				this.preview.setStyles({
 					position: 'fixed', 
 					top: -10 - overflow
@@ -923,7 +991,7 @@ var Simplegallery = new Class({
 			overflow = this.albumAdmin.getSize().y - documentHeight;
 			if (overflow < 0)
 				overflow = 0;
-			if (window.getScroll().y - overflow > this.albumAdmin.distanceTop)
+			if (scroll - overflow > this.albumAdmin.distanceTop)
 				this.albumAdmin.setStyles({
 					position: 'fixed', 
 					top: -overflow
@@ -935,13 +1003,134 @@ var Simplegallery = new Class({
 				});
 		}
 	},
-	setMediaBalloonHide: function() {
-return;
+	setMediaBalloonHide: function()
+	{
+		if (!this.mediaBalloon)
+			return;
 		if (this.mediaBalloonHide)
 			clearTimeout(this.mediaBalloonHide);
 		this.mediaBalloonHide = this.mediaBalloon.setStyle.delay(500, this.mediaBalloon, ['display', 'none']);	
+	},
+	setTextareaHeightAuto: function(textarea)
+	{
+		textarea.addEvents({
+			keydown: function(e) {
+				if (e.key == 'enter' && !e.shift)
+					return false;
+				var nl = 1;
+				if (e.key == 'enter')
+					nl++;
+				e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + nl);
+				
+			}.bind(this),
+			keyup: function(e) {
+				if (e.key == 'enter' && !e.shift) {
+					this.mediaSetUpdate({comments:e.target.get('value')});
+					this.mediaAddComment(this.locale.me, new Date(), e.target.get('value').toHtml());
+				}
+				e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + 1);
+			}.bind(this)
+		});
+	},
+	mediaAddTag: function(coord, tag, system)
+	{
+		if (!this.mediaTags)
+			return;
+	
+		// Set real position in px
+		var size = this.mediaElement.getSize();
+		position = {
+			x: (coord.x * size.x / 100).round(),
+			y: (coord.y * size.y / 100).round()
+		};
+
+		// Set invert transform
+		var flip = this.mediaGetFlip();
+		var transform = 'rotate(' + -this.mediaGetRotation() + 'deg)';
+		if (flip.horizontal)
+			transform+= ' scaleX(-1)';
+		if (flip.vertical)
+			transform+= ' scaleY(-1)';
+		
+		// Inject frame
+		var tagFrame = new Element('div.media-tag', {styles: {
+			left: position.x,
+			top: position.y
+		}}).setStyle3('transform', transform).inject(this.mediaTags);
+		
+		tagFrame.itemList = new Element('span', {html: tag, events: {
+			mouseenter: function() {
+				this.tagFrame.setStyle('display', 'block');
+			},
+			mouseleave: function() {
+				this.tagFrame.setStyle('display', 'none');
+			}
+		}}).inject(this.mediaTagsList);
+		tagFrame.itemList.tagFrame = tagFrame;
+		
+		// Span tag
+		var tagText = new Element('span.media-tag-text', {html: tag}).inject(tagFrame);
+		var size = tagText.getSize();
+		tagText.setStyle('left', (40 - size.x)/2);
+		
+		// Input tag
+		if (!tag || this.albumAdmin) {
+			tagText.setStyle('visibility', 'hidden');
+			var tagInput = new Element('input.media-tag-text', {value: tag, events: {
+				keydown: function(e) {
+					this.tagSetInputPosition(e.target);
+					if (e.key == 'enter') {
+						this.tagUpdate(e.target);
+					} else if (e.key == 'esc' && !e.target.retrieve('system')) {
+						e.target.getParent().destroy();
+					}
+				}.bind(this),
+				keyup: function(e) {
+					this.tagSetInputPosition(e.target);
+				}.bind(this),
+				blur: function(e) {
+					if (e.target.get('value') == '')
+						e.target.getParent().destroy();
+					else
+						this.tagUpdate(e.target);
+				}.bind(this)
+			}}).inject(tagText, 'before');
+			this.tagSetInputPosition(tagInput);
+			tagInput.store('coord', coord);
+			tagInput.store('system', system);
+			if (!system)
+				tagInput.focus();
+		}
+		
+		if (system)
+			tagFrame.setStyle('display', 'none');
+	},
+	tagSetInputPosition: function(input)
+	{
+		var tagText = input.getNext();
+		tagText.set('text', input.get('value'));
+		var size = tagText.getSize().x;
+		input.setStyles({
+			width: size,
+			left: (40 - size)/2
+		});
+	},
+	tagUpdate: function(input)
+	{
+		this.mediaSetUpdate({tags:{
+			x: input.retrieve('coord').x,
+			y: input.retrieve('coord').y,
+			value: input.get('value')
+		}});
+		if (input.get('value') == '')
+			input.getParent().destroy();
 	}
 });
+
+
+/****
+	Simplegallery.Calendar
+****/
 
 Simplegallery.Calendar = new Class({
 	initialize: function()

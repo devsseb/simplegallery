@@ -13,7 +13,12 @@
 			"parameters-update-success":"Les paramètres ont été modifiés avec succès.",
 			"user-delete-success":"L'utilisateur a été supprimé avec succès.",
 			"user-add-empty-name":"Le nom ne peut être vide.",
-			"user-add-empty-mail":"Le mail ne peut être vide."
+			"user-add-empty-mail":"Le mail ne peut être vide.",
+			"albums-reload-success":"Les albums ont été rechargés avec succès."
+		},
+		"state":{
+			"general":"Général",
+			"albums":"Albums"
 		},
 		"parameters":{
 			"name":"Nom de la galerie",
@@ -24,19 +29,30 @@
 			"albums-comments-disable":"Commentaires désactivé"
 		},
 		"groups":"Groupes",
+		"group-add":"Ajouter un groupe",
 		"users":"Utilisateurs",
 		"user-no-active":"L'utilisateur n'est pas actif",
 		"user-delete":"supprimer",
 		"user-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?",
 		"user-add":"Ajouter",
-		"user-add-link":"ajouter"
+		"user-add-link":"ajouter",
+		"albums-reload":"Recharger les albums",
+		"albums-tree":"Arborescence",
+		"albums-name":"Nom",
+		"albums-dates":"Dates",
+		"albums-check-all":"Tout vérifier",
+		"albums-found":"trouvé à l'emplacement",
+		"album-check":"vérifier",
+		"media-found":"trouvé",
+		"album-check-cancelled":"Arrêté par l'utilisateur",
+		"album-check-end":"Vérification terminée"
 	},
 	"user":{
 		"message": {
 			"login-error":"Login ou mot de passe incorect.",
 			"login-success":"Connecté avec succès en tant que %1.",
 			"logout":"Vous êtes maintenant déconnecté.",
-			"no-found":"Utilisateur introuvable.",
+			"not-found":"Utilisateur introuvable.",
 			"password-reset-link-sent":"Un email contenant le lien de modification de votre mot de passe vous a été envoyé.",
 			"password-reset-invalid-code":"Le code de modification de mot de passe est invalide.",
 			"password-update-error":"Le 2 mot de passe sont différents. Merci de resaisir votre mot de passe.",
@@ -137,11 +153,11 @@
 		},
 		"generation": {
 			"_":"Génération de l'album %1",
-			"delete":"Supression de médias :",
+			"delete":"Suppression de miniatures :",
 			"delete-nothing":"Aucune miniature à supprimer",
-			"delete-sprite":"\"%1\" supprimé de la miniature \"%2\"",
+			"delete-sprite":"index \"%1\" supprimé de la miniature \"%2\"",
 			"delete-file":"\"%1\" supprimé",
-			"update":"Mise à jour de medias :",
+			"update":"Mise à jour des miniatures :",
 			"update-nothing":"Aucune minitaure à mettre à jour",
 			"update-start":"Mise à jour de \"%1\" ...",
 			"update-sprite":"miniature générée dans  \"%1\"",
@@ -176,7 +192,8 @@
 	"install":{
 		"_":"Installation",
 		"message":{
-			"success":"Vous pouvez maintenant enregistrer un nouveau compte et vous connecter."
+			"success":"Vous pouvez maintenant enregistrer un nouveau compte et vous connecter.",
+			"update-success":"La mise à jour en version %1 a été appliquée avec succès."
 		},
 		"informations":"Chemin vert le dossier privé. Ce dossier contiendra vos albums, vignettes et configurations. Il est fortement recommandé de e placer dans un endroit non accessible en http.",
 		"private-path":"Chemin privé"

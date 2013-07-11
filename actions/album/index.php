@@ -1,13 +1,7 @@
 <?
-	if (!$user)
+
+	if (!$sg->user)
 		error(l('access-error'), '?');
-
-	// Loads all albums in $sg
-	$sg->loadAlbums();
-
-	// Album update
-	if ($id = get($_POST, k('id')))
-		$sg->albumUpdate($id, $_POST);
 
 	// Album download
 	if ($id = get($_GET, k('download')))
@@ -15,49 +9,32 @@
 	
 	if ($id = get($_GET, k('id'))) {
 
+		// Album update
+		if ($sg->user->admin and $_GET['album'] == 'update')
+			$sg->albumUpdate($id, $_POST);
+
 		$admin = ($_GET['album'] == 'admin' and $sg->user->admin);
-
-		if ($sg->user->admin) {
-			
-			// data.json regeneration
-			if (exists($_GET, 'generate-data'))
-				$sg->albumGenerateData($id);
-			
-			// Thumbs generation
-			if (exists($_GET, 'generate'))
-				$sg->albumGenerate($id);
-		}
 		
-		if ($admin) {		
-			// Check thumbs
-			$check = $sg->albumCheck($id);
-			$album = $check->album;
-			if ($check->update)
-				error(l('album.message.generate-update') . ' <a href="?album&generate&id=' . toHtml($album->id) . '">' . l('album.message.generate-update-link') . '</a>');
-			elseif ($check->delete)
-				information(l('album.message.generate-delete') . ' <a href="?album&generate&id=' . toHtml($album->id) . '">' . l('album.message.generate-delete-link') . '</a>');
+		// Retrieve album $id
+		$album = $sg->getAlbum($id);
 
-		} else
-		
-			// Retrieve album $id
-			$album = $sg->getAlbum($id);
-
-
-		$album->{'comments-disable'} = (get($sg->config->parameters, k('albums-comments-disable')) or $album->data->{'comments-disable'});
+		$comments_disable = ($sg->parameters->albums_comments_disable or $album->comments_disable);
 
 		// Prepare css transformation for medias
+		$noThumb = true;
 		foreach($album->medias as $media) {
+			if ($media->md5)
+				$noThumb = false;
+		
 			$media->styles = '';
-			
-			$flip = explode(' ', get($media, k('data', 'flip'), ''));
-			$flip = (object)array(
-				'h' => in_array('horizontal', $flip),
-				'v' => in_array('vertical', $flip)
+			$flip = object(
+				'h', (bool)$media->flip_horizontal,
+				'v', (bool)$media->flip_vertical
 			);
 
-			$rotation = get($media, k('data', 'rotation'), 0);
+			$rotation = $media->rotation;
 
-			switch (get($media, k('data', 'orientation'), 1)) {
+			switch ($media->orientation) {
 				default :
 					$rotation+= 0;
 					$flip->h = $flip->h ? -1 : 1;
@@ -101,21 +78,20 @@
 			}
 			foreach (array('', '-webkit-', '-moz-', '-o-', '-ms-', 'ms') as $cssPrefix)
 				$media->styles.= $cssPrefix . 'transform:rotate(' . $rotation . 'deg) scaleX(' . $flip->h . ') scaleY(' . $flip->v . ');';
-
+/*
 			foreach ($media->data->comments as $comment)
 				$comment->user = $comment->user == $sg->user->mail ? l('album.media.me') : get($sg->config->users, k($comment->user, 'name'));
-
+*/
 		}
 		
 	}
 	
-	if (!get($sg->config->parameters, k('albums-calendar-disable'))) {
+	if (!$sg->parameters->albums_calendar_disable) {
 	
 		// Prepare dates albums for calendar
 		$dates = array();
 		foreach ($sg->albums as $albumDate) {
-			if (!$date = get($albumDate->data, k('date')))
-				continue;
+			$date = object('start', $albumDate->date_start, 'end', $albumDate->date_end);
 			
 			if ($date->start and $date->end) {
 				$start = new DateTime($date->start);

@@ -13,7 +13,12 @@
 			"parameters-update-success":"Parameters updated successfully.",
 			"user-delete-success":"The user was deleted successfully.",
 			"user-add-empty-name":"Name can't be empty.",
-			"user-add-empty-mail":"Mail can't be empty."
+			"user-add-empty-mail":"Mail can't be empty.",
+			"albums-reload-success":"The albums have been reload successfully."
+		},
+		"state":{
+			"general":"General",
+			"albums":"Albums"
 		},
 		"parameters":{
 			"name":"Gallery name",
@@ -24,19 +29,30 @@
 			"albums-comments-disable":"Comments disable"
 		},
 		"groups":"Groups",
+		"group-add":"Add group",
 		"users":"Users",
 		"user-no-active":"User is no active",
 		"user-delete":"delete",
 		"user-delete-confirm":"The deletion is permanent. You want to continue ?",
 		"user-add":"Add",
-		"user-add-link":"add"
+		"user-add-link":"add",
+		"albums-reload":"reload albums",
+		"albums-tree":"Tree",
+		"albums-name":"Name",
+		"albums-dates":"Dates",
+		"albums-check-all":"Check all",
+		"albums-found":"found at the location",
+		"album-check":"check",
+		"media-found":"found",
+		"album-check-cancelled":"Stop by user",
+		"album-check-end":"Check end"
 	},
 	"user":{
 		"message": {
 			"login-error":"Incorrect user or password.",
 			"login-success":"Successfully connected. Welcome %1.",
 			"logout":"You are now disconnected.",
-			"no-found":"User not found.",
+			"not-found":"User not found.",
 			"password-reset-link-sent":"An mail with a link to reset your password has been sent.",
 			"password-reset-invalid-code":"Password reset code is invalid.",
 			"password-update-error":"The two passwords are differents. Please retype your password.",
@@ -137,11 +153,11 @@
 		},
 		"generation": {
 			"_":"Generation of album %1",
-			"delete":"Medias deletion :",
+			"delete":"Thumbnails deletion :",
 			"delete-nothing":"No thumbnail to delete",
-			"delete-sprite":"\"%1\" deleted from thumb \"%2\"",
+			"delete-sprite":"index \"%1\" deleted from thumb \"%2\"",
 			"delete-file":"\"%1\" deleted",
-			"update":"Medias updates :",
+			"update":"Thumbnails updates :",
 			"update-nothing":"No thumbnail to update",
 			"update-start":"Update \"%1\" ...",
 			"update-sprite":"thumbnail generated in \"%1\"",
@@ -176,7 +192,8 @@
 	"install":{
 		"_":"Install",
 		"message":{
-			"success":"You can now register a new account and login"
+			"success":"You can now register a new account and login",
+			"update-success":"The updated version of %1 was successfully applied."
 		},
 		"informations":"Path to the private folder. This folder will contain your albums, thumbnails and configurations. It is highly recommended to place it in an inaccessible http location.",
 		"private-path":"Private path"

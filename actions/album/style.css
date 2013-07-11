@@ -7,7 +7,7 @@
 #albums a.album-link:hover{background-color:#546c7b;background-color:rgba(255,255,255,0.3);}
 .album-admin-link{display:none;position:absolute;width:21px;height:21px;background:#9cc8e4 url('images/album_admin.png') no-repeat center center;top:0px;left:200px;}
 
-#albumLocales{display:none;}
+#albumLocale,#albumLocales{display:none;}
 #noAlbum{text-align:center;padding-top:20px;font-size:50px;color:#575757;}
 #noMedia{text-align:center;padding-top:20px;font-size:50px;color:#575757;display:none;}
 #noThumb{text-align:center;padding-top:20px;font-size:50px;color:#575757;}
@@ -18,7 +18,12 @@
 .mediaBackgroundPreview{box-shadow:0px 0px 5px #000;}
 .mediaBackgroundSlideshow{}
 #mediaImage{position:relative;display:none;margin:auto;}
+.media-image-tag{cursor:crosshair;}
 #mediaVideo{position:relative;display:none;margin:auto;}
+.media-tag{position:absolute;border:3px solid rgba(255,255,255,0.8);width:40px;height:40px;margin:-23px;border-radius:23px;}
+.media-tag-text{position:absolute;top:40px;left:-23px;border:none;background-color:rgba(255,255,255,0.8);font-size:10px;margin:0px;padding:2px 0px;text-align:center;line-height:16px;}
+span.media-tag-text{padding:0px 5px;}
+#mediaTagsList span{margin:0px 3px;}
 
 #mediaAction{height:26px;background-color:rgba(0,0,0,0.2);position:absolute;border-radius:15px;display:none;z-index:20;}
 #mediaPrevious{display:block;position:absolute;left:0px;top:-2px;width:30px;height:30px;background:transparent url('images/media_previous.png') no-repeat center center;}
@@ -47,11 +52,11 @@ p#mediaDescription{margin:10px 2px;}
 .media-balloon-separator{border-bottom:1px solid #9cc8e4;margin:10px 20px;}
 #mediaBalloon input,
 #mediaBalloon textarea{font-size:11px;font-family:Arial;}
-#mediaComment{border:1px solid #ccc;width:97%;width:calc(100% - 6px);width:-webkit-calc(100% - 6px);width:-moz-calc(100% - 6px);width:-o-calc(100% - 6px);width:-ms-calc(100% - 6px);width:ms-calc(100% - 6px);}
+#mediaComment{border:1px solid #ccc;margin:0px;padding:3px 0px;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
 #mediaComments{list-style-type:none;margin:0px;padding:5px;border:1px solid #ccc;}
 .media-comment-author{color:#555;font-weight:bold;}
 .media-comment-date{color:#555;font-style:italic;float:right;}
-.media-comment-text{margin:0px;}
+.media-comment-text{margin:0px;padding:0px;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
 
 .media-balloon-submit{text-align:right;margin:0px;}
 #thumbs{margin-left:520px;padding:10px 0px 10px 5px;overflow:hidden;position:relative;}

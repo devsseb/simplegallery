@@ -13,9 +13,8 @@ function toUrl($string)
 function array_index($array, $index)
 {
 	$result = array();
-	foreach ($array as $element) {
-		$result[$element[$index]] = $element;
-	}
+	foreach ($array as $element)
+		$result[is_array($element) ? $element[$index] : $element->$index] = $element;
 	return $result;
 }
 
@@ -114,7 +113,11 @@ function randomString($length)
 
 function imagesize($img)
 {
-	return object('width', imagesx($img), 'height', imagesy($img));
+	list($width, $height) =
+		is_string($img) ?
+			getimagesize($img) :
+			array(imagesx($img), imagesy($img));
+	return object('width', $width, 'height', $height);
 }
 
 function write($data, $nl = false)

@@ -50,9 +50,10 @@ class Locale
 		self::$index = json_decode(file_get_contents($file));
 		self::$indexDefault = json_decode(file_get_contents($this->dir . $this->langDefault . '.json'));
 
-		eval('function l($key){
-			return call_user_func_array(\'Locale::get\', func_get_args());
-		}');
+		if (!function_exists('l'))
+			eval('function l($key){
+				return call_user_func_array(\'Locale::get\', func_get_args());
+			}');
 
 	}
 	

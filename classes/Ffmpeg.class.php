@@ -6,12 +6,15 @@ class Ffmpeg
 {
 	public static function getFrameNumber($file)
 	{
-		return (int)Shell::exec('ffmpeg -i ' . Shell::escapeFile($file) . ' -vcodec copy -an -f null /dev/null 2>&1 | grep \'frame=\' | cut -f 2 -d \' \'');
+		return (int)Shell::exec('ffmpeg -i ' . Shell::escapeFile($file) . ' -vcodec copy -an -f null /dev/null 2>&1 | grep \'frame=\' | sed \'s/\s\s*/ /g\' | cut -f 2 -d \' \'');
 	}
 	
 	public static function convert($file, $target, $options = array(), $callback = false)
 	{
 		$frameNumber = self::getFrameNumber($file);
+
+		if (!$frameNumber)
+			$frameNumber = 1;
 
 		$passTotal = get($options, k('pass'));
 		
@@ -71,6 +74,43 @@ class Ffmpeg
 		preg_match('/frame=\s+(\d+)\s+fps=.*$/', $out, $match);
 		return get($match, k(1));
 	}
+	
+	public static function getSize($file)
+	{
+		$infos = Shell::exec('ffmpeg -i ' . Shell::escapeFile($file));
+		
+		preg_match('/Stream .* ([0-9]+)x([0-9]+) .* fps+/', $infos, $match);
+		return object('width', (int)get($match, k(1)), 'height', (int)get($match, k(2)));
+	}
+	
+	public static function capture($file, $percent, $target = null)
+	{
+	
+		$result = shell_exec('ffmpeg -i ' . Shell::escapeFile($file) . ' 2>&1');
+
+		preg_match('/Duration: ([0-9]{2}):([0-9]{2}):([0-9]{2}\\.[0-9]{2})/', $result, $match);
+
+		$time = $match[1] * 3600 + $match[2] * 60 + $match[3];
+		$time = round($percent * $time / 100);
+		
+		$hours = floor($time / 3600);
+		$time-= $hours * 3600;
+		$minutes = floor($time / 60);
+		$time-= $minutes * 60;
+		$time = date('H:i:s', mktime($hours, $minutes, $time));
+				
+		$image = $target ? $target : sys_get_temp_dir() . '/simplegallery_' . uniqid();
+		shell_exec('ffmpeg -ss ' . $time . ' -t 1 -i ' . Shell::escapefile($file) . ' -f mjpeg ' . Shell::escapefile($image));
+		
+		$capture = file_get_contents($image);
+		
+		if (!$target)
+			unlink($image);
+
+		return $capture;
+	
+	}
+
 }
 
 ?>
