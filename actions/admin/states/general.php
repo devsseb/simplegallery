@@ -48,7 +48,7 @@
 	<? foreach ($sg->getGroups() as $group) : ?>
 			<td class="admin-users-group-check"><input type="checkbox" value="1" name="usersGroups[<?=toHtml($user->id)?>][<?=toHtml($group->id)?>]" <?=exists($user->groups, $group->id) ? 'checked="checked" ' : ''?>/></td>
 	<? endforeach; ?>
-			<td class="admin-user-delete"><a href="?admin&userDelete=<?=toHtml($user->mail)?>"><?=l('admin.user-delete')?></a></td>
+			<td class="admin-user-delete"><a href="?admin&userDelete=<?=toHtml($user->id)?>"><?=l('admin.user-delete')?></a></td>
 <? endforeach; ?>
 	</table>
 	<p>

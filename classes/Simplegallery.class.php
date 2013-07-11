@@ -406,8 +406,8 @@ class Simplegallery
 
 				$this->mail(
 					$admin->mail,
-					l('mail.registration-admin.object', $this->config->parameters->name, $user->name, $user->mail),
-					l('mail.registration-admin.message', $admin->name) . l('mail.signature', $this->config->parameters->name)
+					l('mail.registration-admin.object', $this->parameters->name, $user->name, $user->mail),
+					l('mail.registration-admin.message', $admin->name) . l('mail.signature', $this->parameters->name)
 				);
 			}
 
@@ -535,13 +535,27 @@ class Simplegallery
 
 	}
 	
-	public function userDelete($mail)
+	public function userDelete($id)
 	{
-		if (!$this->config->users->$mail)
+		$user = $this->db->execute('
+			SELECT
+				id
+			FROM
+				users
+			WHERE
+				id = ' . $this->db->protect($id) . '
+			;
+		');
+		if (!$user)
 			error(l('user.message.not-found'), '?admin');
 			
-		unset($this->config->users->$mail);
-		file_put_contents($this->pathConfig . 'users.json', json_encode($this->config->users));
+		$this->db->execute('
+			DELETE FROM
+				users
+			WHERE
+				id = ' . $this->db->protect($id) . '
+			;
+		');
 		
 		success(l('admin.message.user-delete-success'), '?admin');
 	}
@@ -842,7 +856,7 @@ class Simplegallery
 		
 		if (exists($this, 'albums'))
 			return $this->albums;
-		
+
 		$this->albums = $this->db->execute('
 			SELECT
 				*
@@ -854,9 +868,38 @@ class Simplegallery
 		');
 
 		$this->albumsSort();
-
-		foreach ($this->albums as $album)
+		
+		$depths = array();
+		$ns_right = 0;
+		foreach ($this->albums as $index => $album) {
 			$this->getAlbum($album->id);
+			// Manage access for non admin user
+			if (!$this->user->admin) {
+				$access = false;
+				foreach ($this->user->groups as $userGroup) {
+					$groupAccess = get($album->groups, k($userGroup->id, 'access'), -2);
+					if ($access = ($groupAccess == -1 or $groupAccess == 1))
+						break;
+				}
+
+				if ($access) {
+					$total = count($depths);
+					for ($i = $total - 1; $i >= 0; $i--) {
+						if ($album->ns_left > $depths[$i]->ns_right or $album->ns_right < $depths[$i]->ns_left or $album->ns_depth == $depths[$i]->ns_depth) {
+							unset($depths[$i]);
+						} else {
+							$album->ns_depth = $depths[$i]->ns_depth + 1;
+							break;
+						}
+					}
+				
+					$depths[] = $album;
+					$depths = array_values($depths);
+				} else {
+					unset($this->albums[$index]);
+				}
+			}
+		}
 
 	}
 
@@ -912,7 +955,7 @@ class Simplegallery
 		$album->pathThumbs = $this->pathThumbs . $album->id . '/';
 		
 		// Retrieve groups
-		$album->groups = $this->getAlbumGroups($album->id);
+		$album->groups = array_index($this->getAlbumGroups($album->id), 'id');
 			
 		// Retrieve medias
 		$album->medias = $this->getMedias($album->id);
@@ -987,6 +1030,8 @@ class Simplegallery
 			);
 			if ($albumAccessInherited)
 				$album_group->access_inherited = get($albumAccessInherited, k($group_id), -2);
+			else
+				$album_group->access_inherited = get($album->groups, k($group_id, 'access_inherited'), -2);
 
 			$album_groups[] = $album_group;
 			
@@ -995,7 +1040,7 @@ class Simplegallery
 		}
 
 		$this->db->updateArray('albums_groups', $album_groups, null, 'group_id', 'album_id=' . $this->db->protect($album->id));
-		
+
 		// Update album children access
 		$children = $this->db->execute('
 			SELECT
@@ -1583,8 +1628,8 @@ class Simplegallery
 
 						$this->mail(
 							$admin->mail,
-							l('mail.media-new-comment.object', $this->config->parameters->name, $this->user->name, $media->name, $album->data->name),
-							l('mail.media-new-comment.message', $admin->name, $this->user->name, $this->user->mail, $media->name, $album->data->name) . $value . l('mail.signature', $this->config->parameters->name)
+							l('mail.media-new-comment.object', $this->parameters->name, $this->user->name, $media->name, $album->data->name),
+							l('mail.media-new-comment.message', $admin->name, $this->user->name, $this->user->mail, $media->name, $album->data->name) . $value . l('mail.signature', $this->parameters->name)
 						);
 					}
 
@@ -1697,7 +1742,7 @@ class Simplegallery
 			implode(chr(13).chr(10), array(
 				'MIME-Version: 1.0',
     	 		'Content-type: text/html; charset=utf-8',
-    	 		'From: ' . get($this->config->parameters, k('name'), 'SimpleGallery') . ' <noreply@domain.com>'
+    	 		'From: ' . $this->parameters->name . ' <noreply@domain.com>'
     	 	))
 		);
 	}
