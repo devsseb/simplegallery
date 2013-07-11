@@ -3,6 +3,7 @@
 * Add possibilite to tag medias
 * Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
 * Manage cookie connection by session in database
+* Revise album download
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
 * ~~Manage cache for medias~~
