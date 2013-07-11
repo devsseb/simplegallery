@@ -1,7 +1,8 @@
 **TODO :**
+* Add description, date and comments for medias
 * Add possibilite to tag medias
 * Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
-* Must be able to verify all albums in the administration 
+* Manage cookie connection by session in database
 * ~~On update user mail, resend verification mail~~
 * ~~Support language~~
 * ~~Manage cache for medias~~
@@ -19,4 +20,4 @@
 * ~~Add options for regenerate data.json for an album~~
 * ~~Browse albums by date with calendar~~
 * ~~Add possibilite to keep user connection~~
-* ~~Add description, date and comments for medias~~
+* ~~Must be able to verify all albums in the administration~~
