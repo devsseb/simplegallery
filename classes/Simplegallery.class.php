@@ -122,7 +122,7 @@ class Simplegallery
 		');
 	
 		/* Access :
-		 * -2 : Forbidden inherited
+		 * -2 : Forbidden inherited (default)
 		 * -1 : Granted inherited
 		 * 0 : Forbidden
 		 * 1 : Granted
