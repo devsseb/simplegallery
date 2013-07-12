@@ -209,6 +209,9 @@ class Simplegallery
 	
 	private function installUpdate()
 	{
+		if ($this->parameters->version == SG_VERSION)
+			return;
+
 		while ($this->parameters->version < SG_VERSION) {
 			switch ($this->parameters->version) {
 				default :

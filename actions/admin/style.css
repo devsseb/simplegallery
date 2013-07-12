@@ -29,6 +29,7 @@
 .admin-album-dates{text-align:center;width:300px;}
 .admin-albums input{font-size:11px;border:1px solid #000;padding:0px 3px;height:18px;margin:2px;}
 .admin-album-name{width:200px;}
+.admin-album-medias-total{font-style:italic;font-size:11px;color:#6f6161;}
 
 #adminGroups{list-style-type:none;margin:0px;padding:0px;}
 #adminGroups input{list-style-type:none;border:1px solid #000;}
