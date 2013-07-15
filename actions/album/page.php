@@ -115,13 +115,13 @@
 		<div class="album-admin-button"><input type="submit" value="<?=l('apply')?>" /></div>
 	</form>
 	<? endif; ?>
-	<? if ($noThumb) : ?>
-	<div id="noThumb">
-		<?=l('album.no-thumb')?>
-	</div>
-	<? elseif (!$album->medias) : ?>
+	<? if (!$album->medias) : ?>
 	<div id="noMedia">
 		<?=l('album.no-media')?>
+	</div>
+	<? elseif ($noThumb) : ?>
+	<div id="noThumb">
+		<?=l('album.no-thumb')?>
 	</div>
 	<? else : ?>
 	<div id="albumAction">
