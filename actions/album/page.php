@@ -83,9 +83,9 @@
 		<label for="albumAdminName"><?=l('album.name')?> :</label>
 		<input id="albumAdminName" type="text" name="name" value="<?=toHtml($album->name)?>" />
 		<label for="albumAdminDateStart"><?=l('album.date.start')?> :</label>
-		<input id="albumAdminDateStart" type="date" name="date-start" value="<?=toHtml($album->date_start)?>" />
+		<input id="albumAdminDateStart" type="date" placeholder="<?=l('date-format')?>" name="date-start" value="<?=toHtml($album->date_start)?>" />
 		<label for="albumAdminDateEnd"><?=l('album.date.end')?> :</label>
-		<input id="albumAdminDateEnd" type="date" name="date-end" value="<?=toHtml($album->date_end)?>" />
+		<input id="albumAdminDateEnd" type="date" placeholder="<?=l('date-format')?>" name="date-end" value="<?=toHtml($album->date_end)?>" />
 		<label for="albumAdminDescription"><?=l('album.description')?> :</label>
 		<textarea id="albumAdminDescription" name="description"><?=toHtml($album->description)?></textarea>
 		<?/* if (!get($sg->config->parameters, k('albums-comments-disable'))) : ?>

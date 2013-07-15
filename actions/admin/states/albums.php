@@ -21,8 +21,8 @@
 			<td style="padding-left:<?=$album->ns_depth * 15 + 5?>px;"><?=toHtml(basename($album->path))?> <span class="admin-album-medias-total">(<?=count($album->medias)?>)</span></td>
 			<td><input type="text" name="albums[<?=toHtml($album->id)?>][name]" placeholder="<?=toHtml(basename($album->path))?>" value="<?=toHtml($album->name)?>" class="admin-album-name" /></td>
 			<td class="admin-album-dates">
-				<input type="date" name="albums[<?=toHtml($album->id)?>][date_start]" value="<?=toHtml($album->date_start)?>" />
-				<input type="date" name="albums[<?=toHtml($album->id)?>][date_end]" value="<?=toHtml($album->date_end)?>" />
+				<input type="date" placeholder="<?=l('date-format')?>" name="albums[<?=toHtml($album->id)?>][date_start]" value="<?=toHtml($album->date_start)?>" />
+				<input type="date" placeholder="<?=l('date-format')?>" name="albums[<?=toHtml($album->id)?>][date_end]" value="<?=toHtml($album->date_end)?>" />
 			</td>
 			<td class="admin-album-links">
 				<a class="admin-album-check" href="?admin=check&amp;id=<?=toHtml($album->id)?>"><?=l('admin.album-check')?></a>

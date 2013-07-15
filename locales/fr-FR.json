@@ -2,6 +2,7 @@
 	"cancel":"Annuler",
 	"apply":"Appliquer",
 	"access-error":"L'accès n'est pas autorisé",
+	"date-format":"aaaa-mm-jj",
 	"structure": {
 		"logged-in-as":"Connecter en tant que",
 		"logout":"Me déconnecter",

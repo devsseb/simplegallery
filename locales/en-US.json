@@ -2,6 +2,7 @@
 	"cancel":"Cancel",
 	"apply":"Apply",
 	"access-error":"Access is forbidden",
+	"date-format":"aaaa-mm-dd",
 	"structure": {
 		"logged-in-as":"Loggin in as",
 		"logout":"Logout",
