@@ -1116,7 +1116,7 @@ class Simplegallery
 			resetTimout();
 
 			$size = $type == 'image' ? imagesize($file) : FFmpeg::getSize($file);
-			
+
 			$md5 = md5_file($file);
 			$basename = $media;
 			$media = get($mediasDb, k($basename));
@@ -1128,13 +1128,14 @@ class Simplegallery
 					'album_id', $album->id,
 					'file', $basename,
 					'md5', '',
-					'width', $size->width,
-					'height', $size->height,
 					'orientation', exif_imagetype($file) === false ? 1 : (int)geta(exif_read_data($file), k('Orientation'), 1),
 					'rotation', 0,
 					'thumb_index', 0,
 					'type', $type
 				);
+			
+			$media->width = $size->width;
+			$media->height = $size->height;
 			write('<strong>' . round($i * 100 / $total) . '%</strong> - ' . $i . '/' . $total . ' "' . toHtml($media->file) . '" ' . l('admin.media-found') . ' ');
 
 			$videosDeleted = array();
@@ -1199,6 +1200,7 @@ class Simplegallery
 
 			}
 			$media->md5 = $md5;
+
 			$this->db->executeArray('medias', $media);
 		}
 		
@@ -1368,7 +1370,6 @@ class Simplegallery
 					// Prepare vars for resize and crop image
 					$dstY = $lagX = $lagY = 0;
 					if ($dimension->type == 'sprite') {
-				
 						if ($media->width >= $media->height) {
 							$srcWidth = $media->height;
 							$srcHeight = $media->height;
@@ -1414,7 +1415,7 @@ class Simplegallery
 				
 					if ($new)
 						$imgThumb = imagecreatetruecolor($dstWidth, $dstHeight);
-				
+
 					imagecopyresampled($imgThumb, $imgMedia, 0, $dstY, $lagX, $lagY, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
 
 					imagejpeg($imgThumb, $fileThumb);

@@ -78,8 +78,7 @@ class Ffmpeg
 	public static function getSize($file)
 	{
 		$infos = Shell::exec('ffmpeg -i ' . Shell::escapeFile($file));
-		
-		preg_match('/Stream .* ([0-9]+)x([0-9]+) .* fps+/', $infos, $match);
+		preg_match('/Stream.*Video.*\\s([0-9]+)x([0-9]+)/', $infos, $match);
 		return object('width', (int)get($match, k(1)), 'height', (int)get($match, k(2)));
 	}
 	

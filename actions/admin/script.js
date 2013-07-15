@@ -57,6 +57,8 @@ window.addEvent('domready', function() {
 					var locale = JSON.decode($('admin-locales').get('text'));
 					this.options.update.grab(new Element('strong.album-check-end', {html: '<br />' + locale['album-check-end']}));
 
+					this.options.update.scrollTop = this.options.update.scrollHeight;
+
 					$$('.admin-album-cancel').setStyle('display', 'none');
 					if (next) {
 						var tr = this.options.update.getParent('tr').getNext('tr');
