@@ -10,7 +10,7 @@
 	</table>
 	<ul class="box-links">
 		<li><a href="?user=lost"><?=l('user.lost-password._')?></a></li>
-<? if (!get($sg->config->parameters, k('registration-disable'))) : ?>
+<? if (!get($sg->parameters->registration_disable)) : ?>
 		<li><a href="?user=registration"><?=l('user.registration._')?></a></li>
 <? endif; ?>
 	</ul>

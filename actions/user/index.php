@@ -32,22 +32,26 @@
 				
 		break;
 		case 'registration' :
-			if ($sg->parameters->registration_disable and $sg->usersTotal(true) > 0)
+
+			if (
+				$sg->parameters->registration_disable and
+				$sg->usersTotal(true) > 0 and
+				!gete($_GET, k('rpcode')) and
+				!gete($_POST, k('rcode'))
+			)
 				go('?');
 
 			if ($sg->user)
 				go('?album');
 
-			if (exists($_POST, 'name'))
-				$sg->userRegistration($_POST['name'], $_POST['mail'], $_POST['password'], $_POST['password-check']);
-
-			if ($code = get($_GET, k('rcode')))
-				$sg->userActive($code);
-				
-			if ($code = get($_POST, k('rcode')))
+			if ($code = get($_GET, k('rpcode')))
+				$sg->userCheckRegistrationCode($code);
+			elseif ($code = get($_POST, k('rcode')))
 				$sg->userActive($code, $_POST['password'], $_POST['password-check']);
-				
-			$code = get($_GET, k('rpcode'));
+			elseif (exists($_POST, 'name'))
+				$sg->userRegistration($_POST['name'], $_POST['mail'], $_POST['password'], $_POST['password-check']);
+			elseif ($code = get($_GET, k('rcode')))
+				$sg->userActive($code);
 
 		break;
 		case 'profil' :

@@ -428,11 +428,11 @@ class Simplegallery
 		return crypt($password, sprintf('$2a$%02d$', 7) . $salt);
 	}
 	
-	public function userActive($code, $password = null, $passwordCheck = null)
+	public function userCheckRegistrationCode($code)
 	{
 		if (strlen($code) != 12)
 			error(l('user.message.registration-active-invalid-code'), '?user=registration');
-	
+
 		$user = $this->db->execute('
 			SELECT
 				id
@@ -445,6 +445,13 @@ class Simplegallery
 	
 		if (!$user)
 			error(l('user.message.registration-active-invalid-code'), '?user=registration');
+			
+		return $user;
+	}
+	
+	public function userActive($code, $password = null, $passwordCheck = null)
+	{
+		$user = $this->userCheckRegistrationCode($code);
 
 		if (!is_null($password)) {
 			if (trim($password) == '')
