@@ -50,6 +50,7 @@ class Simplegallery
 		);
 
 		$this->getUser();
+
 		$this->getAlbums();
 
 	}
@@ -878,11 +879,11 @@ class Simplegallery
 		');
 
 		$this->albumsSort();
-		
+
 		$depths = array();
 		$ns_right = 0;
 		foreach ($this->albums as $index => $album) {
-			$this->getAlbum($album->id);
+			$this->getAlbum($album->id, true, false);
 			// Manage access for non admin user
 			if (!$this->user->admin) {
 				$access = false;
@@ -955,20 +956,23 @@ class Simplegallery
 	}
 	
 	// Return album infos
-	public function getAlbum($id)
+	public function getAlbum($id, $group = true, $media = true)
 	{
 		// Test if album exists
 		if (!$album = get($this->albums, k($id)))
 			error(l('album.message.error'), '?');		
 
 		// Set thumbs path
-		$album->pathThumbs = $this->pathThumbs . $album->id . '/';
+		if (!exists($album, 'pathThumbs'))
+			$album->pathThumbs = $this->pathThumbs . $album->id . '/';
 		
-		// Retrieve groups
-		$album->groups = array_index($this->getAlbumGroups($album->id), 'id');
-			
-		// Retrieve medias
-		$album->medias = $this->getMedias($album->id);
+		if ($group and !exists($album, 'groups'))
+			// Retrieve groups
+			$album->groups = array_index($this->getAlbumGroups($album->id), 'id');
+	
+		if ($media and !exists($album, 'medias'))
+			// Retrieve medias
+			$album->medias = $this->getMedias($album->id);
 
 		return $album;
 	}
