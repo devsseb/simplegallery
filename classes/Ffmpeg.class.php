@@ -6,6 +6,16 @@ class Ffmpeg
 {
 	public static function getFrameNumber($file)
 	{
+		$infos = Shell::exec('ffmpeg -i ' . Shell::escapeFile($file));
+
+		preg_match('/Duration: ([0-9\\.:]+)/', $infos, $match);
+		$duration = explode(':', $match[1]);
+		$duration = $duration[0] * 3600 + $duration[1] * 60 + $duration[2];
+
+		preg_match('/Stream.*Video.*\\s+([0-9]+)\\s+fps/', $infos, $match);
+		$fps = gete($match, k(1), 25);
+		return ceil($fps * $duration);
+		
 		return (int)Shell::exec('ffmpeg -i ' . Shell::escapeFile($file) . ' -vcodec copy -an -f null /dev/null 2>&1 | grep \'frame=\' | sed \'s/\s\s*/ /g\' | cut -f 2 -d \' \'');
 	}
 	
