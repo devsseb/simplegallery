@@ -210,17 +210,16 @@
 		</div>
 		<? endif; ?>
 	</div>
-<? /*
 	<div id="mediaBalloon">
 		<div id="mediaBalloonPointer"></div>
 		<? if ($admin) : ?>
 		<div>
-			<textarea id="mediaDescription" placeholder="<?=l('album.media.description')?>" cols="30" rows="2"></textarea>
-			<div class="media-balloon-submit"><input id="mediaBalloonSubmit" type="button" value="<?=l('apply')?>" /></div>
+			<textarea id="mediaDescription" placeholder="<?=l('album.media.no-description')?>" cols="30" rows="2"></textarea>
 		</div>
 		<? else : ?>
 		<p id="mediaDescription"></p>
 		<? endif; ?>
+<? /*
 		<div class="media-balloon-separator"></div>
 		<? if (false and !get($sg->config->parameters, k('albums-tags-disable'))) : ?>
 		<div id="mediaTagsList"></div>
@@ -230,8 +229,8 @@
 		<textarea id="mediaComment" cols="30" rows="1"></textarea>
 		<ul id="mediaComments"></ul>
 		<? endif; ?>
-	</div>
 */ ?>
+	</div>
 	<? endif; ?>
 </div>
 <? endif; ?>

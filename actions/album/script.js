@@ -115,7 +115,6 @@ var Simplegallery = new Class({
 		this.mediaDescription = $('mediaDescription');
 		this.mediaComment = $('mediaComment');
 		this.mediaComments = $('mediaComments');
-		this.mediaBalloonSubmit = $('mediaBalloonSubmit');
 		
 		this.mediaBackground = $('mediaBackground');
 		this.mediaImage = $('mediaImage');
@@ -302,11 +301,11 @@ var Simplegallery = new Class({
 			});
 		}
 		
-		if (this.mediaBalloonSubmit)
-			this.mediaBalloonSubmit.addEvent('click', function() {
-				this.mediaSetUpdate({
-					description: this.mediaDescription.get('value')
-				});
+		if (this.mediaDescription)
+			this.mediaDescription.addEvent('blur', function() {
+				var description = this.mediaDescription.get('value');
+				if (description != this.media.description)
+					this.mediaSetUpdate({description: description});
 			}.bind(this));
 			
 		if (this.mediaComment) {
@@ -505,11 +504,13 @@ var Simplegallery = new Class({
 		this.mediaDownload.set('href', this.media.url + '&download');
 
 		if (this.mediaBalloon) {
-			this.mediaDescription.set('html', this.media.description || this.locale['no-description']);
-			if (this.media.description)
-				this.mediaDescription.removeClass('media-no-description');
-			else
-				this.mediaDescription.addClass('media-no-description');
+			this.mediaDescription.set('html', this.media.description);
+			if (this.mediaDescription.get('tag') == 'p') {
+				if (this.media.description)
+					this.mediaDescription.removeClass('media-no-description');
+				else
+					this.mediaDescription.addClass('media-no-description').set('html', this.locale['no-description'])
+			}
 		}
 /*
 		if (this.mediaComments) {
@@ -581,6 +582,9 @@ var Simplegallery = new Class({
 				$('noMedia').setStyle('display', 'block');
 			}
 		}
+		
+		if (update.description != undefined)
+			this.thumb.set('mediaDescription', this.media.description = update.description);
 		
 		this.mediaUpdateRequest.send({url: url, data: {update: update}});
 		
@@ -1010,6 +1014,8 @@ var Simplegallery = new Class({
 		if (this.mediaBalloonHide)
 			clearTimeout(this.mediaBalloonHide);
 		this.mediaBalloonHide = this.mediaBalloon.setStyle.delay(500, this.mediaBalloon, ['display', 'none']);	
+		if (this.mediaDescription)
+			this.mediaDescription.fireEvent('blur');
 	},
 	setTextareaHeightAuto: function(textarea)
 	{
