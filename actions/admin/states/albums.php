@@ -18,7 +18,7 @@
 		</tr>
 	<? foreach ($sg->albums as $album) : ?>
 		<tr>
-			<td style="padding-left:<?=$album->ns_depth * 15 + 5?>px;"><?=toHtml(basename($album->path))?> <span class="admin-album-medias-total">(<?=count($album->medias)?>)</span></td>
+			<td style="padding-left:<?=$album->ns_depth * 15 + 5?>px;"><?=toHtml(basename($album->path))?> <span class="admin-album-medias-total">(<?=$album->medias_total?>)</span></td>
 			<td><input type="text" name="albums[<?=toHtml($album->id)?>][name]" placeholder="<?=toHtml(basename($album->path))?>" value="<?=toHtml($album->name)?>" class="admin-album-name" /></td>
 			<td class="admin-album-dates">
 				<input type="date" placeholder="<?=l('date-format')?>" name="albums[<?=toHtml($album->id)?>][date_start]" value="<?=toHtml($album->date_start)?>" />

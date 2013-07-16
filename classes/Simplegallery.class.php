@@ -760,6 +760,7 @@ class Simplegallery
 				unset($album->pathThumbs);
 				unset($album->groups);
 				unset($album->medias);
+				unset($album->medias_total);
 				
 				$albums[] = $album;
 			}
@@ -870,9 +871,14 @@ class Simplegallery
 
 		$this->albums = $this->db->execute('
 			SELECT
-				*
+				albums.*,
+				COUNT(medias.id) AS medias_total
 			FROM
 				albums
+			LEFT JOIN
+				medias ON medias.album_id = albums.id
+			GROUP BY
+				albums.id
 			ORDER BY
 				ns_left ASC
 			;
@@ -1010,6 +1016,7 @@ class Simplegallery
 
 		unset($album->pathThumbs);
 		unset($album->groups);
+		unset($album->medias_total);
 
 		if ($reorder = $data['reorder']) {
 			$reorder = json_decode($reorder);
@@ -1449,11 +1456,11 @@ class Simplegallery
 
 			imagedestroy($imgMedia);
 			
-			unset($media->type);
 			$this->db->executeArray('medias', $media);
 			unset($album->pathThumbs);
 			unset($album->groups);
 			unset($album->medias);
+			unset($album->medias_total);
 			$this->db->executeArray('albums', $album);
 			
 		}
