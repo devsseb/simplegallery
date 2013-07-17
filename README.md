@@ -1,5 +1,5 @@
 **TODO :**
-* Add date and comments for medias
+* Add date for medias
 * Add possibilite to tag medias
 * Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
 * Manage cookie connection by session in database
@@ -23,3 +23,4 @@
 * ~~Add possibilite to keep user connection~~
 * ~~Must be able to verify all albums in the administration~~
 * ~~Add description for medias~~
+* ~~Add comments for medias~~

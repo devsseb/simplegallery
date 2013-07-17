@@ -150,7 +150,10 @@
 			"description":"Description",
 			"no-description":"Aucune description",
 			"comments":"Commentaires",
-			"me":"Moi"
+			"me":"Moi",
+			"unknow-user":"Iconnu",
+			"comment-delete":"supprimer",
+			"comment-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?"
 		},
 		"generation": {
 			"_":"Génération de l'album %1",

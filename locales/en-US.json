@@ -150,7 +150,10 @@
 			"description":"Description",
 			"no-description":"No description",
 			"comments":"Comments",
-			"me":"Me"
+			"me":"Me",
+			"unknow-user":"Unknow",
+			"comment-delete":"delete",
+			"comment-delete-confirm":"The deletion is permanent. You want to continue ?"
 		},
 		"generation": {
 			"_":"Generation of album %1",

@@ -282,7 +282,7 @@ var Simplegallery = new Class({
 					this.mediaSetUpdate('delete');
 			}.bind(this));
 		}
-		this.mediaUpdateRequest = new Request.JSON();
+		this.mediaUpdateRequest = new Request.JSON({onSuccess: this.mediaSetUpdateSuccess.bind(this)});
 
 		this.slideshow.addEvents({
 			click: this.slideshowEnd.bind(this)
@@ -308,27 +308,8 @@ var Simplegallery = new Class({
 					this.mediaSetUpdate({description: description});
 			}.bind(this));
 			
-		if (this.mediaComment) {
+		if (this.mediaComment)
 			this.setTextareaHeightAuto(this.mediaComment);
-			this.mediaComment.addEvents({
-				keydown: function(e) {
-					if (e.key == 'enter' && !e.shift)
-						return false;
-					var nl = 1;
-					if (e.key == 'enter')
-						nl++;
-					e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + nl);
-					
-				}.bind(this),
-				keyup: function(e) {
-					if (e.key == 'enter' && !e.shift) {
-						this.mediaSetUpdate({comments:this.mediaComment.get('value')});
-						this.mediaAddComment(this.locale.me, new Date(), this.mediaComment.get('value').toHtml());
-					}
-					e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + 1);
-				}.bind(this)
-			});
-		}
 
 		if (this.mediaBalloon)
 			this.mediaBalloon.addEvents({
@@ -511,22 +492,24 @@ var Simplegallery = new Class({
 				else
 					this.mediaDescription.addClass('media-no-description').set('html', this.locale['no-description'])
 			}
-		}
-/*
-		if (this.mediaComments) {
-			this.mediaComments.empty();
-			this.mediaComments.setStyle('display', this.media.comments.length ? 'block' : 'none');
-			for (var i = 0,comment; comment = this.media.comments[i]; i++)
-				this.mediaAddComment(comment.user, comment.date, comment.text);
-		}
-		if (this.mediaTags) {
-			this.mediaTags.empty();
-			for (tag in this.media.tags) {
-				tag = this.media.tags[tag];
-				this.mediaAddTag({x: tag.x, y: tag.y}, tag.value, true);
+
+			if (this.mediaComments) {
+				this.mediaComments.empty();
+				this.mediaComments.setStyle('display', this.media.comments.length ? 'block' : 'none');
+				for (var i = 0,comment; comment = this.media.comments[i]; i++)
+					this.mediaAddComment(comment.id, comment.user_name, comment.datetime, comment.value);
 			}
-		}
+/*
+			if (this.mediaTags) {
+				this.mediaTags.empty();
+				for (tag in this.media.tags) {
+					tag = this.media.tags[tag];
+					this.mediaAddTag({x: tag.x, y: tag.y}, tag.value, true);
+				}
+			}
 */
+		}
+		
 		this.resize();
 
 	},
@@ -586,7 +569,49 @@ var Simplegallery = new Class({
 		if (update.description != undefined)
 			this.thumb.set('mediaDescription', this.media.description = update.description);
 		
-		this.mediaUpdateRequest.send({url: url, data: {update: update}});
+		this.mediaUpdateRequest.send({
+			url: url,
+			data: {update: update}
+		});
+		
+	},
+	mediaSetUpdateSuccess: function(response)
+	{
+		if (response.comments != undefined) {
+
+			var comment = {
+				id: response.comments.id,
+				media_id: response.comments.media_id,
+				user_id: response.comments.user_id,
+				datetime: response.comments.datetime,
+				value: response.comments.value,
+				user_name: response.comments.user_name
+			};
+			for (var i = 0,thumb; thumb = this.thumbs[i]; i++)
+				if (thumb.get('mediaId') == comment.media_id) {
+					var comments = JSON.decode(this.thumb.get('mediaComments'));
+					comments.push(comment);
+					thumb.set('mediaComments', JSON.encode(comments));
+					if (this.media.id == comment.media_id)
+						this.media.comments = comments;
+					break;
+				}
+		}
+		
+		if (response.commentsRemove != undefined)
+			for (var i = 0,thumb; thumb = this.thumbs[i]; i++)
+				if (thumb.get('mediaId') == response.media_id) {
+					var comments = JSON.decode(this.thumb.get('mediaComments'));
+					for (var i = 0, comment; comment = comments[i]; i++) {
+						if (comment.id == response.commentsRemove) {
+							comments.splice(i, 1);
+							thumb.set('mediaComments', JSON.encode(comments));
+							if (this.media.id == comment.media_id)
+								this.media.comments = comments;
+						}
+					}
+					break;
+				}
 		
 	},
 	mediaGetOrientation: function()
@@ -600,20 +625,41 @@ var Simplegallery = new Class({
 		else
 			return 'vertical';
 	},
-	mediaAddComment: function(user, date, text)
+	mediaAddComment: function(id, user, date, text, isNew)
 	{
 		this.mediaComment.set('value', '');
 		var type = /*this.albumAdmin ||  ? 'textarea' : */'p';
-		var textarea;
+		var textarea, remove;
 		new Element('li').adopt(
+			new Element('input[type=hidden]', {value: id}),
 			new Element('div').adopt(
 				new Element('span.media-comment-author', {html: user}),
 				new Element('span.media-comment-date', {html: new Date(date).format('%x %X')})
 			),
-			textarea = new Element(type+'.media-comment-text', {html: text})
+			textarea = new Element(type+'.media-comment-text', {html: text}),
+			this.albumAdmin ? new Element('div.media-comment-delete').grab(
+				remove = new Element('a[href=#]', {html: this.locale['comment-delete']})
+			) : null
 		).inject(this.mediaComments);
+		
+		if (remove)
+			remove.addEvent('click', function(e) {
+				e.preventDefault();
+				this.mediaRemoveComment(e.target.getParent('li'));
+			}.bind(this));
 /*		if (type == 'textarea')
 			this.setTextareaHeightAuto(textarea);*/
+	},
+	mediaRemoveComment: function(li)
+	{
+		var id = li.getElement('input[type=hidden]').get('value');
+		if (confirm(this.locale['comment-delete-confirm'])) {
+			this.mediaSetUpdate({commentsRemove:id});
+			var ul = li.getParent('ul');
+			li.destroy();
+			if (!ul.getElement('li'))
+				this.mediaComments.setStyle('display', 'none');
+		}
 	},
 	mediaSetSize: function()
 	{
@@ -1032,7 +1078,7 @@ var Simplegallery = new Class({
 			keyup: function(e) {
 				if (e.key == 'enter' && !e.shift) {
 					this.mediaSetUpdate({comments:e.target.get('value')});
-					this.mediaAddComment(this.locale.me, new Date(), e.target.get('value').toHtml());
+					this.mediaAddComment(0, this.locale.me, new Date(), e.target.get('value').toHtml(), true);
 				}
 				e.target.set('rows', (e.target.get('value').match(/\n|\r\n/g) || []).length + 1);
 			}.bind(this)

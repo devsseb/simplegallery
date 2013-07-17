@@ -398,22 +398,12 @@ class Simplegallery
 		);
 
 		if ($this->usersTotal() > 1)
-			foreach ($this->db->execute('
-				SELECT
-					*
-				FROM
-					users
-				WHERE
-					admin = 1
-				;
-			') as $admin) {
-
+			foreach ($this->getAdministrators() as $admin)
 				$this->mail(
 					$admin->mail,
 					l('mail.registration-admin.object', $this->parameters->name, $user->name, $user->mail),
 					l('mail.registration-admin.message', $admin->name) . l('mail.signature', $this->parameters->name)
 				);
-			}
 
 		if (!is_null($password))
 			success(l('user.message.registration-active-link-sent'), $successLink);
@@ -683,6 +673,19 @@ class Simplegallery
 				groups
 			ORDER BY
 				name
+			;
+		');
+	}
+	
+	private function getAdministrators()
+	{
+		return $this->db->execute('
+			SELECT
+				*
+			FROM
+				users
+			WHERE
+				admin = 1
 			;
 		');
 	}
@@ -1260,8 +1263,10 @@ class Simplegallery
 				ifnull(nullif(trim(name), ""), file) ASC
 			;
 		'), 'id');
-		foreach ($medias as $media)
+		foreach ($medias as $media) {
 			$media->rotation = (int)$media->rotation;
+			$media->comments = $this->mediaGetComments($media->id);
+		}
 
 		return $medias;
 	}
@@ -1593,7 +1598,7 @@ class Simplegallery
 	
 	public function mediaUpdate($albumId, $mediaId, $updates)
 	{
-
+		$data = $updates;
 		$album = $this->getAlbum($albumId);
 		if (!$media = get($album->medias, k($mediaId)))
 			die(l('album.media.not-found'));
@@ -1633,30 +1638,42 @@ class Simplegallery
 					$this->db->executeArray('medias', $media);
 				break;
 				case 'comments' :
-/*
+				
+					if (!($sg->parameters->albums_comments_disable or $album->comments_disable))
+						exit();
+				
 					$value = nl2br(toHtml($value));
-					$media->data->{$update}[] = object(
-						'date', date('Y-m-d h:i:s'),
-						'user', $this->user->mail,
-						'text', $value
+					$comment = object(
+						'id', 0,
+						'media_id', $mediaId,
+						'user_id', $this->user->id,
+						'datetime', date('Y-m-d h:i:s'),
+						'value', $value
 					);
-					$this->albumSaveConfig($album->id);
+					$this->db->executeArray('medias_comments', $comment);
+
+					$comment->user_name = $this->user->name;
+					$data['comments'] = $comment;
 
 					// Send mail to administrators
-					foreach ($this->config->users as $admin) {
-
-						if (!in_array('admins', $admin->groups))
-							continue;
-
+					foreach ($this->getAdministrators() as $admin)
 						$this->mail(
 							$admin->mail,
-							l('mail.media-new-comment.object', $this->parameters->name, $this->user->name, $media->name, $album->data->name),
-							l('mail.media-new-comment.message', $admin->name, $this->user->name, $this->user->mail, $media->name, $album->data->name) . $value . l('mail.signature', $this->parameters->name)
+							l('mail.media-new-comment.object', $this->parameters->name, $this->user->name, $media->name, $album->name ? $album->name : basename($album->path)),
+							l('mail.media-new-comment.message', $admin->name, $this->user->name, $this->user->mail, basename($media->file), $album->name ? $album->name : basename($album->path)) . $value . l('mail.signature', $this->parameters->name)
 						);
-					}
 
 				break;
+				case 'commentsRemove' :
+
+					if (!($sg->parameters->albums_comments_disable or $album->comments_disable))
+					exit();
+				
+					$this->db->executeArray('medias_comments', object('id', -$value));
+					$data['media_id'] = $mediaId;
+				break;
 				case 'tags' :
+/*
 					if ($value['value'] == '')
 						unset($media->data->{$update}[$value['x'].'-'.$value['y']]);
 					else
@@ -1671,7 +1688,8 @@ class Simplegallery
 			}
 		}
 		
-		exit(json_encode(array('success' => 'Update success')));
+		$data['success'] = 'Update success';
+		exit(json_encode($data));
 	}
 
 	private function mediaDelete($albumId, $media)
@@ -1692,7 +1710,21 @@ class Simplegallery
 
 	}
 	
-	
+	private function mediaGetComments($mediaId)
+	{
+		return $this->db->execute('
+			SELECT
+				medias_comments.*,
+				ifnull(users.name, ' . $this->db->protect(l('album.media.unknow-user')) . ') as user_name
+			FROM
+				medias_comments
+			LEFT JOIN
+				users ON medias_comments.user_id = users.id
+			WHERE
+				media_id = ' . $this->db->protect($mediaId) . '
+			;
+		');
+	}
 	
 	
 	

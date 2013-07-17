@@ -16,7 +16,7 @@
 		<label for="parameters-registration-disable"><?=l('admin.parameters.registration-disable')?> : </label>
 		<input type="checkbox" id="parameters-registration-disable" name="registration-disable" value="1"<?=$sg->parameters->registration_disable ? ' checked="checked"' : ''?> /><br />
 		<label for="parameters-albums-calendar-disable"><?=l('admin.parameters.albums-calendar-disable')?> : </label>
-		<input type="checkbox" id="parameters-albums-calendar-disable" name="albums-calendar-disable" value="1"<?=$sg->parameters->albums_calendar_disable ? ' checked="checked"' : ''?> /><?/*<br />
+		<input type="checkbox" id="parameters-albums-calendar-disable" name="albums-calendar-disable" value="1"<?=$sg->parameters->albums_calendar_disable ? ' checked="checked"' : ''?> /><br />
 		<label for="parameters-albums-comments-disable"><?=l('admin.parameters.albums-comments-disable')?> : </label>
 		<input type="checkbox" id="parameters-albums-comments-disable" name="albums-comments-disable" value="1"<?=$sg->parameters->albums_comments_disable ? ' checked="checked"' : ''?> /><?/*<br />
 		<label for="parameters-albums-tags-disable"><?=l('admin.parameters.albums-tags-disable')?> : </label>

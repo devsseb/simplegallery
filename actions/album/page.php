@@ -2,7 +2,9 @@
 <div id="albumLocales"><?=json_encode(array(
 	'delete-confirm' => l('album.media.delete-confirm'),
 	'me' => l('album.media.me'),
-	'no-description' => l('album.media.no-description')
+	'no-description' => l('album.media.no-description'),
+	'comment-delete' => l('album.media.comment-delete'),
+	'comment-delete-confirm' => l('album.media.comment-delete-confirm')
 ))?></div>
 
 <? if ($sg->albums) : ?>
@@ -88,10 +90,10 @@
 		<input id="albumAdminDateEnd" type="date" placeholder="<?=l('date-format')?>" name="date-end" value="<?=toHtml($album->date_end)?>" />
 		<label for="albumAdminDescription"><?=l('album.description')?> :</label>
 		<textarea id="albumAdminDescription" name="description"><?=toHtml($album->description)?></textarea>
-		<?/* if (!get($sg->config->parameters, k('albums-comments-disable'))) : ?>
+		<? if (!$sg->parameters->albums_comments_disable) : ?>
 		<label for="albumAdminComments"><?=l('admin.parameters.albums-comments-disable')?> : </label>
 		<input id="albumAdminComments" name="comments-disable" type="checkbox"<?=$album->comments_disable ? ' checked="checked"' : ''?>/>
-		<? endif; */?>
+		<? endif; ?>
 		<label for="albumAdminReorder"><?=l('album.reorder')?> : </label>
 		<input id="albumAdminReorder" type="checkbox" />
 		<input type="hidden" name="reorder" id="albumAdminReorderValue" />
@@ -168,7 +170,7 @@
 			mediaFlipHorizontal="<?=toHtml($media->flip_horizontal)?>"
 			mediaFlipVertical="<?=toHtml($media->flip_vertical)?>"
 			mediaDescription="<?=toHtml($media->description)?>"
-			<? if (false and !$album->comments_disable) : ?>
+			<? if (!$comments_disable) : ?>
 			mediaComments="<?=toHtml(json_encode($media->comments))?>"
 			<? endif; ?>
 			<? if (false and !get($sg->config->parameters, k('albums-tags-disable'))) : ?>
@@ -219,17 +221,19 @@
 		<? else : ?>
 		<p id="mediaDescription"></p>
 		<? endif; ?>
+
 <? /*
-		<div class="media-balloon-separator"></div>
 		<? if (false and !get($sg->config->parameters, k('albums-tags-disable'))) : ?>
 		<div id="mediaTagsList"></div>
 		<? endif; ?>
-		<? if (!$album->comments_disable) : ?>
+*/ ?>
+		<? if (!$comments_disable) : ?>
+		<div class="media-balloon-separator"></div>
 		<label for="mediaComment"><?=l('album.media.comments')?> :</label><br />
 		<textarea id="mediaComment" cols="30" rows="1"></textarea>
 		<ul id="mediaComments"></ul>
 		<? endif; ?>
-*/ ?>
+
 	</div>
 	<? endif; ?>
 </div>

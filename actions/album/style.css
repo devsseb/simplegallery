@@ -57,6 +57,8 @@ p#mediaDescription{margin:10px 2px;}
 .media-comment-author{color:#555;font-weight:bold;}
 .media-comment-date{color:#555;font-style:italic;float:right;}
 .media-comment-text{margin:0px;padding:0px;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
+.media-comment-delete{text-align:right;}
+.media-comment-delete a{color:#e94d4d;}
 
 .media-balloon-submit{text-align:right;margin:0px;}
 #thumbs{margin-left:520px;padding:10px 0px 10px 5px;overflow:hidden;position:relative;}
