@@ -4,7 +4,8 @@
 	'me' => l('album.media.me'),
 	'no-description' => l('album.media.no-description'),
 	'comment-delete' => l('album.media.comment-delete'),
-	'comment-delete-confirm' => l('album.media.comment-delete-confirm')
+	'comment-delete-confirm' => l('album.media.comment-delete-confirm'),
+	'date' => l('album.media.date')
 ))?></div>
 
 <? if ($sg->albums) : ?>
@@ -90,13 +91,25 @@
 		<input id="albumAdminDateEnd" type="date" placeholder="<?=l('date-format')?>" name="date-end" value="<?=toHtml($album->date_end)?>" />
 		<label for="albumAdminDescription"><?=l('album.description')?> :</label>
 		<textarea id="albumAdminDescription" name="description"><?=toHtml($album->description)?></textarea>
+		<table>
 		<? if (!$sg->parameters->albums_comments_disable) : ?>
-		<label for="albumAdminComments"><?=l('admin.parameters.albums-comments-disable')?> : </label>
-		<input id="albumAdminComments" name="comments-disable" type="checkbox"<?=$album->comments_disable ? ' checked="checked"' : ''?>/>
+			<tr>
+				<td><input id="albumAdminComments" name="comments-disable" type="checkbox"<?=$album->comments_disable ? ' checked="checked"' : ''?>/></td>
+				<td><label for="albumAdminComments"><?=l('admin.parameters.albums-comments-disable')?></label></td>
+			</tr>
 		<? endif; ?>
-		<label for="albumAdminReorder"><?=l('album.reorder')?> : </label>
-		<input id="albumAdminReorder" type="checkbox" />
-		<input type="hidden" name="reorder" id="albumAdminReorderValue" />
+		<? if (!$sg->parameters->albums_medias_dates_disable) : ?>
+			<tr>
+				<td><input id="albumAdminMediasDates" name="medias-dates-disable" type="checkbox"<?=$album->medias_dates_disable ? ' checked="checked"' : ''?>/></td>
+				<td><label for="albumAdminMediasDates"><?=l('admin.parameters.albums-medias-dates-disable')?></label></td>
+			</tr>
+		<? endif; ?>
+			<tr>
+				<td><input id="albumAdminReorder" type="checkbox" /><input type="hidden" name="reorder" id="albumAdminReorderValue" /></td>
+				<td><label for="albumAdminReorder"><?=l('album.reorder')?></label></td>
+			</tr>
+		</table>
+		
 		<label for=""><?=l('album.groups')?> :</label>
 		<table>
 			<tr><th><?=l('album.inherited')?></th><th><?=l('album.forbidden')?></th><th><?=l('album.granted')?></th><th></th></tr>
@@ -170,6 +183,9 @@
 			mediaFlipHorizontal="<?=toHtml($media->flip_horizontal)?>"
 			mediaFlipVertical="<?=toHtml($media->flip_vertical)?>"
 			mediaDescription="<?=toHtml($media->description)?>"
+			<? if (!$medias_dates_disable) : ?>
+			mediaDate="<?=toHtml($media->date ? $media->date : $media->exif_date)?>"
+			<? endif; ?>
 			<? if (!$comments_disable) : ?>
 			mediaComments="<?=toHtml(json_encode($media->comments))?>"
 			<? endif; ?>
@@ -215,10 +231,18 @@
 	<div id="mediaBalloon">
 		<div id="mediaBalloonPointer"></div>
 		<? if ($admin) : ?>
+			<? if (!$medias_dates_disable) : ?>
+		<div>
+			<?=l('album.media.date')?> <input type="datetime-local" placeholder="<?=l('datetime-format')?>" id="mediaDate" />
+		</div>
+			<? endif; ?>
 		<div>
 			<textarea id="mediaDescription" placeholder="<?=l('album.media.no-description')?>" cols="30" rows="2"></textarea>
 		</div>
 		<? else : ?>
+			<? if (!$medias_dates_disable) : ?>
+		<p id="mediaDate"></p>
+			<? endif; ?>
 		<p id="mediaDescription"></p>
 		<? endif; ?>
 

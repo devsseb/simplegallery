@@ -3,6 +3,7 @@
 	"apply":"Appliquer",
 	"access-error":"L'accès n'est pas autorisé",
 	"date-format":"aaaa-mm-jj",
+	"datetime-format":"aaaa-mm-dd hh:mm:ss",
 	"structure": {
 		"logged-in-as":"Connecter en tant que",
 		"logout":"Me déconnecter",
@@ -25,9 +26,10 @@
 			"name":"Nom de la galerie",
 			"locale":"Langue",
 			"locale-auto":"Auto",
-			"registration-disable":"Inscription désactivée",
-			"albums-calendar-disable":"Calendrier désactivé",
-			"albums-comments-disable":"Commentaires désactivé"
+			"registration-disable":"Désactiver les inscriptions",
+			"albums-calendar-disable":"Désactiver le calendrier",
+			"albums-comments-disable":"Désactiver les commentaires",
+			"albums-medias-dates-disable":"Désactiver les dates des médias"
 		},
 		"groups":"Groupes",
 		"group-add":"Ajouter un groupe",
@@ -153,7 +155,8 @@
 			"me":"Moi",
 			"unknow-user":"Iconnu",
 			"comment-delete":"supprimer",
-			"comment-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?"
+			"comment-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?",
+			"date":"Le"
 		},
 		"generation": {
 			"_":"Génération de l'album %1",

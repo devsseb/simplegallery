@@ -113,6 +113,7 @@ var Simplegallery = new Class({
 			this.mediaDownload = $('mediaDownload');
 		this.mediaBalloon = $('mediaBalloon');
 		this.mediaDescription = $('mediaDescription');
+		this.mediaDate = $('mediaDate');
 		this.mediaComment = $('mediaComment');
 		this.mediaComments = $('mediaComments');
 		
@@ -301,6 +302,13 @@ var Simplegallery = new Class({
 			});
 		}
 		
+		if (this.mediaDate)
+			this.mediaDate.addEvent('blur', function() {
+				var date = this.mediaDate.get('value').replace('T', ' ');
+				if (date != this.media.date)
+					this.mediaSetUpdate({date: date});
+			}.bind(this));
+		
 		if (this.mediaDescription)
 			this.mediaDescription.addEvent('blur', function() {
 				var description = this.mediaDescription.get('value');
@@ -453,7 +461,10 @@ var Simplegallery = new Class({
 		};
 		this.media.transform = '';
 		this.media.description = this.thumb.get('mediaDescription');
-		this.media.comments = JSON.decode(this.thumb.get('mediaComments'));
+		if (this.mediaDate)
+			this.media.date = this.thumb.get('mediaDate');
+		if (this.mediaComments)
+			this.media.comments = JSON.decode(this.thumb.get('mediaComments'));
 		if (this.mediaTags)
 			this.media.tags = JSON.decode(this.thumb.get('mediaTags'));
 
@@ -485,6 +496,16 @@ var Simplegallery = new Class({
 		this.mediaDownload.set('href', this.media.url + '&download');
 
 		if (this.mediaBalloon) {
+			
+			if (this.mediaDate) {
+				if (this.mediaDate.get('tag') == 'input')
+					this.mediaDate.set('value', this.media.date.replace(' ', 'T'));
+				else if (this.media.date)
+					this.mediaDate.set('html', this.locale['date'] + ' ' + new Date(this.media.date).format('%x %X'));
+				else
+					this.mediaDate.set('html', '');
+			}
+		
 			this.mediaDescription.set('html', this.media.description);
 			if (this.mediaDescription.get('tag') == 'p') {
 				if (this.media.description)
@@ -565,6 +586,9 @@ var Simplegallery = new Class({
 				$('noMedia').setStyle('display', 'block');
 			}
 		}
+		
+		if (update.date != undefined)
+			this.thumb.set('mediaDate', this.media.date = update.date);
 		
 		if (update.description != undefined)
 			this.thumb.set('mediaDescription', this.media.description = update.description);

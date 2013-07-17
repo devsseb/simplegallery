@@ -47,11 +47,13 @@ span.media-tag-text{padding:0px 5px;}
 #mediaBalloon{background-color:rgba(255,255,255,0.8);position:absolute;padding:8px;font-size:11px;display:none;}
 #mediaBalloonPointer{position:absolute;left:-15px;top:0px;width:0px;height:0px;border-top:15px solid rgba(255,255,255,0.8);border-left:15px solid transparent;}
 #mediaBalloon label{font-weight:bold;}
+p#mediaDate{margin:0px;text-align:right;font-size:10px;font-style:italic;}
 p#mediaDescription{margin:10px 2px;}
 .media-no-description{color:#aaa;font-style:italic;text-align:center;}
 .media-balloon-separator{border-bottom:1px solid #9cc8e4;margin:10px 20px;}
 #mediaBalloon input,
-#mediaBalloon textarea{font-size:11px;font-family:Arial;}
+#mediaBalloon textarea{font-size:11px;font-family:Arial;border:1px solid;}
+#mediaBalloon input[type=datetime-local]{width:155px;}
 #mediaComment{border:1px solid #ccc;margin:0px;padding:3px 0px;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
 #mediaComments{list-style-type:none;margin:0px;padding:5px;border:1px solid #ccc;}
 .media-comment-author{color:#555;font-weight:bold;}

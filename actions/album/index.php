@@ -19,6 +19,7 @@
 		$album = $sg->getAlbum($id);
 
 		$comments_disable = ($sg->parameters->albums_comments_disable or $album->comments_disable);
+		$medias_dates_disable = ($sg->parameters->albums_medias_dates_disable or $album->medias_dates_disable);
 
 		// Prepare css transformation for medias
 		$noThumb = true;

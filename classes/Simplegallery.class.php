@@ -31,13 +31,7 @@ class Simplegallery
 		if ($install)
 			$this->installDatabase();
 
-		$this->parameters = $this->db->execute('
-			SELECT
-				*
-			FROM
-				parameters
-			;
-		', true);
+		$this->getParameters();
 
 		$this->installUpdate();
 
@@ -118,7 +112,8 @@ class Simplegallery
 				ns_left INTEGER,
 				ns_right INTEGER,
 				ns_depth INTEGER,
-				thumb_md5 TEXT
+				thumb_md5 TEXT,
+				medias_dates_disable BOOL
 			);
 		');
 	
@@ -156,7 +151,9 @@ class Simplegallery
 				thumb_index INTEGER,
 				preview_md5 INTEGER,
 				slideshow_md5 INTEGER,
-				type TEXT
+				type TEXT,
+				date DATETIME,
+				exif_date DATETIME
 			);
 		');
 	
@@ -173,13 +170,14 @@ class Simplegallery
 		$this->db->execute('
 			CREATE TABLE IF NOT EXISTS parameters (
 				id INTEGER PRIMARY KEY AUTOINCREMENT, 
-				version TEXT,
+				database_version TEXT,
 				name TEXT,
 				locale TEXT,
 				registration_disable BOOL,
 				albums_calendar_disable BOOL,
 				albums_comments_disable BOOL,
-				albums_tags_disable BOOL
+				albums_tags_disable BOOL,
+				albums_medias_dates_disable BOOL
 			);
 		');
 		
@@ -210,26 +208,88 @@ class Simplegallery
 	
 	private function installUpdate()
 	{
-		if ($this->parameters->version == SG_VERSION)
+
+		$database_version = get($this->parameters, k('database_version'), '0.0');
+		if ($database_version == SG_DATABASE_VERSION)
 			return;
 
-		while ($this->parameters->version < SG_VERSION) {
-			switch ($this->parameters->version) {
+		while ($database_version < SG_DATABASE_VERSION) {
+			switch ($database_version) {
 				default :
 					exit('Unknow version');
-				case '0.1' :
-					$this->parameters->version = '0.2';
+				case '0.0' :
+
+					$this->db->execute('
+						CREATE TABLE IF NOT EXISTS parameters_new (
+							id INTEGER PRIMARY KEY AUTOINCREMENT, 
+							database_version TEXT,
+							name TEXT,
+							locale TEXT,
+							registration_disable BOOL,
+							albums_calendar_disable BOOL,
+							albums_comments_disable BOOL,
+							albums_tags_disable BOOL
+						);
+					');
+					$this->db->execute('INSERT INTO parameters_new SELECT * FROM parameters;');
+					$this->db->execute('DROP TABLE parameters;');
+					$this->db->execute('ALTER TABLE parameters_new RENAME TO parameters;');
+
+					$this->db->execute('
+						ALTER TABLE
+							parameters
+						ADD COLUMN
+							albums_medias_dates_disable BOOL
+						;
+					');
+
+					$this->db->execute('
+						ALTER TABLE
+							albums
+						ADD COLUMN
+							medias_dates_disable BOOL
+						;
+					');
+
+					$this->db->execute('
+						ALTER TABLE
+							medias
+						ADD COLUMN
+							date DATETIME
+						;
+					');
+					$this->db->execute('
+						ALTER TABLE
+							medias
+						ADD COLUMN
+							exif_date DATETIME
+						;
+					');
+					
+					$this-getParameters();
 				break;
 			}
+			$database_version+= 0.1;
 		}
-		
+
 		$this->db->execute('
 			UPDATE
 				parameters
 			SET
-				version = ' . $this->db->protect(SG_VERSION) . '
+				database_version = ' . $this->db->protect(SG_DATABASE_VERSION) . '
 			;
 		');
+	}
+	
+	private function getParameters()
+	{
+		$this->parameters = $this->db->execute('
+			SELECT
+				*
+			FROM
+				parameters
+			;
+		', true);
 	}
 	
 //******************************************************************************
@@ -707,6 +767,7 @@ class Simplegallery
 			$this->parameters->albums_calendar_disable = get($data, k('albums-calendar-disable'));
 			$this->parameters->albums_comments_disable = get($data, k('albums-comments-disable'));
 			$this->parameters->albums_tags_disable = get($data, k('albums-tags-disable'));
+			$this->parameters->albums_medias_dates_disable = get($data, k('albums-medias-dates-disable'));
 			
 			$this->db->executeArray('parameters', $this->parameters);
 
@@ -1016,6 +1077,7 @@ class Simplegallery
 		$album->date_end = $data['date-end'];
 		$album->description = $data['description'];
 		$album->comments_disable = get($data, k('comments-disable'));
+		$album->medias_dates_disable = get($data, k('medias-dates-disable'));
 
 		unset($album->pathThumbs);
 		unset($album->groups);
@@ -1141,6 +1203,9 @@ class Simplegallery
 			$md5 = md5_file($file);
 			$basename = $media;
 			$media = get($mediasDb, k($basename));
+			
+			$exif = exif_imagetype($file) !== false;
+			
 			if ($media)
 				unset($mediasDb[$basename]);
 			else
@@ -1149,7 +1214,7 @@ class Simplegallery
 					'album_id', $album->id,
 					'file', $basename,
 					'md5', '',
-					'orientation', exif_imagetype($file) === false ? 1 : (int)geta(exif_read_data($file), k('Orientation'), 1),
+					'orientation', $exif ? (int)geta(exif_read_data($file), k('Orientation'), 1) : 1,
 					'rotation', 0,
 					'thumb_index', 0,
 					'type', $type
@@ -1157,6 +1222,11 @@ class Simplegallery
 			
 			$media->width = $size->width;
 			$media->height = $size->height;
+			$media->exif_date = $exif ? geta(exif_read_data($file), k('DateTime'), '') : '';
+			// Reformat date
+			if (preg_match('/([0-9]{4}).([0-9]{2}).([0-9]{2}).([0-9]{2}).([0-9]{2}).?([0-9]*)/', $media->exif_date, $match))
+				$media->exif_date = $match[1] . '-' . $match[2] . '-' . $match[3] . ' ' . $match[4] . ':' . $match[5] . ':' . ($match[6] ? $match[6] : '00');
+			
 			write('<strong>' . round($i * 100 / $total) . '%</strong> - ' . $i . '/' . $total . ' "' . toHtml($media->file) . '" ' . l('admin.media-found') . ' ');
 
 			$videosDeleted = array();
@@ -1631,6 +1701,11 @@ class Simplegallery
 				break;
 				case 'delete' :
 					$this->mediaDelete($album->id, $media->id);
+				break;
+				case 'date' :
+					$media->date = $value;
+					
+					$this->db->executeArray('medias', $media);
 				break;
 				case 'description' :
 					$media->description = $value;

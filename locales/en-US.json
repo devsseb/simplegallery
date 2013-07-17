@@ -3,6 +3,7 @@
 	"apply":"Apply",
 	"access-error":"Access is forbidden",
 	"date-format":"aaaa-mm-dd",
+	"datetime-format":"aaaa-mm-dd hh:mm:ss",
 	"structure": {
 		"logged-in-as":"Loggin in as",
 		"logout":"Logout",
@@ -25,9 +26,10 @@
 			"name":"Gallery name",
 			"locale":"Language",
 			"locale-auto":"Auto",
-			"registration-disable":"Registration disable",
-			"albums-calendar-disable":"Calendar disable",
-			"albums-comments-disable":"Comments disable"
+			"registration-disable":"Disable registration",
+			"albums-calendar-disable":"Disable calendar",
+			"albums-comments-disable":"Disable comments",
+			"albums-medias-dates-disable":"Disable medias dates"
 		},
 		"groups":"Groups",
 		"group-add":"Add group",
@@ -153,7 +155,8 @@
 			"me":"Me",
 			"unknow-user":"Unknow",
 			"comment-delete":"delete",
-			"comment-delete-confirm":"The deletion is permanent. You want to continue ?"
+			"comment-delete-confirm":"The deletion is permanent. You want to continue ?",
+			"date":"The"
 		},
 		"generation": {
 			"_":"Generation of album %1",
