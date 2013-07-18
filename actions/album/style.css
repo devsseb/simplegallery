@@ -72,11 +72,13 @@ p#mediaDescription{margin:10px 2px;}
 #albumAction{float:right;width:20px;padding:10px;}
 #albumAction-download{display:block;width:20px;height:20px;background-image:url('images/album_download.png');margin:auto;}
 
-#albumAdmin{position:absolute;right:0px;top:0px;width:150px;padding:10px;background-color:#c5a677;}
+#albumAdmin{position:absolute;right:0px;top:0px;width:150px;padding:10px;background-color:#c5a677;font-size:11px;}
 #albumAdmin label{display:block;text-align:left;font-weight:bold;padding:3px 0px;}
-#albumAdminName{border:1px solid #707070;margin:0px;font-size:11px;width:150px;}
-#albumAdminDateStart,#albumAdminDateEnd{border:1px solid #707070;margin:0px;font-size:11px;width:120px;}
-#albumAdminDescription{border:1px solid #707070;margin:0px;font-size:11px;width:150px;height:50px;}
+#albumAdmin input{font-size:11px;}
+.album-admin-title{font-weight:bold;color:#922b2b;text-align:center;}
+#albumAdminName{border:1px solid #707070;margin:0px;width:150px;}
+#albumAdminDateStart,#albumAdminDateEnd{border:1px solid #707070;margin:0px;width:120px;}
+#albumAdminDescription{border:1px solid #707070;margin:0px;width:150px;height:50px;}
 #albumAdminReorder{}
 #albumAdmin table{width:100%;}
 #albumAdmin table th{font-style:italic;font-weight:normal;}
@@ -87,8 +89,6 @@ p#mediaDescription{margin:10px 2px;}
 .album-admin-radio-g{background-color:rgb(117, 255, 124);}
 .album-admin-radio-inherited-f{background-color:rgba(244, 137, 137, 0.5);}
 .album-admin-radio-inherited-g{background-color:rgba(117, 255, 124, 0.5);}
-.album-admin-links{text-align:right;margin-top:10px;}
-.album-admin-links a{color:#3466d1;text-decoration:none;font-size:11px;}
 
 #slideshow{display:none;position:fixed;left:0px;top:0px;width:100%;height:100%;background-color:#000;z-index:10;}
 #slide{margin:0px auto;text-align:center;position:relative;}

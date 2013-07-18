@@ -83,8 +83,9 @@
 	<? if ($admin) : ?>
 	<!-- Update zone -->
 	<form id="albumAdmin" method="post" action="?album=update&id=<?=toUrl($album->id)?>">
+		<div class="album-admin-title"><?=toHtml(basename($album->path))?></div>
 		<label for="albumAdminName"><?=l('album.name')?> :</label>
-		<input id="albumAdminName" type="text" name="name" value="<?=toHtml($album->name)?>" />
+		<input id="albumAdminName" type="text" name="name" placeholder="<?=toHtml(basename($album->path))?>" value="<?=toHtml($album->name)?>" />
 		<label for="albumAdminDateStart"><?=l('album.date.start')?> :</label>
 		<input id="albumAdminDateStart" type="date" placeholder="<?=l('date-format')?>" name="date-start" value="<?=toHtml($album->date_start)?>" />
 		<label for="albumAdminDateEnd"><?=l('album.date.end')?> :</label>
