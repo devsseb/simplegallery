@@ -74,7 +74,7 @@ p#mediaDescription{margin:10px 2px;}
 
 #albumAdmin{position:absolute;right:0px;top:0px;width:150px;padding:10px;background-color:#c5a677;font-size:11px;}
 #albumAdmin label{display:block;text-align:left;font-weight:bold;padding:3px 0px;}
-#albumAdmin input{font-size:11px;}
+#albumAdmin input, #albumAdmin textarea{font-size:11px;}
 .album-admin-title{font-weight:bold;color:#922b2b;text-align:center;}
 #albumAdminName{border:1px solid #707070;margin:0px;width:150px;}
 #albumAdminDateStart,#albumAdminDateEnd{border:1px solid #707070;margin:0px;width:120px;}
