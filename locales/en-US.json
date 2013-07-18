@@ -40,6 +40,7 @@
 		"user-add":"Add",
 		"user-add-link":"add",
 		"albums-reload":"reload albums",
+		"albums-id":"#",
 		"albums-tree":"Tree",
 		"albums-name":"Name",
 		"albums-dates":"Dates",

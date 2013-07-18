@@ -11,6 +11,7 @@
 	<a href="?admin=albums&amp;albumsReload"><?=l('admin.albums-reload')?></a>
 	<table class="admin-albums">
 		<tr>
+			<th><?=l('admin.albums-id')?></th>
 			<th><?=l('admin.albums-tree')?></th>
 			<th><?=l('admin.albums-name')?></th>
 			<th><?=l('admin.albums-dates')?></th>
@@ -18,6 +19,7 @@
 		</tr>
 	<? foreach ($sg->albums as $album) : ?>
 		<tr>
+			<td class="admin-album-id"><?=toHtml($album->id)?></td>
 			<td style="padding-left:<?=$album->ns_depth * 15 + 5?>px;"><?=toHtml(basename($album->path))?> <span class="admin-album-medias-total">(<?=$album->medias_total?>)</span></td>
 			<td><input type="text" name="albums[<?=toHtml($album->id)?>][name]" placeholder="<?=toHtml(basename($album->path))?>" value="<?=toHtml($album->name)?>" class="admin-album-name" /></td>
 			<td class="admin-album-dates">

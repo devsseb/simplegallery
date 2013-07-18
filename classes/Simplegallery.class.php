@@ -1185,7 +1185,7 @@ class Simplegallery
 				album_id = ' . $this->db->protect($album->id) . '
 			;
 		'), 'file');
-//quit($mediasDb);
+
 		$medias = array();
 		$files = getDir($album->path);
 		$total = count($files);
@@ -1305,8 +1305,6 @@ class Simplegallery
 			$media->id*= -1;
 
 		$this->db->executeArray('medias', $mediasDb);
-
-
 
 		return object(
 			'delete', $mediasDir,

@@ -33,6 +33,7 @@
 
 #adminGroups{list-style-type:none;margin:0px;padding:0px;}
 #adminGroups input{list-style-type:none;border:1px solid #000;}
+.admin-album-id{width:20px;font-weight:bold;text-align:right;color:#c05555;font-style:italic;}
 .admin-album-links{text-align:center;}
 .admin-album-check-result{background-color:#fff;vertical-align:top;padding:0px;}
 .admin-album-check-result div{margin:5px;overflow:auto;height:200px;}
