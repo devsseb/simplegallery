@@ -1720,7 +1720,7 @@ class Simplegallery
 				break;
 				case 'comments' :
 				
-					if (!($sg->parameters->albums_comments_disable or $album->comments_disable))
+					if ($this->parameters->albums_comments_disable or $album->comments_disable)
 						exit();
 				
 					$value = nl2br(toHtml($value));
@@ -1747,8 +1747,8 @@ class Simplegallery
 				break;
 				case 'commentsRemove' :
 
-					if (!($sg->parameters->albums_comments_disable or $album->comments_disable))
-					exit();
+					if ($this->parameters->albums_comments_disable or $album->comments_disable)
+						exit();
 				
 					$this->db->executeArray('medias_comments', object('id', -$value));
 					$data['media_id'] = $mediaId;

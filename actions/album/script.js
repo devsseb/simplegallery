@@ -283,7 +283,13 @@ var Simplegallery = new Class({
 					this.mediaSetUpdate('delete');
 			}.bind(this));
 		}
-		this.mediaUpdateRequest = new Request.JSON({onSuccess: this.mediaSetUpdateSuccess.bind(this)});
+		this.mediaUpdateRequest = new Request.JSON({
+/*			onComplete: function() {console.log('complete')},
+			onFailure: function() {console.log('failure')},
+			onException: function() {console.log('exception')},
+			onProgress: function(a,b) {console.log('progress', a,b)},*/
+			onSuccess: this.mediaSetUpdateSuccess.bind(this)}
+		);
 
 		this.slideshow.addEvents({
 			click: this.slideshowEnd.bind(this)
@@ -309,7 +315,7 @@ var Simplegallery = new Class({
 					this.mediaSetUpdate({date: date});
 			}.bind(this));
 		
-		if (this.mediaDescription)
+		if (this.mediaDescription && this.mediaDescription.get('tag') == 'textarea')
 			this.mediaDescription.addEvent('blur', function() {
 				var description = this.mediaDescription.get('value');
 				if (description != this.media.description)
@@ -592,7 +598,7 @@ var Simplegallery = new Class({
 		
 		if (update.description != undefined)
 			this.thumb.set('mediaDescription', this.media.description = update.description);
-		
+
 		this.mediaUpdateRequest.send({
 			url: url,
 			data: {update: update}
@@ -601,6 +607,7 @@ var Simplegallery = new Class({
 	},
 	mediaSetUpdateSuccess: function(response)
 	{
+
 		if (response.comments != undefined) {
 
 			var comment = {
@@ -664,7 +671,7 @@ var Simplegallery = new Class({
 			this.albumAdmin ? new Element('div.media-comment-delete').grab(
 				remove = new Element('a[href=#]', {html: this.locale['comment-delete']})
 			) : null
-		).inject(this.mediaComments);
+		).inject(this.mediaComments.setStyle('display', 'block'));
 		
 		if (remove)
 			remove.addEvent('click', function(e) {
