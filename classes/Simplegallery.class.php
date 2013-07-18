@@ -1185,7 +1185,7 @@ class Simplegallery
 				album_id = ' . $this->db->protect($album->id) . '
 			;
 		'), 'file');
-
+//quit($mediasDb);
 		$medias = array();
 		$files = getDir($album->path);
 		$total = count($files);
@@ -1264,9 +1264,15 @@ class Simplegallery
 
 					} else {
 						$thumb = $media->file . '.webm';
+						
 						if ('webm' == strtolower(pathinfo($media->file, PATHINFO_EXTENSION)))
+							// If original is already webm
 							$needUpdate = false;
-						else {
+						elseif (!gete($media, k($key . '_md5')) and is_file($fileThumb = $album->pathThumbs . $thumb)) {
+							// If a webm thumb already exists
+							$needUpdate = false;
+							$media->{$key . '_md5'} = md5_file($fileThumb);
+						} else {
 							$dimension = 'convert';
 							if (!$needUpdate and !exists($videosDeleted, $thumb))
 								$needUpdate = !exists($mediasDir, $thumb);
@@ -1291,14 +1297,16 @@ class Simplegallery
 
 			}
 			$media->md5 = $md5;
-
 			$this->db->executeArray('medias', $media);
 		}
 		
 		// Delete medias not found from db
 		foreach ($mediasDb as $media)
 			$media->id*= -1;
+
 		$this->db->executeArray('medias', $mediasDb);
+
+
 
 		return object(
 			'delete', $mediasDir,
