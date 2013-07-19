@@ -1729,6 +1729,8 @@ class Simplegallery
 					$media->description = $value;
 					
 					$this->db->executeArray('medias', $media);
+					
+					$data['description'] = $value;
 				break;
 				case 'comments' :
 				
@@ -1738,7 +1740,6 @@ class Simplegallery
 					$value = nl2br(toHtml($value));
 					$comment = object(
 						'id', 0,
-						'media_id', $mediaId,
 						'user_id', $this->user->id,
 						'datetime', date('Y-m-d h:i:s'),
 						'value', $value
@@ -1763,7 +1764,6 @@ class Simplegallery
 						exit();
 				
 					$this->db->executeArray('medias_comments', object('id', -$value));
-					$data['media_id'] = $mediaId;
 				break;
 				case 'tags' :
 /*
@@ -1782,6 +1782,7 @@ class Simplegallery
 		}
 		
 		$data['success'] = 'Update success';
+		$data['media_id'] = $mediaId;
 		exit(json_encode($data));
 	}
 

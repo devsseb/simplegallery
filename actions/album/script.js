@@ -512,13 +512,14 @@ var Simplegallery = new Class({
 					this.mediaDate.set('html', '');
 			}
 		
-			this.mediaDescription.set('html', this.media.description);
 			if (this.mediaDescription.get('tag') == 'p') {
+				this.mediaDescription.set('html', this.media.description);
 				if (this.media.description)
 					this.mediaDescription.removeClass('media-no-description');
 				else
 					this.mediaDescription.addClass('media-no-description').set('html', this.locale['no-description'])
-			}
+			} else
+				this.mediaDescription.set('value', this.media.description);
 
 			if (this.mediaComments) {
 				this.mediaComments.empty();
@@ -596,9 +597,6 @@ var Simplegallery = new Class({
 		if (update.date != undefined)
 			this.thumb.set('mediaDate', this.media.date = update.date);
 		
-		if (update.description != undefined)
-			this.thumb.set('mediaDescription', this.media.description = update.description);
-
 		this.mediaUpdateRequest.send({
 			url: url,
 			data: {update: update}
@@ -607,12 +605,20 @@ var Simplegallery = new Class({
 	},
 	mediaSetUpdateSuccess: function(response)
 	{
+		if (response.description != undefined)
+			for (var i = 0,thumb; thumb = this.thumbs[i]; i++)
+				if (thumb.get('mediaId') == response.media_id) {
+					thumb.set('mediaDescription', response.description);
+					if (this.media.id == response.media_id)
+						this.media.description = response.description;
+					break;
+				}
 
 		if (response.comments != undefined) {
 
 			var comment = {
 				id: response.comments.id,
-				media_id: response.comments.media_id,
+				media_id: response.media_id,
 				user_id: response.comments.user_id,
 				datetime: response.comments.datetime,
 				value: response.comments.value,
