@@ -697,7 +697,7 @@ class Simplegallery
 
 	}
 	
-	public function getUsers()
+	public function getUsers($group = true)
 	{
 		$users = $this->db->execute('
 			SELECT
@@ -708,18 +708,20 @@ class Simplegallery
 				name
 			;
 		');
-		foreach ($users as $user)
-			$user->groups = array_index($this->db->execute('
-				SELECT
-					groups.*
-				FROM
-					users_groups
-				LEFT join
-					groups ON users_groups.group_id = groups.id
-				WHERE
-					user_id = ' . $this->db->protect($user->id) . '
-				;
-			'), 'id');
+		
+		if ($group)
+			foreach ($users as $user)
+				$user->groups = array_index($this->db->execute('
+					SELECT
+						groups.*
+					FROM
+						users_groups
+					LEFT join
+						groups ON users_groups.group_id = groups.id
+					WHERE
+						user_id = ' . $this->db->protect($user->id) . '
+					;
+				'), 'id');
 		
 		return $users;
 	}
@@ -770,6 +772,16 @@ class Simplegallery
 			$this->parameters->albums_medias_dates_disable = get($data, k('albums-medias-dates-disable'));
 			
 			$this->db->executeArray('parameters', $this->parameters);
+
+			foreach ($users = $this->getUsers(false) as $user) {
+			
+				if ($user->id == $this->user->id)
+					continue;
+					
+				$user->admin = get($data, k('usersAdmins', $user->id), false);
+			
+			}
+			$this->db->executeArray('users', $users);
 
 			$groups = array();
 			foreach (get($data, k('groups'), array()) as $id => $name)

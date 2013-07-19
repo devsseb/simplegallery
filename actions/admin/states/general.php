@@ -37,6 +37,7 @@
 			<th class="table-empty-cell-top-left1"></th>
 			<th class="table-empty-cell-top-left1"></th>
 			<th class="table-empty-cell-top-left2"></th>
+			<th class="admin-user-admin"><?=l('admin.administrator')?></th>
 <? foreach ($sg->getGroups() as $group) : ?>
 			<th><?=toHtml($group->name)?></th>
 <? endforeach; ?>
@@ -47,6 +48,7 @@
 			<th class="admin-user-name<?=$user->active !== '1' ? ' admin-user-no-active" title="' . l('admin.user-no-active') : ''?>"><?=toHtml($user->id)?></th>
 			<th class="admin-user-name<?=$user->active !== '1' ? ' admin-user-no-active" title="' . l('admin.user-no-active') : ''?>"><?=toHtml($user->name)?></th>
 			<th class="admin-user-name<?=$user->active !== '1' ? ' admin-user-no-active" title="' . l('admin.user-no-active') : ''?>"><?=toHtml($user->mail)?></th>
+			<td class="admin-users-group-check"><input type="checkbox" value="1"<?=$user->id == $sg->user->id ? ' disabled="disabled"' : ''?> name="usersAdmins[<?=toHtml($user->id)?>]" <?=$user->admin ? 'checked="checked" ' : ''?>/></td>
 	<? foreach ($sg->getGroups() as $group) : ?>
 			<td class="admin-users-group-check"><input type="checkbox" value="1" name="usersGroups[<?=toHtml($user->id)?>][<?=toHtml($group->id)?>]" <?=exists($user->groups, $group->id) ? 'checked="checked" ' : ''?>/></td>
 	<? endforeach; ?>

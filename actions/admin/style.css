@@ -10,6 +10,7 @@
 .admin label{font-weight:bold;}
 .admin-user-add{font-weight:normal;}
 .admin-user-no-active{color:#aa2424;}
+.admin-user-admin{color:#c05555;}
 .admin-users-groups{border-collapse:collapse;table-layout:fixed;}
 .admin-users-groups th{padding:3px 5px;font-weight:normal;}
 .admin-users-groups th,.admin-users-groups td{border:1px #808080 solid;}
