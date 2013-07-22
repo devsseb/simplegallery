@@ -1,5 +1,4 @@
 **TODO :**
-* Add possibilite to tag medias
 * Add possibilite to search in albums (name,dates,description) and medias (name,description,date,comments,tags)
 * Manage cookie connection by session in database
 * Revise album download
@@ -24,3 +23,4 @@
 * ~~Add description for medias~~
 * ~~Add comments for medias~~
 * ~~Add date for medias~~
+* ~~Add possibilite to tag medias~~

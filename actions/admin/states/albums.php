@@ -3,7 +3,7 @@
 	'album-check-end' => l('admin.album-check-end')
 ))?></div>
 <ul class="admin-states">
-	<li><a href="?admin=albums"><?=l('admin.state.general')?></a></li>
+	<li><a href="?admin=general"><?=l('admin.state.general')?></a></li>
 	<li><?=l('admin.state.albums')?></li>
 </ul>
 <form class="box admin" action="?admin=albums" method="post">
