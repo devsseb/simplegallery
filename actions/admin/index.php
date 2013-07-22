@@ -8,18 +8,24 @@
 			
 			if (exists($_POST, 'name'))
 				$sg->adminUpdate($state, $_POST);
-
-			if (exists($_GET, 'userDelete'))
-				$sg->userDelete($_GET['userDelete']);
 		
 		break;
 		case 'albums' :
 
 			if (exists($_POST, 'albums'))
-				$sg->adminUpdate('albums', $_POST);
+				$sg->adminUpdate($state, $_POST);
 
 			if (exists($_GET, 'albumsReload'))
 				$sg->loadAlbums();
+		
+		break;
+		case 'users' :
+
+			if (exists($_POST, 'usersAdmins'))
+				$sg->adminUpdate($state, $_POST);
+
+			if (exists($_GET, 'userDelete'))
+				$sg->userDelete($_GET['userDelete']);
 		
 		break;
 		case 'check' :

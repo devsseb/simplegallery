@@ -803,6 +803,32 @@ class Simplegallery
 			
 			$this->db->executeArray('parameters', $this->parameters);
 
+			success(l('admin.message.parameters-update-success'), '?admin=general');
+		} elseif ($from == 'albums') {
+
+			$albums = array();
+			foreach ($data['albums'] as $id => $update) {
+
+				if (!$album = get($this->albums, k($id)))
+					continue;
+
+				$album->name = $update['name'];
+				$album->date_start = $update['date_start'];
+				$album->date_end = $update['date_end'];
+				
+				unset($album->pathThumbs);
+				unset($album->groups);
+				unset($album->medias);
+				unset($album->medias_total);
+				
+				$albums[] = $album;
+			}
+			
+			$this->db->executeArray('albums', $albums);
+
+			success(l('admin.message.parameters-update-success'), '?admin=albums');
+		} elseif ($from == 'users') {
+		
 			foreach ($users = $this->getUsers(false) as $user) {
 			
 				if ($user->id == $this->user->id)
@@ -850,30 +876,7 @@ class Simplegallery
 		
 			}
 		
-			success(l('admin.message.parameters-update-success') . ($success ? '<br />' . $success : ''), '?admin');
-		} elseif ($from == 'albums') {
-
-			$albums = array();
-			foreach ($data['albums'] as $id => $update) {
-
-				if (!$album = get($this->albums, k($id)))
-					continue;
-
-				$album->name = $update['name'];
-				$album->date_start = $update['date_start'];
-				$album->date_end = $update['date_end'];
-				
-				unset($album->pathThumbs);
-				unset($album->groups);
-				unset($album->medias);
-				unset($album->medias_total);
-				
-				$albums[] = $album;
-			}
-			
-			$this->db->executeArray('albums', $albums);
-
-			success(l('admin.message.parameters-update-success'), '?admin=albums');
+			success(l('admin.message.parameters-update-success') . ($success ? '<br />' . $success : ''), '?admin=users');
 		}
 
 	}

@@ -20,7 +20,8 @@
 		},
 		"state":{
 			"general":"General",
-			"albums":"Albums"
+			"albums":"Albums",
+			"users":"Users"
 		},
 		"parameters":{
 			"name":"Gallery name",

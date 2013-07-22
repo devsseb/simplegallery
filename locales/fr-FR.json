@@ -20,7 +20,8 @@
 		},
 		"state":{
 			"general":"Général",
-			"albums":"Albums"
+			"albums":"Albums",
+			"users":"Utilisateurs"
 		},
 		"parameters":{
 			"name":"Nom de la galerie",
@@ -162,7 +163,7 @@
 			"date":"Le",
 			"tag-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?",
 			"tags":"Tags",
-			"no-tag":"aucun"
+			"no-tag":"Aucun"
 		},
 		"generation": {
 			"_":"Génération de l'album %1",

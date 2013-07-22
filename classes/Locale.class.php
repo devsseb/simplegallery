@@ -29,7 +29,7 @@ class Locale
 			}
 			unset($lang);
 		}
-		
+
 		$this->langs = getDir($this->dir, '^([^.])');
 		foreach ($this->langs as &$lang)
 			$lang = substr($lang, 0, strlen($lang) - 5);
@@ -47,8 +47,10 @@ class Locale
 
 		$file = $this->dir . $this->lang . '.json';
 
-		self::$index = json_decode(file_get_contents($file));
-		self::$indexDefault = json_decode(file_get_contents($this->dir . $this->langDefault . '.json'));
+		if (!self::$index = json_decode(file_get_contents($file)))
+			throw new Exception(json_last_error_msg());
+		if (!self::$indexDefault = json_decode(file_get_contents($this->dir . $this->langDefault . '.json')))
+			throw new Exception(json_last_error_msg());
 
 		if (!function_exists('l'))
 			eval('function l($key){

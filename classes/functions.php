@@ -85,12 +85,12 @@ function stripAccents($string)
 function split_unicode($str, $l = 0)
 {
 	if ($l > 0) {
-	    $ret = array();
-	    $len = mb_strlen($str, "UTF-8");
-	    for ($i = 0; $i < $len; $i += $l) {
-	        $ret[] = mb_substr($str, $i, $l, "UTF-8");
-	    }
-	    return $ret;
+		$ret = array();
+		$len = mb_strlen($str, "UTF-8");
+		for ($i = 0; $i < $len; $i += $l) {
+			$ret[] = mb_substr($str, $i, $l, "UTF-8");
+		}
+		return $ret;
 		}
 	return preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY);
 }
@@ -153,5 +153,31 @@ function object($x = null)
 	for ($i = 0; $i < $total; $i = $i + 2)
 		$o->{$args[$i]} = $args[$i + 1];
 	return $o;
+}
+
+if (!function_exists('json_last_error_msg')) {
+	function json_last_error_msg()
+	{
+		switch (json_last_error()) {
+			default:
+				return;
+		    case JSON_ERROR_DEPTH:
+		        $error = 'Maximum stack depth exceeded';
+		    break;
+		    case JSON_ERROR_STATE_MISMATCH:
+		        $error = 'Underflow or the modes mismatch';
+		    break;
+		    case JSON_ERROR_CTRL_CHAR:
+		        $error = 'Unexpected control character found';
+		    break;
+		    case JSON_ERROR_SYNTAX:
+		        $error = 'Syntax error, malformed JSON';
+		    break;
+		    case JSON_ERROR_UTF8:
+		        $error = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+			break;
+		}
+		throw new Exception($error);
+	}
 }
 ?>

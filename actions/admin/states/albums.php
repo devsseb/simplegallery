@@ -5,6 +5,7 @@
 <ul class="admin-states">
 	<li><a href="?admin=general"><?=l('admin.state.general')?></a></li>
 	<li><?=l('admin.state.albums')?></li>
+	<li><a href="?admin=users"><?=l('admin.state.users')?></a></li>
 </ul>
 <form class="box admin" action="?admin=albums" method="post">
 	<h2><?=l('admin._')?></h2>
