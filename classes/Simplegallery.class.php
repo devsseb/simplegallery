@@ -113,7 +113,8 @@ class Simplegallery
 				ns_right INTEGER,
 				ns_depth INTEGER,
 				thumb_md5 TEXT,
-				medias_dates_disable BOOL
+				medias_dates_disable BOOL,
+				tags_disable BOOL
 			);
 		');
 	
@@ -181,6 +182,15 @@ class Simplegallery
 			);
 		');
 		
+		$this->db->execute('
+			CREATE TABLE IF NOT EXISTS tags (
+				id INTEGER PRIMARY KEY AUTOINCREMENT, 
+				media_id INTEGER,
+				x REAL,
+				y REAL,
+				value TEXT
+			);
+		');
 		
 		if (!geta($this->db->execute('
 			SELECT
@@ -267,6 +277,26 @@ class Simplegallery
 					');
 					
 					$this-getParameters();
+				break;
+				case '0.1' :
+					$this->db->execute('
+						ALTER TABLE
+							albums
+						ADD COLUMN
+							tags_disable BOOL
+						;
+					');
+
+					$this->db->execute('
+						CREATE TABLE IF NOT EXISTS tags (
+							id INTEGER PRIMARY KEY AUTOINCREMENT, 
+							media_id INTEGER,
+							x REAL,
+							y REAL,
+							value TEXT
+						);
+					');
+
 				break;
 			}
 			$database_version+= 0.1;
@@ -1040,6 +1070,7 @@ class Simplegallery
 	// Return album infos
 	public function getAlbum($id, $group = true, $media = true)
 	{
+
 		// Test if album exists
 		if (!$album = get($this->albums, k($id)))
 			error(l('album.message.error'), '?');		
@@ -1090,6 +1121,7 @@ class Simplegallery
 		$album->description = $data['description'];
 		$album->comments_disable = get($data, k('comments-disable'));
 		$album->medias_dates_disable = get($data, k('medias-dates-disable'));
+		$album->tags_disable = get($data, k('tags-disable'));
 
 		unset($album->pathThumbs);
 		unset($album->groups);
@@ -1354,6 +1386,7 @@ class Simplegallery
 		foreach ($medias as $media) {
 			$media->rotation = (int)$media->rotation;
 			$media->comments = $this->mediaGetComments($media->id);
+			$media->tags = $this->mediaGetTags($media->id);
 		}
 
 		return $medias;
@@ -1452,7 +1485,7 @@ class Simplegallery
 						)
 					);
 
-					$fileThumb = $album->pathThumbs . $media->file . '.webm';
+					$fileThumb = $album->pathThumbs . $media->file . '.progress.webm';
 					write(chr(9) . chr(9) . l('album.generation.update-video') . ' :');
 					$lastPercent = -1;
 					Ffmpeg::convert($file, $fileThumb, $options, function($current, $total, $pass) use (&$lastPercent) {
@@ -1462,6 +1495,7 @@ class Simplegallery
 							write(' ' . $percent . '%');
 						$lastPercent = $percent;
 					});
+					rename($fileThumb, $fileThumb = $album->pathThumbs . $media->file . '.webm');
 					write('', true);
 					
 				} else {
@@ -1766,17 +1800,22 @@ class Simplegallery
 					$this->db->executeArray('medias_comments', object('id', -$value));
 				break;
 				case 'tags' :
-/*
-					if ($value['value'] == '')
-						unset($media->data->{$update}[$value['x'].'-'.$value['y']]);
-					else
-						$media->data->{$update}[$value['x'].'-'.$value['y']] = object(
-							'x', $value['x'],
-							'y', $value['y'],
-							'value', $value['value']
-						);
-					$this->albumSaveConfig($album->id);
-*/
+					$tag = object(
+						'id', (int)$value['id'],
+						'media_id', $media->id,
+						'x', $value['x'],
+						'y', $value['y'],
+						'value', $value['value']
+					);
+					
+					if (trim($tag->value) != '' or $tag->id) {
+					
+						if ($tag->id > 0 and trim($tag->value) == '')
+							$tag->id*= -1;
+
+						$this->db->executeArray('tags', $tag);
+						$data['tags'] = $tag;
+					}
 				break;
 			}
 		}
@@ -1820,7 +1859,18 @@ class Simplegallery
 		');
 	}
 	
-	
+	private function mediaGetTags($mediaId)
+	{
+		return array_index($this->db->execute('
+			SELECT
+				*
+			FROM
+				tags
+			WHERE
+				media_id = ' . $this->db->protect($mediaId) . '
+			;
+		'), 'id');
+	}	
 	
 	
 	

@@ -5,7 +5,8 @@
 	'no-description' => l('album.media.no-description'),
 	'comment-delete' => l('album.media.comment-delete'),
 	'comment-delete-confirm' => l('album.media.comment-delete-confirm'),
-	'date' => l('album.media.date')
+	'date' => l('album.media.date'),
+	'tag-delete-confirm' => l('album.media.tag-delete-confirm')
 ))?></div>
 
 <? if ($sg->albums) : ?>
@@ -105,6 +106,12 @@
 				<td><label for="albumAdminMediasDates"><?=l('admin.parameters.albums-medias-dates-disable')?></label></td>
 			</tr>
 		<? endif; ?>
+		<? if (!$sg->parameters->albums_tags_disable) : ?>
+			<tr>
+				<td><input id="albumAdminTags" name="tags-disable" type="checkbox"<?=$album->tags_disable ? ' checked="checked"' : ''?>/></td>
+				<td><label for="albumAdminTags"><?=l('admin.parameters.albums-tags-disable')?></label></td>
+			</tr>
+		<? endif; ?>
 			<tr>
 				<td><input id="albumAdminReorder" type="checkbox" /><input type="hidden" name="reorder" id="albumAdminReorderValue" /></td>
 				<td><label for="albumAdminReorder"><?=l('album.reorder')?></label></td>
@@ -148,12 +155,12 @@
 	<div id="preview">
 		<div id="mediaBackground" class="mediaBackgroundPreview">
 			<img id="mediaImage"<?=
-				(false and $admin and !get($sg->config->parameters, k('albums-tags-disable'))) ?
+				($admin and !$tags_disable) ?
 					' class="media-image-tag"' :
 					''
 				?> src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
 			<video id="mediaVideo" preload="metadata" controls></video>
-		<? if (false and !get($sg->config->parameters, k('albums-tags-disable'))) : ?>
+		<? if (!$tags_disable) : ?>
 			<div id="mediaTags"></div>
 		<? endif; ?>
 		</div>
@@ -190,8 +197,8 @@
 			<? if (!$comments_disable) : ?>
 			mediaComments="<?=toHtml(json_encode($media->comments))?>"
 			<? endif; ?>
-			<? if (false and !get($sg->config->parameters, k('albums-tags-disable'))) : ?>
-			mediaTags="<?=toHtml(json_encode($media->data->tags))?>"
+			<? if (!$tags_disable) : ?>
+			mediaTags="<?=toHtml(json_encode($media->tags, JSON_FORCE_OBJECT))?>"
 			<? endif; ?>
 		></a>
 		<? endforeach; ?>
@@ -246,12 +253,11 @@
 			<? endif; ?>
 		<p id="mediaDescription"></p>
 		<? endif; ?>
-
-<? /*
-		<? if (false and !get($sg->config->parameters, k('albums-tags-disable'))) : ?>
+		<? if (!$tags_disable) : ?>
+		<div class="media-balloon-separator"></div>
+		<label fom="mediaTagsList"><?=l('album.media.tags')?> :</label><span id="mediaNoTag"> <?=l('album.media.no-tag')?></span>
 		<div id="mediaTagsList"></div>
 		<? endif; ?>
-*/ ?>
 		<? if (!$comments_disable) : ?>
 		<div class="media-balloon-separator"></div>
 		<label for="mediaComment"><?=l('album.media.comments')?> :</label><br />

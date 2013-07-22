@@ -29,7 +29,8 @@
 			"registration-disable":"Disable registration",
 			"albums-calendar-disable":"Disable calendar",
 			"albums-comments-disable":"Disable comments",
-			"albums-medias-dates-disable":"Disable medias dates"
+			"albums-medias-dates-disable":"Disable medias dates",
+			"albums-tags-disable":"Disable tags"
 		},
 		"administrator":"Administrator",
 		"groups":"Groups",
@@ -158,7 +159,10 @@
 			"unknow-user":"Unknow",
 			"comment-delete":"delete",
 			"comment-delete-confirm":"The deletion is permanent. You want to continue ?",
-			"date":"The"
+			"date":"The",
+			"tag-delete-confirm":"The deletion is permanent. You want to continue ?",
+			"tags":"Tags",
+			"no-tag":"none"
 		},
 		"generation": {
 			"_":"Generation of album %1",

@@ -29,7 +29,8 @@
 			"registration-disable":"Désactiver les inscriptions",
 			"albums-calendar-disable":"Désactiver le calendrier",
 			"albums-comments-disable":"Désactiver les commentaires",
-			"albums-medias-dates-disable":"Désactiver les dates des médias"
+			"albums-medias-dates-disable":"Désactiver les dates des médias",
+			"albums-tags-disable":"Désactiver les tags"
 		},
 		"administrator":"Administrateur",
 		"groups":"Groupes",
@@ -158,7 +159,10 @@
 			"unknow-user":"Iconnu",
 			"comment-delete":"supprimer",
 			"comment-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?",
-			"date":"Le"
+			"date":"Le",
+			"tag-delete-confirm":"La suppression est définitive. Voulez-vous continuer ?",
+			"tags":"Tags",
+			"no-tag":"aucun"
 		},
 		"generation": {
 			"_":"Génération de l'album %1",

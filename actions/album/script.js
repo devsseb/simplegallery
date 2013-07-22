@@ -85,7 +85,6 @@ var Simplegallery = new Class({
 		this.mode = 'preview';
 
 		this.thumb = null;
-		this.tags = [];
 		
 		if (!(this.container = $('album')))
 			return;
@@ -121,8 +120,10 @@ var Simplegallery = new Class({
 		this.mediaImage = $('mediaImage');
 		this.mediaVideo = $('mediaVideo');
 		this.mediaTags = $('mediaTags');
-		if (this.mediaTags)
+		if (this.mediaTags) {
 			this.mediaTagsList = $('mediaTagsList');
+			this.mediaNoTag = $('mediaNoTag');
+		}
 		
 		this.albumsMenu = $('albumsMenu');
 		this.albumsMenu.distanceTop = this.albumsMenu.getPosition().y + 10;
@@ -229,7 +230,12 @@ var Simplegallery = new Class({
 					x: (position.x * angle.cos() - position.y * angle.sin() + 50).round(2),
 					y: (position.x * angle.sin() + position.y * angle.cos() + 50).round(2)
 				};
-				this.mediaAddTag(position);
+				this.mediaAddTag({
+					id: 0,
+					x: position.x,
+					y: position.y,
+					value: ''
+				});
 			}.bind(this)
 		});
 		this.mediaSlideshowStart.addEvents({
@@ -284,10 +290,6 @@ var Simplegallery = new Class({
 			}.bind(this));
 		}
 		this.mediaUpdateRequest = new Request.JSON({
-/*			onComplete: function() {console.log('complete')},
-			onFailure: function() {console.log('failure')},
-			onException: function() {console.log('exception')},
-			onProgress: function(a,b) {console.log('progress', a,b)},*/
 			onSuccess: this.mediaSetUpdateSuccess.bind(this)}
 		);
 
@@ -527,22 +529,27 @@ var Simplegallery = new Class({
 				for (var i = 0,comment; comment = this.media.comments[i]; i++)
 					this.mediaAddComment(comment.id, comment.user_name, comment.datetime, comment.value);
 			}
-/*
-			if (this.mediaTags) {
-				this.mediaTags.empty();
-				for (tag in this.media.tags) {
-					tag = this.media.tags[tag];
-					this.mediaAddTag({x: tag.x, y: tag.y}, tag.value, true);
-				}
-			}
-*/
+			
+			this.mediaSetTags();
+			
 		}
 		
 		this.resize();
 
 	},
+	mediaSetTags: function()
+	{
+		if (this.mediaTags) {
+			this.mediaTags.empty();
+			this.mediaTagsList.empty();
+			this.mediaNoTag.setStyle('display', Object.getLength(this.media.tags) ? 'none' : 'inline');
+			for (var id in this.media.tags)
+				this.mediaAddTag(this.media.tags[id]);
+		}
+	},
 	mediaSetUpdate: function(update)
 	{
+
 		var url = this.media.url;
 	
 		if (typeof update == 'string')
@@ -629,7 +636,7 @@ var Simplegallery = new Class({
 					var comments = JSON.decode(this.thumb.get('mediaComments'));
 					comments.push(comment);
 					thumb.set('mediaComments', JSON.encode(comments));
-					if (this.media.id == comment.media_id)
+					if (this.media.id == response.media_id)
 						this.media.comments = comments;
 					break;
 				}
@@ -643,12 +650,32 @@ var Simplegallery = new Class({
 						if (comment.id == response.commentsRemove) {
 							comments.splice(i, 1);
 							thumb.set('mediaComments', JSON.encode(comments));
-							if (this.media.id == comment.media_id)
+							if (this.media.id == response.media_id)
 								this.media.comments = comments;
 						}
 					}
 					break;
 				}
+
+		if (response.tags != undefined) {
+			for (var i = 0,thumb; thumb = this.thumbs[i]; i++)
+				if (thumb.get('mediaId') == response.media_id) {
+					var tags = JSON.decode(this.thumb.get('mediaTags'));
+
+					if (response.tags.id < 0)
+						delete tags[response.tags.id.abs()];
+					else
+					 	tags[response.tags.id] = response.tags;
+
+					thumb.set('mediaTags', JSON.encode(tags));
+
+					if (this.media.id == response.media_id) {
+						this.media.tags = tags;
+						this.mediaSetTags();
+					}
+				}
+		
+		}
 		
 	},
 	mediaGetOrientation: function()
@@ -1121,16 +1148,16 @@ var Simplegallery = new Class({
 			}.bind(this)
 		});
 	},
-	mediaAddTag: function(coord, tag, system)
+	mediaAddTag: function(tag)
 	{
 		if (!this.mediaTags)
 			return;
-	
+
 		// Set real position in px
 		var size = this.mediaElement.getSize();
 		position = {
-			x: (coord.x * size.x / 100).round(),
-			y: (coord.y * size.y / 100).round()
+			x: (tag.x * size.x / 100).round(),
+			y: (tag.y * size.y / 100).round()
 		};
 
 		// Set invert transform
@@ -1142,63 +1169,93 @@ var Simplegallery = new Class({
 			transform+= ' scaleY(-1)';
 		
 		// Inject frame
-		var tagFrame = new Element('div.media-tag', {styles: {
-			left: position.x,
-			top: position.y
-		}}).setStyle3('transform', transform).inject(this.mediaTags);
-		
-		tagFrame.itemList = new Element('span', {html: tag, events: {
-			mouseenter: function() {
-				this.tagFrame.setStyle('display', 'block');
+		var tagFrame = new Element('div.media-tag', {
+			styles: {
+				left: position.x,
+				top: position.y
 			},
-			mouseleave: function() {
-				this.tagFrame.setStyle('display', 'none');
+			events: {
+				mouseenter: function() {
+					if (this.mediaBalloonHide)
+						clearTimeout(this.mediaBalloonHide);
+					this.mediaBalloon.setStyle('display', 'block');
+				}.bind(this)
 			}
-		}}).inject(this.mediaTagsList);
+		}).setStyle3('transform', transform).inject(this.mediaTags);
+		
+		tagFrame.itemList = new Element('span');
 		tagFrame.itemList.tagFrame = tagFrame;
+		tagFrame.itemList.tag = tag;
+		tagFrame.itemList.adopt(
+			tagFrame.itemList.valueSpan = new Element('span', {html: tag.value, events: {
+				mouseenter: function() {
+					this.addClass('tag-item-hover');
+					this.getParent().tagFrame.setStyle('display', 'block');
+				},
+				mouseleave: function() {
+					this.removeClass('tag-item-hover');
+					if (!this.getParent().tagFrame.lock)
+						this.getParent().tagFrame.setStyle('display', 'none');
+				},
+				click: function(e) {
+					if (!this.albumAdmin)
+						return;
+					e.target.getParent().tagFrame.lock = !e.target.getParent().tagFrame.lock;
+				}.bind(this)
+			}}),
+			this.albumAdmin ? new Element('sup[html=x]', {events:{
+				mouseenter: function() {
+					this.addClass('tag-item-delete-hover');
+					return false;
+				},
+				mouseleave: function() {
+					this.removeClass('tag-item-delete-hover');
+					return false;
+				},
+				click: function(e) {
+					this.tagUpdate(e.target.getParent().tagFrame.input.set('value', ''));
+				}.bind(this)
+			}}) : null
+		).inject(this.mediaTagsList);
 		
 		// Span tag
-		var tagText = new Element('span.media-tag-text', {html: tag}).inject(tagFrame);
-		var size = tagText.getSize();
-		tagText.setStyle('left', (40 - size.x)/2);
+		var tagValue = new Element('span.media-tag-text', {html: tag.value}).inject(tagFrame);
+		var size = tagValue.getSize();
+		tagValue.setStyle('left', (40 - size.x)/2);
 		
 		// Input tag
-		if (!tag || this.albumAdmin) {
-			tagText.setStyle('visibility', 'hidden');
-			var tagInput = new Element('input.media-tag-text', {value: tag, events: {
+		if (!tag.value || this.albumAdmin) {
+			tagValue.setStyle('visibility', 'hidden');
+			var tagInput = new Element('input.media-tag-text', {value: tag.value, events: {
 				keydown: function(e) {
 					this.tagSetInputPosition(e.target);
-					if (e.key == 'enter') {
+					if (e.key == 'enter')
 						this.tagUpdate(e.target);
-					} else if (e.key == 'esc' && !e.target.retrieve('system')) {
-						e.target.getParent().destroy();
-					}
+					else if (e.key == 'esc' && !e.target.retrieve('tag').id)
+						this.tagUpdate(e.target.set('value', ''));
 				}.bind(this),
 				keyup: function(e) {
 					this.tagSetInputPosition(e.target);
 				}.bind(this),
 				blur: function(e) {
-					if (e.target.get('value') == '')
-						e.target.getParent().destroy();
-					else
-						this.tagUpdate(e.target);
+					this.tagUpdate(e.target);
 				}.bind(this)
-			}}).inject(tagText, 'before');
+			}}).inject(tagValue, 'before');
 			this.tagSetInputPosition(tagInput);
-			tagInput.store('coord', coord);
-			tagInput.store('system', system);
-			if (!system)
+			tagInput.store('tag', tag);
+			if (!tag.id)
 				tagInput.focus();
+			tagFrame.input = tagInput;
 		}
 		
-		if (system)
+		if (tag.id)
 			tagFrame.setStyle('display', 'none');
 	},
 	tagSetInputPosition: function(input)
 	{
-		var tagText = input.getNext();
-		tagText.set('text', input.get('value'));
-		var size = tagText.getSize().x;
+		var tagValue = input.getNext();
+		tagValue.set('text', input.get('value'));
+		var size = tagValue.getSize().x;
 		input.setStyles({
 			width: size,
 			left: (40 - size)/2
@@ -1206,13 +1263,23 @@ var Simplegallery = new Class({
 	},
 	tagUpdate: function(input)
 	{
-		this.mediaSetUpdate({tags:{
-			x: input.retrieve('coord').x,
-			y: input.retrieve('coord').y,
-			value: input.get('value')
-		}});
-		if (input.get('value') == '')
+		var tag = input.retrieve('tag');
+
+		if (input.get('value').trim() == '') {
+			if (tag.id && !confirm(this.locale['tag-delete-confirm']))
+				return;
+			input.getParent().itemList.destroy();
 			input.getParent().destroy();
+		}
+
+		if (
+			(input.get('value').trim() == '' && tag.id) ||
+			input.get('value') != tag.value
+		) {
+			tag.value = input.get('value');
+			this.mediaSetUpdate({tags:tag})
+		}
+
 	}
 });
 
