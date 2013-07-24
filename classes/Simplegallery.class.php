@@ -1653,6 +1653,7 @@ class Simplegallery
 	
 	public function getMedia($albumId, $media = null, $dim = null)
 	{
+
 		if (!$album = $this->getAlbum($albumId))
 			die(l('album.media.not-found'));
 
@@ -1725,7 +1726,7 @@ class Simplegallery
 		header('Content-Length: '.filesize($album->path . $media->file));
 		header('Connection: close');
 		
-		$this->getMedia($albumId, $media->file);
+		$this->getMedia($albumId, $media->id);
 
 	}
 	
