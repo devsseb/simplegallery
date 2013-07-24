@@ -24,3 +24,4 @@
 * ~~Add comments for medias~~
 * ~~Add date for medias~~
 * ~~Add possibilite to tag medias~~
+* ~~Add possibilite to sort albums manualy~~

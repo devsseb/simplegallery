@@ -11,20 +11,57 @@
 	<h2><?=l('admin._')?></h2>
 	<a href="?admin=albums&amp;albumsReload"><?=l('admin.albums-reload')?></a>
 	<table class="admin-albums">
-		<tr>
+		<tr id="admin-albums-th" albumDepth="-1">
 			<th><?=l('admin.albums-id')?></th>
 			<th><?=l('admin.albums-tree')?></th>
 			<th><?=l('admin.albums-name')?></th>
 			<th><?=l('admin.albums-dates')?></th>
 			<th><a href="#" id="adminAlbumsCheckAll"><?=l('admin.albums-check-all')?></a></th>
 		</tr>
-	<? foreach ($sg->albums as $album) : ?>
-		<tr>
-			<td class="admin-album-id"><?=toHtml($album->id)?></td>
-			<td style="padding-left:<?=$album->ns_depth * 15 + 5?>px;"><?=toHtml(basename($album->path))?> <span class="admin-album-medias-total">(<?=$album->medias_total?>)</span></td>
-			<td><input type="text" name="albums[<?=toHtml($album->id)?>][name]" placeholder="<?=toHtml(basename($album->path))?>" value="<?=toHtml($album->name)?>" class="admin-album-name" /></td>
+	<? foreach ($sg->albums as $album) :
+		$start = $album->date_start;
+		$end = $album->date_end;
+		if (!$start)
+			$start = $end;
+		if (!$end)
+			$end = $start;
+		if (!$start)
+			$start = $end = '0000-00-00';
+		$date = $start . $end;
+	?>
+		<tr class="admin-album"
+			albumName="<?=toHtml($album->name ? $album->name : basename($album->path))?>"
+			albumDate="<?=$date?>"
+			albumDepth="<?=$album->ns_depth?>"
+		>
+			<td class="admin-album-id">
+				<?=toHtml($album->id)?>
+				<input class="admin-album-position" type="hidden" name="albums[<?=toHtml($album->id)?>][position]" value="<?=toHtml($album->position)?>" />
+			</td>
+			<td class="admin-album-tree">
+				<span class="album-spacer" style="padding-left:<?=$album->ns_depth * 15?>px;"></span>
+				<img class="album-sort-manual" src="actions/admin/images/sort.png" title="<?=l('admin.album-sort-manual')?>" title="<?=l('admin.album-sort-manual')?>" />
+				<?=toHtml(basename($album->path))?> <span class="admin-album-medias-total">(<?=$album->medias_total?>)</span>
+			</td>
+			<td>
+				<span class="album-spacer" style="padding-left:<?=$album->ns_depth * 15?>px;"></span>
+				<div class="album-sort">
+		<? if ($album->ns_right - $album->ns_left > 1) : ?>
+					<img class="album-sort-name" src="actions/admin/images/sort-alphabet.png" title="<?=l('admin.album-sort-name')?>" title="<?=l('admin.album-sort-name')?>" />
+		<? endif; ?>
+				</div>
+				
+				<input name="albums[<?=toHtml($album->id)?>][name]" placeholder="<?=toHtml(basename($album->path))?>" value="<?=toHtml($album->name)?>" class="admin-album-name" />
+			</td>
 			<td class="admin-album-dates">
+				<span class="album-spacer" style="padding-left:<?=$album->ns_depth * 15?>px;"></span>
+				<div class="album-sort">
+		<? if ($album->ns_right - $album->ns_left > 1) : ?>
+					<img class="album-sort-date" src="actions/admin/images/sort-date.png" title="<?=l('admin.album-sort-date')?>" title="<?=l('admin.album-sort-date')?>" />
+		<? endif; ?>
+				</div>
 				<input type="date" placeholder="<?=l('date-format')?>" name="albums[<?=toHtml($album->id)?>][date_start]" value="<?=toHtml($album->date_start)?>" />
+				<?=l('album.date.at')?>
 				<input type="date" placeholder="<?=l('date-format')?>" name="albums[<?=toHtml($album->id)?>][date_end]" value="<?=toHtml($album->date_end)?>" />
 			</td>
 			<td class="admin-album-links">

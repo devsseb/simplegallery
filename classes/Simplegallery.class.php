@@ -114,7 +114,8 @@ class Simplegallery
 				ns_depth INTEGER,
 				thumb_md5 TEXT,
 				medias_dates_disable BOOL,
-				tags_disable BOOL
+				tags_disable BOOL,
+				position INTEGER
 			);
 		');
 	
@@ -298,6 +299,17 @@ class Simplegallery
 					');
 
 				break;
+				case '0.2' :
+
+					$this->db->execute('
+						ALTER TABLE
+							albums
+						ADD COLUMN
+							position INTEGER
+						;
+					');
+				
+				break;
 			}
 			$database_version+= 0.1;
 		}
@@ -320,6 +332,7 @@ class Simplegallery
 				parameters
 			;
 		', true);
+		
 	}
 	
 //******************************************************************************
@@ -815,6 +828,7 @@ class Simplegallery
 				$album->name = $update['name'];
 				$album->date_start = $update['date_start'];
 				$album->date_end = $update['date_end'];
+				$album->position = $update['position'];
 				
 				unset($album->pathThumbs);
 				unset($album->groups);
@@ -1038,16 +1052,8 @@ class Simplegallery
 		foreach ($this->albums as $album) {
 
 			if ($album->ns_depth == $ns->depth and $album->ns_left >= $ns->left and $album->ns_right <= $ns->right) {
-				$start = $album->date_start;
-				$end = $album->date_end;
-				if (!$start)
-					$start = $end;
-				if (!$end)
-					$end = $start;
-				if (!$start)
-					$start = $end = '0000-00-00';
-				$albumsSort[$start . $end . '.' . (trim($album->name) ? trim($album->name) : basename($album->path))] = $album;
-				
+
+				$albumsSort[$album->position] = $album;
 			}
 		}
 		ksort($albumsSort);

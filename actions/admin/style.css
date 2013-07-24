@@ -8,6 +8,15 @@
 .admin-parameters{margin:5px 0px;}
 .admin-parameters input{border:1px solid #707070;padding:0px 3px;}
 .admin label{font-weight:bold;}
+.admin label.sub-label{font-weight:normal;}
+
+.admin-p-albums-sort{margin-bottom:0px;}
+#parameters-albums-sort-priority{list-style-type:none;margin:0px 0px 0px 20px;padding:0px;overflow:hidden;}
+#parameters-albums-sort-priority span{font-weight:bold;color:#c05555;}
+#parameters-albums-sort-priority>li{float:left;text-align:center;width:80px;line-height:22px;margin:2px;border:3px dashed #a3a3a3;background-color:#fff;cursor:move;}
+#parameters-albums-sort-priority>li>ul{list-style-type:none;margin:0px;padding:0px;font-size:10px;line-height:12px;}
+#parameters-albums-sort-priority>li>ul input{width:10px;margin:0px;vertical-align:middle;}
+
 .admin-user-add{font-weight:normal;}
 .admin-user-no-active{color:#aa2424;}
 .admin-user-admin{color:#c05555;}
@@ -27,10 +36,18 @@
 .admin-albums{width:100%;border-collapse:collapse;}
 .admin-albums tr:hover td{background-color:rgba(0,0,0,0.3);}
 .admin-albums td{border:1px solid #000;padding:0px 5px;background-color:rgba(0,0,0,0.1);}
-.admin-album-dates{text-align:center;width:300px;}
+.admin-albums td img{vertical-align:middle;}
+.admin-albums tr.hoverChildren td{background-color:#d1e0d4;}
+.admin-album-dates{}
+.admin-album-dates input{width:120px;}
 .admin-albums input{font-size:11px;border:1px solid #000;padding:0px 3px;height:18px;margin:2px;}
 .admin-album-name{width:200px;}
 .admin-album-medias-total{font-style:italic;font-size:11px;color:#6f6161;}
+.album-sort-manual{width:16px;cursor:move;}
+.album-sort-name,.album-sort-date{cursor:pointer;}
+.album-sort{display:inline-block;width:16px;}
+.album-spacer{display:inline-block;}
+.admin-albums tr.album-sorting td{background-color:#f0cdcd;}
 
 #adminGroups{list-style-type:none;margin:0px;padding:0px;}
 #adminGroups input{list-style-type:none;border:1px solid #000;}

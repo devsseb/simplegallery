@@ -3,7 +3,7 @@ try {
 
 	session_start();
 	
-	define('SG_DATABASE_VERSION', '0.2');
+	define('SG_DATABASE_VERSION', '0.3');
 	
 	include('./classes/functions.php');
 	include('./classes/Get.class.php');

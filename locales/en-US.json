@@ -31,7 +31,18 @@
 			"albums-calendar-disable":"Disable calendar",
 			"albums-comments-disable":"Disable comments",
 			"albums-medias-dates-disable":"Disable medias dates",
-			"albums-tags-disable":"Disable tags"
+			"albums-tags-disable":"Disable tags",
+			"albums-sort-priority":"Sort priority",
+			"albums-sort":"Albums sort",
+			"albums-sort-auto":"automatic",
+			"albums-sort-manual":"manual",
+			"sort":{
+				"date":"Date",
+				"name":"Name",
+				"position":"Position"
+			},
+			"ascendant":"Ascendant",
+			"descendant":"Descendant"
 		},
 		"administrator":"Administrator",
 		"groups":"Groups",
@@ -44,6 +55,7 @@
 		"user-add-link":"add",
 		"albums-reload":"reload albums",
 		"albums-id":"#",
+		"albums-sort":"Sort",
 		"albums-tree":"Tree",
 		"albums-name":"Name",
 		"albums-dates":"Dates",
@@ -52,7 +64,10 @@
 		"album-check":"check",
 		"media-found":"found",
 		"album-check-cancelled":"Stop by user",
-		"album-check-end":"Check end"
+		"album-check-end":"Check end",
+		"album-sort-name":"Sort by name",
+		"album-sort-date":"Sort by date",
+		"album-sort-manual":"Sort manualy"
 	},
 	"user":{
 		"message": {
