@@ -310,6 +310,17 @@ class Simplegallery
 					');
 				
 				break;
+				case '0.3' :
+
+					$this->db->execute('
+						DELETE FROM
+							medias_comments
+						WHERE
+							media_id IS NULL
+						;
+					');
+
+				break;
 			}
 			$database_version+= 0.1;
 		}
@@ -1786,6 +1797,7 @@ class Simplegallery
 					$value = nl2br(toHtml($value));
 					$comment = object(
 						'id', 0,
+						'media_id', $mediaId,
 						'user_id', $this->user->id,
 						'datetime', date('Y-m-d h:i:s'),
 						'value', $value
