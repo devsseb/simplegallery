@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><?=toHtml(get($sg, k('config', 'parameters', 'name'), 'SimpleGallery'))?></title>
+		<title><?=toHtml($sg->parameters->name)?></title>
  		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  		<link rel="stylesheet" type="text/css" href="./structure/style.css" />
 <?	if (is_file($file = $actionPath . 'style.css')) : ?>
@@ -25,7 +25,7 @@ document.createElement('footer');
  		<header>
 	 		<a href="?">
 	 			<img class="simplegallery-logo" src="structure/images/simplegallery.png" />
-	 			<h1><?=toHtml(get($sg, k('config', 'parameters', 'name'), 'SimpleGallery'))?></h1>
+	 			<h1><?=toHtml($sg->parameters->name)?></h1>
  			</a>
 <? if (get($sg, k('user'))) : ?>
  			<div class="header-menu">
