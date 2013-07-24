@@ -117,7 +117,7 @@ window.addEvent('domready', function() {
 				if (me >= him)
 					break;
 
-				if (me + 15 == him) {
+				if (me.toInt() + 1 == him) {
 					trsToSort.push(tr);
 					tr.albumChildren = [];
 				} else {
