@@ -1049,13 +1049,15 @@ class Simplegallery
 			$ns = object('left', 1, 'right', count($this->albums) * 2, 'depth', 0);
 
 		$albumsSort = array();
-		foreach ($this->albums as $album) {
+		foreach ($this->albums as $album)
 
 			if ($album->ns_depth == $ns->depth and $album->ns_left >= $ns->left and $album->ns_right <= $ns->right) {
-
-				$albumsSort[$album->position] = $album;
+				if (exists($albumsSort, $album->position))
+					$albumsSort[] = $album;
+				else
+					$albumsSort[$album->position] = $album;
 			}
-		}
+
 		ksort($albumsSort);
 
 		$albums = array();
