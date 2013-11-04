@@ -1,0 +1,5 @@
+.album-groups td{padding:3px;line-height:14px;}
+.access-inherited-forbidden,.access-forbidden{background-color:#bd4242;}
+.access-inherited-granted,.access-granted{background-color:#78bb78;}
+.name-access-forbidden{color:#bd4242;}
+.name-access-granted{color:#3d963d;}

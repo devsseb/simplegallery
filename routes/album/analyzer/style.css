@@ -1,0 +1,16 @@
+.album{height:30px;line-height:30px;background-color:#2e60ca;color:#fff;font-size:16px;padding-left:10px;}
+.media-synchronize input{vertical-align:middle;}
+.media-synchronize:nth-child(2n+1){background-color:#e6e6e6;}
+.media-synchronize.media-new{background-color:#b8e6ba;}
+.media-synchronize.media-update{background-color:#bfd3fd;}
+.media-synchronize.media-delete{background-color:#e6b8c3;}
+.media-synchronize:hover{background-color:#f1efd7;}
+.media-updates{font-size:11px;color:#9b9b9b;}
+.album-cover-synchronization{margin-left:15px;color:#c7ecee;font-style:italic;font-size:13px;}
+.media-synchronization{margin-left:5px;color:#8d8080;font-style:italic;}
+.media-progress{height:5px;background-color:#e0c47c;width:0px;}
+
+.synchronize-complete{text-align:center;}
+.synchronize-complete span{font-size:20px;color:#6aa76a;}
+.synchronize-complete span.no{color:#cc6363;}
+a.syncrhonize{font-size:20px;}

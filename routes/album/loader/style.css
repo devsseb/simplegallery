@@ -1,0 +1,12 @@
+.loader-menu{text-align:right;background-color:#ebe3d9;padding:10px 5px;}
+.album{font-size:14px;height:46px;}
+.album input[type=checkbox]{margin:17px 5px;vertical-align:top;}
+.album:nth-child(2n+1){background-color:#e6e6e6;}
+.album:hover{background-color:#f1efd7;}
+.spacer{display:inline-block;}
+.album-names{display:inline-block;}
+.album-basename{line-height:23px;font-style:italic;color:#707070;}
+.album-name{line-height:23px;border:none;background-color:transparent;margin:0px;padding:0px;display:block;font-size:inherit;width:200px;}
+.album-name:hover{background-color:#fff;}
+.album-name:focus{border:none;}
+

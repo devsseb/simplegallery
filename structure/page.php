@@ -1,60 +1,50 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><?=toHtml($sg->parameters->name)?></title>
- 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- 		<link rel="stylesheet" type="text/css" href="./structure/style.css" />
-<?	if (is_file($file = $actionPath . 'style.css')) : ?>
-		<link rel="stylesheet" type="text/css" href="<?=$file?>" />
+		<title>SG2</title>
+		<link rel="stylesheet" type="text/css" href="structure/style.css" />
+<? if (is_file($file = 'routes/' . $response->route . '/' . $response->action . '/style.css')) : ?>
+		<link rel="stylesheet" type="text/css" href="<?=toHtml($file)?>" />
 <? endif; ?>
-
-<!--[if lt IE 9]>
-<script>
-document.createElement('header');
-document.createElement('footer');
-</script>
-<![endif]-->
-
-		<script type="text/javascript" src="./structure/mootools.js"></script>
-<?	if (is_file($file = $actionPath . 'script.js')) : ?>
-		<script type="text/javascript" src="<?=$file?>"></script>
+		<script type='text/javascript' src="structure/mootools.js"></script>
+		<script type='text/javascript' src="structure/script.js"></script>
+<? if (is_file($file = 'routes/' . $response->route . '/' . $response->action . '/script.js')) : ?>
+		<script type='text/javascript' src="<?=toHtml($file)?>"></script>
 <? endif; ?>
-
- 	</head>
- 	<body>
- 		<header>
-	 		<a href="?">
-	 			<img class="simplegallery-logo" src="structure/images/simplegallery.png" />
-	 			<h1><?=toHtml($sg->parameters->name)?></h1>
- 			</a>
-<? if (get($sg, k('user'))) : ?>
- 			<div class="header-menu">
-	<? if ($sg->user->admin) : ?>
-				<a href="?admin"><?=l('admin._')?></a><br />
-	<? endif; ?>
- 				<?=l('structure.logged-in-as')?> <a href="?user=profil" title="Update my profil"><span class="header-login"><?=toHtml($sg->user->name)?></span></a> |
- 				<a href="?user=logout"><?=l('structure.logout')?></a>
- 			</div>
-<? endif; ?>
- 		</header>
-<? if ($message = get($_SESSION, k('messages' ,'success'))) : ?>
-			<div class="message_success"><?=$message?></div>
-	<? unset($_SESSION['messages']['success'])?>
-<? endif;
-	if ($message = get($_SESSION, k('messages' ,'error'))) : ?>
-			<div class="message_error"><?=$message?></div>
-	<? unset($_SESSION['messages']['error'])?>
-<? endif;
-	if ($message = get($_SESSION, k('messages' ,'information'))) : ?>
-			<div class="message_information"><?=$message?></div>
-	<? unset($_SESSION['messages']['information'])?>
-<? endif; ?>
-	 	<div class="page">
-			<? include($actionPath . $actionPage); ?>
+	</head>
+	<body>
+	<? if ($response->menu) : ?>
+		<div id="menu">
+		<? if ($response->menu->back->enable) : ?>
+			<a title="Back" class="menu-button menu-back" href="<?=toHtml($response->menu->back->url)?>"></a>
+		<? endif; ?>
+		<? if ($response->menu->albumconfig->enable) : ?>
+			<a title="Album config" class="menu-button menu-albumconfig" href="<?=toHtml($response->menu->albumconfig->url)?>"></a>
+		<? endif; ?>
+		<? if ($response->menu->load->enable) : ?>
+			<a title="Load" class="menu-button menu-load" href="<?=toHtml($response->menu->load->url)?>"></a>
+		<? endif; ?>
+		<? if ($response->menu->users->enable) : ?>
+			<a title="User management" class="menu-button menu-users" href="<?=toHtml($response->menu->users->url)?>"></a>
+		<? endif; ?>
+			<a title="Logout" class="menu-button menu-logout" href="?user=logout"></a>
 		</div>
-		<footer>
-			<?=l('structure.time-generation', round(chronoGet('phptime'), 3))?> |
-			<a href="mailto:essarea@gmail.com">Ess</a> © 2012<?=date('Y') > 2012 ? ' - ' . date('Y') : ''?>
-		</footer>
+	<? endif; ?>
+		<div id="content">
+			<? if ($message = gete($_SESSION, k('messages', 'success'))) : ?>
+				<div class="message message-success"><?=toHtml($message)?></div>
+				<?unset($_SESSION['messages']['success'])?>
+			<? endif; ?>
+			<? if ($message = gete($_SESSION, k('messages', 'error'))) : ?>
+				<div class="message message-error"><?=toHtml($message)?></div>
+				<?unset($_SESSION['messages']['error'])?>
+			<? endif; ?>
+			<? if ($message = gete($_SESSION, k('messages', 'information'))) : ?>
+				<div class="message message-information"><?=toHtml($message)?></div>
+				<?unset($_SESSION['messages']['information'])?>
+			<? endif; ?>
+			<?include 'routes/' . $response->route . '/' . $response->action . '/page.php'?>
+		</div>
+<?/*	<div style="position:fixed;right:0px;bottom:0px;"><?=chronoGet('phptime')?></div>*/?>
 	</body>
 </html>

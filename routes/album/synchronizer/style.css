@@ -1,0 +1,10 @@
+.album-synchronize{}
+.album-synchronize:nth-child(2n+1){background-color:#e6e6e6;}
+.album-synchronize.album-new{background-color:#b8e6ba;}
+.album-synchronize.album-update{background-color:#bfd3fd;}
+.album-synchronize.album-delete{background-color:#e6b8c3;}
+.album-synchronize:hover{background-color:#f1efd7;}
+.album-updates{font-size:11px;color:#9b9b9b;}
+
+.synchronize-complete{text-align:center;}
+.synchronize-complete span{font-size:20px;color:#6aa76a;}

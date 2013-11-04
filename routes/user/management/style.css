@@ -1,0 +1,9 @@
+.groups{list-style-type:none;margin:10px 50px;overflow:hidden;padding:13px;border:1px solid #38456b;background-color:#e5f1e6;}
+.groups li{float:left;margin:0px 3px;padding:0px;}
+
+.user-form{max-width:none;}
+.users{border-collapse:collapse;width:100%;}
+.users td{border:1px solid #fff;padding:3px;}
+.users ul{list-style-type:none;margin:0px;padding:0px;overflow:hidden;}
+.users li{float:left;margin:0px 3px;padding:0px ;}
+.users input{vertical-align:middle;}

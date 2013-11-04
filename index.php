@@ -3,45 +3,29 @@ try {
 
 	session_start();
 	
-	define('SG_DATABASE_VERSION', '0.4');
+	include 'includes/functions.php';
+	include 'includes/Get.php';
+	include 'includes/Object.php';
 	
-	include('./classes/functions.php');
-	include('./classes/Get.class.php');
-	new Get();
-	include('./classes/Debug.class.php');
-	new Debug();
+	$config = object();
+
+	if (is_file('config.php'))
+		include 'config.php';
+	
+	include 'includes/Debug.class.php';
+	new Debug(get($config, k('debug'), false));
 
 	chronoStart('phptime');
 
-	include('./classes/Locale.class.php');
-	new Locale();
-	include('./classes/Simplegallery.class.php');
-
-	$user = false;
-
-	if (is_file('./config.php')) {
-
-		$config = new StdClass();
-		include('./config.php');
-		Debug::enable(get($config, k('debug')));		
-
-		$action = geta(array_keys($_GET), k('0'));
-		$action = in_array($action, array('album', 'media', 'admin')) ? $action : 'user';
+//	include('includes/Simplegallery.class.php');
+	include('includes/sg/Simplegallery.class.php');
+	include('includes/Book.class.php');
+	$sg = new SimpleGallery($config);
 	
-	} else {
+	$response = $sg->routing();
 
-		$action = 'install';
-
-	}
-
-	$sg = new Simplegallery(get($config, k('privatePath')));
-
-	$actionPath = './actions/' . $action . '/';
-	$actionPage = 'page.php';
-	include($actionPath . 'index.php');
-
-	include('./structure/page.php');
-
+	include 'structure/page.php';
+	
 } catch (Exception $exception) {
 	echo '<!DOCTYPE html><html><head><title>' . toHtml(get($sg, k('parameters', 'name'), 'SimpleGallery')) . '</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>';
 	echo '<br/>Une erreur est survenue.<br/>';
@@ -54,4 +38,4 @@ try {
 	echo '<br/><br/><a href="./" title="Retour">Retour</a>';
 	echo '</body></html>';
 }
-?>
+
