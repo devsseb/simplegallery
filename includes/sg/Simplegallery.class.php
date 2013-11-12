@@ -791,7 +791,7 @@ class SimpleGallery
 		
 		if ($session_code) {
 			$session = \Database\UserSessionTable::findOneByCodeWithUser($session_code);
-			if ($session->getUser()) {
+			if ($session) {
 				$this->user = $session->getUser();
 				return true;
 			}
