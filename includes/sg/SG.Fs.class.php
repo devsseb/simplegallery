@@ -13,7 +13,7 @@ class Fs {
 	private
 		$mediasTypes = array(
 			'image'	=> array('jpg', 'jpeg', 'png', 'gif', 'bmp'),
-			'video'	=> array('avi', 'mts', 'm2ts', 'm2t', 'mkv', 'mov', 'mpeg', 'mpg', 'webm', 'mp4', 'asf', 'wma', 'mp2', 'm2p', 'vob', 'flv'),
+			'video'	=> array('avi', 'mts', 'm2ts', 'm2t', 'mkv', 'mov', 'mpeg', 'mpg', 'webm', 'mp4', 'asf', 'wmv', 'mp2', 'm2p', 'vob', 'flv', 'dv'),
 			'book'	=> array('cbz', 'cbr'/*, 'pdf'*/)
 		),
 		$mediasMask
