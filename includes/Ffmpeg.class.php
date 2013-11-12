@@ -10,24 +10,28 @@ class Ffmpeg
 		return self::$program;
 	}
 
-	public static function getFrameNumber($file)
+	public static function getInfos($file)
 	{
-		$infos = Shell::exec(self::getProgram() . ' -i ' . Shell::escapeFile($file));
+		$shellInfos = Shell::exec(self::getProgram() . ' -i ' . Shell::escapeFile($file));
 
-		preg_match('/Duration: ([0-9\\.:]+)/', $infos, $match);
+		preg_match('/Duration: ([0-9\\.:]+)/', $shellInfos, $match);
 		$duration = explode(':', $match[1]);
 		$duration = $duration[0] * 3600 + $duration[1] * 60 + $duration[2];
 
-		preg_match('/Stream.*Video.*\\s+([0-9]+)\\s+fps/', $infos, $match);
+		preg_match('/Stream.*Video.*\\s+([0-9]+)\\s+fps/', $shellInfos, $match);
 		$fps = gete($match, k(1), 25);
-		return ceil($fps * $duration);
+		$frames = ceil($fps * $duration);
 		
-		return (int)Shell::exec(self::getProgram() . ' -i ' . Shell::escapeFile($file) . ' -vcodec copy -an -f null /dev/null 2>&1 | grep \'frame=\' | sed \'s/\s\s*/ /g\' | cut -f 2 -d \' \'');
+		return object(
+			'duration', $duration,
+			'fps', $fps,
+			'frames', $frames
+		);
 	}
 	
 	public static function convert($file, $target, $options = array(), $callback = false)
 	{
-		$frameNumber = self::getFrameNumber($file);
+		$frameNumber = geta(self::getInfos($file), k('frames'));
 
 		if (!$frameNumber)
 			$frameNumber = 1;
@@ -153,12 +157,7 @@ class Ffmpeg
 	public static function capture($file, $percent, $target = null)
 	{
 	
-		$result = shell_exec(self::getProgram() . ' -i ' . Shell::escapeFile($file) . ' 2>&1');
-
-		preg_match('/Duration: ([0-9]{2}):([0-9]{2}):([0-9]{2}\\.[0-9]{2})/', $result, $match);
-
-		$time = $match[1] * 3600 + $match[2] * 60 + $match[3];
-		$time = round($percent * $time / 100);
+		$time = round($percent * geta(self::getInfos($file), k('duration')) / 100);
 		
 		$hours = floor($time / 3600);
 		$time-= $hours * 3600;
@@ -166,7 +165,7 @@ class Ffmpeg
 		$time-= $minutes * 60;
 		$time = date('H:i:s', mktime($hours, $minutes, $time));
 				
-		$image = $target ? $target : sys_get_temp_dir() . '/simplegallery_' . uniqid();
+		$image = $target ? $target : sys_get_temp_dir() . '/simplegallery_' . uniqid() . '.jpg';
 		shell_exec(self::getProgram() . ' -ss ' . $time . ' -t 1 -i ' . Shell::escapefile($file) . ' -f mjpeg ' . Shell::escapefile($image));
 		
 		$capture = file_get_contents($image);

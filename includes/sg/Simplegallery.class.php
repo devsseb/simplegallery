@@ -802,7 +802,6 @@ class SimpleGallery
 	
 	public function userAuthentication($post)
 	{
-		
 		$user = \Database\UserTable::findOneByEmailAndIsActive(get($post, k('email')));
 		if ($user) {
 			if (crypt($post['password'], $user->getPassword()) === $user->getPassword()) {

@@ -1,6 +1,6 @@
 <? if ($response->data['album']) : ?>
 <div id="albums">
-<? foreach ($response->data['album']->getChildren() as $album) :
+<? foreach ($response->data['album']->getChildren()->findAllOrderPath() as $album) :
 	$name = toHtml($album->getName()?:basename($album->getPath())) ?>
 	<a class="album" href="?albums&amp;id=<?=toHtml($album->getId())?>">
 		<div class="album-cover">
