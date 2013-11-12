@@ -86,8 +86,8 @@ var SimpleGallery = new Class({
 		
 		this.slideshow = new SimpleGallery.Slideshow(this.medias);
 
-		this.albumWall = new SimpleGallery.Wall(this.albumsContainer, this.albums, {width: 'static'});
-		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias);
+		this.albumWall = new SimpleGallery.Wall(this.albumsContainer, this.albums, {width: 'static', onResize: this.albums.setStyle.bind(this.albums, 'visibility', 'visible')});
+		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
 		
 		/*** POUR TEST ***/
 //		this.slideshow.open(1);
