@@ -165,13 +165,19 @@ class Ffmpeg
 		$time-= $minutes * 60;
 		$time = date('H:i:s', mktime($hours, $minutes, $time));
 				
-		$image = $target ? $target : sys_get_temp_dir() . '/simplegallery_' . uniqid() . '.jpg';
-		shell_exec(self::getProgram() . ' -ss ' . $time . ' -t 1 -i ' . Shell::escapefile($file) . ' -f mjpeg ' . Shell::escapefile($image));
-		
+		$outdir = sys_get_temp_dir() . '/simplegallery_' . uniqid() . '/';
+		mkdir($outdir);
+		$image = $outdir . '00000001.jpg';
+//		shell_exec(self::getProgram() . ' -ss ' . $time . ' -t 1 -i ' . Shell::escapefile($file) . ' -vsync 1 -r 1 -an -y ' . Shell::escapefile($image));
+
+// Créer une fichier 
+		shell_exec('mplayer ' . Shell::escapefile($file) . ' -ss ' . $time . ' -frames 1 -vo jpeg:outdir=' . Shell::escapefile($outdir));
 		$capture = file_get_contents($image);
-		
-		if (!$target)
+		if ($target)
+			rename($image, $target);
+		else
 			unlink($image);
+		rmdir($outdir);
 
 		return $capture;
 	
