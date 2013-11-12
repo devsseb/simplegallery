@@ -170,7 +170,6 @@ class Ffmpeg
 		$image = $outdir . '00000001.jpg';
 //		shell_exec(self::getProgram() . ' -ss ' . $time . ' -t 1 -i ' . Shell::escapefile($file) . ' -vsync 1 -r 1 -an -y ' . Shell::escapefile($image));
 
-// Créer une fichier 
 		shell_exec('mplayer ' . Shell::escapefile($file) . ' -ss ' . $time . ' -frames 1 -vo jpeg:outdir=' . Shell::escapefile($outdir));
 		$capture = file_get_contents($image);
 		if ($target)
