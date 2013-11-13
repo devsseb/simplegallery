@@ -41,7 +41,6 @@
 				<div class="media-video-play-cover" style="left:<?=floor($size->width / 2 - 25)?>px;top:<?=floor($size->height / 2 - 25)?>px;<?=$sg->getAntiMediaCssTransform($media)?>"></div>
 				<? endif; ?>
 			</div>
-			
 	<?
 			endforeach;
 		else :
@@ -55,11 +54,13 @@
 <div id="medias">
 <? foreach ($response->data['album']->getMediaCollection() as $index => $media) :
 		$rotate = $sg->getMediaTransform($media)->rotation;
+		$width = ($rotate == 0 or $rotate == 180) ? $media->getWidth() : $media->getHeight();
+		$height = ($rotate == 0 or $rotate == 180) ? $media->getHeight() : $media->getWidth();
 ?>
 	<a
 		class="media"
 		href="?media=slideshow&amp;id=<?=toHtml($media->getId())?>"
-		style="width:<?=ceil($media->getWidth() * 200 / $media->getHeight())?>px;height:200px;<?=$sg->getMediaCssTransform($media)?>"
+		style="width:<?=ceil($width * 200 / $height)?>px;height:200px;"
 		mediaId="<?=toHtml($media->getId())?>"
 		mediaIndex="<?=toHtml($index)?>"
 		mediaType="<?=toHtml($media->getType())?>"
@@ -71,10 +72,19 @@
 		mediaName="<?=toHtml(basename($media->getPath()))?>"
 		mediaExif="<?=toHtml($media->getExifData())?>"
 	>
-		<img src="?media=brick&amp;id=<?=toHtml($media->getId())?>" />
+		<img src="?media=brick&amp;id=<?=toHtml($media->getId())?>" style="width:<?=ceil($media->getWidth() * 200 / $media->getHeight())?>px;height:200px;<?=$sg->getMediaCssTransform($media)?>" />
 	<? if ($media->getType() == 'video') : ?>
-		<div class="media-video-play" style="<?=$sg->getAntiMediaCssTransform($media)?>"></div>
+		<div class="media-video-play"></div>
 	<? endif; ?>
+		<ul class="media-tools">
+	<? if ($sg->user->isAdmin()) : ?>
+		<? if ($media->getType() == 'image') : ?>
+			<li class="rotate-left" title="Rotate left"></li>
+			<li class="rotate-right" title="Rotate right"></li>
+<?/*			<li class="delete" title="Delete"></li>*/?>
+		<? endif; ?>
+	<? endif; ?>
+		</ul>
 	</a>
 <? endforeach; ?>
 </div>

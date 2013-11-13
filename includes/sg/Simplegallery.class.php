@@ -342,6 +342,29 @@ class SimpleGallery
 						exit();						
 					
 					break;
+					
+					case 'update' :
+					
+						if (!$this->user->isAdmin())
+							exit('Access is forbidden.');
+							
+						$media = new \Database\Media($_GET['id']);
+						$rotation = $media->getRotation();
+						if ($_GET['direction'] == 'left')
+							$rotation-= 90;
+						else
+							$rotation+= 90;
+						if ($rotation < 0)
+							$rotation = 270;
+						elseif ($rotation > 270)
+							$rotation = 0;
+							
+						$media->setRotation($rotation);
+						$media->save();
+					
+						exit(json_encode(array('media-rotation' => $rotation)));
+					
+					break;
 				}
 			
 			break;

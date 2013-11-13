@@ -6,6 +6,15 @@ Element.NativeEvents = Object.merge(Element.NativeEvents, {
 	timeupdate: 2, ended: 2, ratechange: 2, durationchange: 2, volumechange: 2
 });
 
+Element.implement({
+	setStyle3: function (attribute, value) {
+		['', '-webkit-', '-moz-', '-o-', '-ms-', 'ms'].each(function(prefix) {
+			this.setStyle(prefix + attribute, value);
+		}.bind(this));
+		return this;
+	}
+});
+
 Number.implement({
 	toFileWeight: function() {
 		var bytes = this;
@@ -54,42 +63,119 @@ var SimpleGallery = new Class({
 				exif: JSON.decode(mediaEl.get('mediaExif'))
 			};
 			
-			if (media.type == 'video')
-				media.dom.addEvent('resize', function(e) {
+			media.dom.img = media.dom.getElement('img');
+			media.dom.addEvent('resize', function(mediaDom) {
+			
+				var media = mediaDom.media;
+			
+				var size = media.dom.getSize();
+				var width = (media.rotate == 0 || media.rotate == 180) ? size.x : size.y;
+				var height = (media.rotate == 0 || media.rotate == 180) ? size.y : size.x;
+				media.dom.img.setStyles({
+					width: width,
+					height: height,
+					left: (size.x - width) / 2,
+					top: (size.y - height) / 2
+				});
+			
+			
+				if (media.type == 'video') {
+			
 					var play = this.getElement('.media-video-play');
 					var size = play.getSize();
 					var mediaSize = this.getSize();
-					
+				
 					play.setStyles({
 						left: (mediaSize.x - size.x) / 2,
 						top: (mediaSize.y - size.y) / 2
 					});
-				});
+					
+				}
+
+			});
 			
 			media.dom.media = media;
+			media.dom.tools = media.dom.getElement('.media-tools');
 
-			media.dom.addEvent('click', function (e) {
-				e.preventDefault();
+			media.dom.addEvents({
+				click: function (e) {
+					e.preventDefault();
 				
-				var mediaDom = e.target;
-				if (!mediaDom.hasClass('media'))
-					mediaDom = mediaDom.getParent('.media');
+					var mediaDom = e.target;
+					if (!mediaDom.hasClass('media'))
+						mediaDom = mediaDom.getParent('.media');
 				
-				this.slideshow.open(mediaDom.media.index);
+					this.slideshow.open(mediaDom.media.index);
 				
-			}.bind(this));
+				}.bind(this),
+				mouseenter: function(e)
+				{
+					this.tools.setStyle('display', 'block');
+				},
+				mouseleave: function(e)
+				{
+					this.tools.setStyle('display', 'none');
+				}
+			});
+			
+			if (media.dom.tools.getElement('.rotate-left'))
+				media.dom.tools.getElement('.rotate-left').addEvent('click', function(e) {
+					e.stopPropagation().preventDefault();
+					this.mediaRotate(e.target.getParent('a').media, 'left');
+				}.bind(this));
+
+			if (media.dom.tools.getElement('.rotate-right'))
+				media.dom.tools.getElement('.rotate-right').addEvent('click', function(e) {
+					e.stopPropagation().preventDefault();
+					this.mediaRotate(e.target.getParent('a').media, 'right');
+				}.bind(this));
+			
+			if (media.dom.tools.getElement('.delete'))
+				media.dom.tools.getElement('.delete').addEvent('click', function(e) {
+					e.stopPropagation().preventDefault();
+					console.log('delete');
+				}.bind(this));
 			
 			this.medias.push(media);
 		}
 		
 		this.slideshow = new SimpleGallery.Slideshow(this.medias);
 
-		this.albumWall = new SimpleGallery.Wall(this.albumsContainer, this.albums, {width: 'static', onResize: this.albums.setStyle.bind(this.albums, 'visibility', 'visible')});
-		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {margin: 0, onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
+		this.albumWall = new SimpleGallery.Wall(this.albumsContainer, this.albums, {margin: 0, width: 'static', onResize: this.albums.setStyle.bind(this.albums, 'visibility', 'visible')});
+		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
 		
 		/*** POUR TEST ***/
 //		this.slideshow.open(1);
 
+	},
+	mediaRotate: function(media, direction)
+	{
+
+		new Request.JSON({
+			url: '?media=update&id=' + media.id + '&direction=' + direction,
+			onError: function(error) {
+				console.error(error);
+			}
+		}).send();
+
+		if (direction == 'left')
+			media.rotate-= 90;
+		else
+			media.rotate+= 90;
+		if (media.rotate < 0)
+			media.rotate = 270;
+		else if (media.rotate > 270)
+			media.rotate = 0;
+		media.dom.set('mediaRotate');
+		media.dom.img.setStyle3('transform', 'rotate(' + media.rotate + 'deg)');
+
+		var width = (media.rotate == 0 || media.rotate == 180) ? media.width : media.height;
+		var height = (media.rotate == 0 || media.rotate == 180) ? media.height : media.width;
+		var wallData = media.dom.retrieve('wallData');
+		wallData.width = (width * 200 / height).ceil();
+		wallData.height = 200;
+		this.mediaWall.resize();
+		
 	}
 });
 
@@ -491,37 +577,30 @@ SimpleGallery.Wall = new Class({
 	initialize: function(wall, bricks, options) {
 
 		this.wall = $(wall);
+		this.bricksEls = bricks;
 		this.setOptions(options);
 
 		this.bricks = [];
 		
-		for (var i = 0, brick; brick = bricks[i]; i++) {
+		for (var i = 0, brick; brick = this.bricksEls[i]; i++) {
 
 			var size = brick.getSize();
-
-			var deg = /rotate\(([-0-9]+)deg\)/.exec(brick.get('style'));
-			deg = deg ? deg[1] : 0;
-			var isRotate = deg == 90 || deg == 270;
 			
-			if (isRotate) {
-				var width = size.y;
-				size.y = (width * size.y / size.x).ceil();
-				size.x = width;
-			}
-			this.bricks.push({
+			var brickData = {
 				domElement: brick,
 				width: size.x,
 				height: size.y,
 				paddingWidth: brick.getStyle('padding-left').toInt() + brick.getStyle('padding-right').toInt(),
-				paddingHeight: brick.getStyle('padding-top').toInt() + brick.getStyle('padding-bottom').toInt(),
-				isRotate: isRotate
-			});
+				paddingHeight: brick.getStyle('padding-top').toInt() + brick.getStyle('padding-bottom').toInt()
+			}
+			this.bricks.push(brickData);
+			brick.store('wallData', brickData);
 			
 		}
 
 		window.addEvent('resize', this.resize.bind(this));
 		this.resize();
-
+		
 	},
 	resize: function()
 	{
@@ -535,7 +614,7 @@ SimpleGallery.Wall = new Class({
 		for (var i = 0,brick; brick = this.bricks[i]; i++) {
 			
 			row.push(brick);
-			row.width+= brick[brick.isRotate ? 'height' : 'width'];
+			row.width+= brick.width;
 
 			if (row.width > wallWidth || i == this.bricks.length - 1) {
 				wall.push(row);
@@ -559,14 +638,14 @@ SimpleGallery.Wall = new Class({
 			for (var x = 0,brick; brick = row[x]; x++) {
 
 				if (this.options.width == 'auto' || (x == 0 && y == 0)) {
-					width = (brick[brick.isRotate ? 'height' : 'width'] * rowWidth / row.width).ceil();
-					if (width > brick[brick.isRotate ? 'height' : 'width'])
-						width = brick[brick.isRotate ? 'height' : 'width'];
+					width = (brick.width * rowWidth / row.width).ceil();
+					if (width > brick.width)
+						width = brick.width;
 				}
 
 				if (x == 0)
 					// Compute row height at first brick
-					height = (width * brick[brick.isRotate ? 'width' : 'height'] / brick[brick.isRotate ? 'height' : 'width']).ceil();
+					height = (width * brick.height / brick.width).ceil();
 
 				var brickWidth = width;
 				if (position.left + brickWidth + (x == 0 ? 0 : this.options.margin) > wallWidth)
@@ -574,11 +653,11 @@ SimpleGallery.Wall = new Class({
 
 				brick.domElement.setStyles({
 					position: 'absolute',
-					left: position.left + (x == 0 ? 0 : this.options.margin) + (brick.isRotate ? ((width - height)/2).floor() : 0),
-					top: position.top + (y == 0 ? 0 : this.options.margin) + (brick.isRotate ? ((height - width)/2).floor() : 0),
-					width: (brick.isRotate ? height : brickWidth) - brick['padding' + (brick.isRotate ? 'Height' : 'Width')],
-					height: (brick.isRotate ? brickWidth : height) - brick['padding' + (brick.isRotate ? 'Width' : 'Height')]
-				}).fireEvent('resize');
+					left: position.left + (x == 0 ? 0 : this.options.margin),
+					top: position.top + (y == 0 ? 0 : this.options.margin),
+					width: brickWidth - brick.paddingWidth,
+					height: height - brick.paddingHeight
+				}).fireEvent('resize', brick.domElement);
 				position.left+= brickWidth + (x == 0 ? 0 : this.options.margin);
 
 			}
