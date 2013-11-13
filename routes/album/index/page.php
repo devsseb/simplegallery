@@ -8,25 +8,38 @@
 	<?
 		$covers = json_decode($album->getCoverMedias());
 		$coverSize = object('width', 200, 'height', 180);
-		$top = 0;
+		$sprite = 0;
 		if ($covers) :
 			foreach ($covers as $size)
-				$top+= $size->height;
+				$sprite+= $size->height;
 			foreach (array_reverse((array)$covers) as $id => $size) :
-				$rotate = rand(-10, 10);
-				$top-= $size->height;
+				$media = new \Database\Media($id);
+				$rotate = $sg->getMediaTransform($media)->rotation;
+				if ($rotate == 0 || $rotate == 180) {
+					$left = rand(0, $coverSize->width - $size->width);
+					$top = rand(0, $coverSize->height - $size->height);
+				} else {
+					$left = rand(0, $coverSize->height - $size->height);
+					$top = rand(0, $coverSize->width - $size->width);
+				}
+				$rotate+= rand(-10, 10);
+				$sprite-= $size->height;
 	?>
 			<div class="album-cover-media" style="
-				left:<?=rand(0, $coverSize->width - $size->width)?>px;
-				top:<?=rand(0, $coverSize->height - $size->height)?>px;
+				left:<?=$left?>px;
+				top:<?=$top?>px;
 				-webkit-transform:rotate(<?=$rotate?>deg);
 				-moz-transform:rotate(<?=$rotate?>deg);
 				transform:rotate(<?=$rotate?>deg);
 				background-image:url('?album=cover&amp;id=<?=$album->getId()?>');
-				background-position:0 <?=-$top?>px;
+				background-position:0 <?=-$sprite?>px;
 				width:<?=$size->width?>px;
 				height:<?=$size->height?>px;
-			"></div>
+			">
+				<? if ($media->getType() == 'video') : ?>
+				<div class="media-video-play-cover" style="left:<?=floor($size->width / 2 - 25)?>px;top:<?=floor($size->height / 2 - 25)?>px;<?=$sg->getAntiMediaCssTransform($media)?>"></div>
+				<? endif; ?>
+			</div>
 			
 	<?
 			endforeach;

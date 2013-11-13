@@ -643,7 +643,7 @@ class SimpleGallery
 	
 
 
-	public function getMediaTransform($media)
+	public function getMediaTransform(\Database\Media $media)
 	{
 		$result = object(
 			'flip', object(
