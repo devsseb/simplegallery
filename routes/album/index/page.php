@@ -3,6 +3,7 @@
 <? foreach ($response->data['album']->getChildren()->findAllOrderPath() as $album) :
 	$name = toHtml($album->getName()?:basename($album->getPath())) ?>
 	<a class="album" href="?albums&amp;id=<?=toHtml($album->getId())?>">
+		<div class="album-name"><?=$name?></div>
 		<div class="album-cover">
 		
 	<?
@@ -16,18 +17,18 @@
 				$media = new \Database\Media($id);
 				$rotate = $sg->getMediaTransform($media)->rotation;
 				if ($rotate == 0 || $rotate == 180) {
-					$left = rand(0, $coverSize->width - $size->width);
-					$top = rand(0, $coverSize->height - $size->height);
+					$left = $coverSize->width - $size->width;
+					$top = $coverSize->height - $size->height;
 				} else {
-					$left = rand(0, $coverSize->height - $size->height);
-					$top = rand(0, $coverSize->width - $size->width);
+					$left = $coverSize->height - $size->height;
+					$top = $coverSize->width - $size->width;
 				}
 				$rotate+= rand(-10, 10);
 				$sprite-= $size->height;
 	?>
 			<div class="album-cover-media" style="
-				left:<?=$left?>px;
-				top:<?=$top?>px;
+				left:<?=rand(0, floor($left / 2))?>px;
+				top:<?=rand(0, floor($top / 2))?>px;
 				-webkit-transform:rotate(<?=$rotate?>deg);
 				-moz-transform:rotate(<?=$rotate?>deg);
 				transform:rotate(<?=$rotate?>deg);
@@ -48,7 +49,6 @@
 			No media found
 	<? endif; ?>
 		</div>
-		<div class="album-name"><?=$name?></div>
 	</a>
 <? endforeach; ?>
 </div>

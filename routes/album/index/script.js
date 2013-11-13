@@ -28,8 +28,6 @@ window.addEvent('domready', function() {
 var SimpleGallery = new Class({
 	initialize: function() {
 	
-		this.margin = 2;
-
 		this.albumsContainer = $('albums');
 		this.albums = $$('.album');
 		this.albumsCover = $$('.album-cover');
@@ -87,7 +85,7 @@ var SimpleGallery = new Class({
 		this.slideshow = new SimpleGallery.Slideshow(this.medias);
 
 		this.albumWall = new SimpleGallery.Wall(this.albumsContainer, this.albums, {width: 'static', onResize: this.albums.setStyle.bind(this.albums, 'visibility', 'visible')});
-		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
+		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {margin: 0, onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
 		
 		/*** POUR TEST ***/
 //		this.slideshow.open(1);
