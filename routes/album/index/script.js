@@ -107,7 +107,6 @@ var SimpleGallery = new Class({
 					var mediaDom = e.target;
 					if (!mediaDom.hasClass('media'))
 						mediaDom = mediaDom.getParent('.media');
-				
 					this.slideshow.open(mediaDom.media.index);
 				
 				}.bind(this),
@@ -257,7 +256,7 @@ SimpleGallery.Slideshow = new Class({
 		this.video = new SimpleGallery.Slideshow.Video(this);
 		this.book = new SimpleGallery.Slideshow.Book(this);
 		
-		this.mediaIndex = 0;
+		this.mediaIndex = -1;
 		this.isOpen = false;
 		this.navigationEnable = true;
 		
@@ -293,7 +292,7 @@ SimpleGallery.Slideshow = new Class({
 		
 		this.resize();
 		
-		this.mediaLoad();
+		this.navigation(0);
 
 	},
 	close: function(e)
@@ -308,14 +307,8 @@ SimpleGallery.Slideshow = new Class({
 	},
 	mediaLoad: function()
 	{
-		if (this.mediaIndex < 0) {
-			this.mediaIndex = 0;
-			return;
-		}
-		else if (this.mediaIndex > this.medias.length - 1) {
-			this.mediaIndex = this.medias.length - 1;
-			return;
-		}
+		if (this.medias[this.mediaIndex].deleted && !$('medias').hasClass('show-deleted'))		
+			return false;
 		
 		var type = this.medias[this.mediaIndex].type;
 		if (this.media)
@@ -343,7 +336,8 @@ SimpleGallery.Slideshow = new Class({
 			this.addExif('none', '');
 		
 		this.media.load(this.medias[this.mediaIndex]);
-			
+		
+		return true;
 	},
 	addExif: function(title, data)
 	{
@@ -368,8 +362,12 @@ SimpleGallery.Slideshow = new Class({
 	},
 	navigation: function(direction)
 	{
-		this.mediaIndex+= direction;
-		this.mediaLoad();
+		if (this.mediaIndex + direction >= 0 && this.mediaIndex + direction < this.medias.length) {
+			this.mediaIndex+= direction;
+			if (!this.mediaLoad())
+				this.navigation(direction == -1 ? -1 : 1);
+			
+		}
 	}
 });
 
