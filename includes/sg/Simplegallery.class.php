@@ -743,6 +743,9 @@ class SimpleGallery
 			break;
 		}
 
+		if ($result->rotation > 270)
+			$result->rotation = ($result->rotation / 90)%4 * 90;
+
 		return $result;
 	}
 	

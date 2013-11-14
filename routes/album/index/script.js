@@ -50,6 +50,7 @@ var SimpleGallery = new Class({
 		for (var i = 0, mediaEl; mediaEl = medias[i]; i++) {
 		
 			var media = {
+				sg: this,
 				dom: mediaEl,
 				index: mediaEl.get('mediaIndex').toInt(),
 				id: mediaEl.get('mediaId').toInt(),
@@ -155,7 +156,7 @@ var SimpleGallery = new Class({
 		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
 		
 		/*** POUR TEST ***/
-//		this.slideshow.open(1);
+//		this.slideshow.open(10);
 
 	},
 	mediaReloadWallData: function(media)
@@ -214,11 +215,13 @@ var SimpleGallery = new Class({
 			media.dom.set('mediaDeleted', false);
 			media.dom.removeClass('deleted');
 			request.send({data: {restore: true}});
+			media.dom.tools.getElement('.delete').set('title', 'Delete');
 		} else {
 			media.deleted = true;
 			media.dom.set('mediaDeleted', true);
 			media.dom.addClass('deleted');
 			request.send({data: {delete: true}});
+			media.dom.tools.getElement('.delete').set('title', 'Resore');
 		}
 		
 		this.mediaReloadWallData(media);
@@ -240,6 +243,20 @@ SimpleGallery.Slideshow = new Class({
 		this.dom.media.onselectstart = function(e) {e.preventDefault()};
 		this.dom.panel = $('slideshow-panel');
 		this.dom.panel.name = $('slideshow-panel-name');
+		this.dom.panel.tools = {
+			rotateLeft: $('slideshow-panel-rotateLeft').addEvent('click', function() {
+				this.media.sg.mediaRotate(this.media, 'left');
+				this.navigation(0);
+			}.bind(this)),
+			rotateRight: $('slideshow-panel-rotateRight').addEvent('click', function() {
+				this.media.sg.mediaRotate(this.media, 'right');
+				this.navigation(0);
+			}.bind(this)),
+			delete: $('slideshow-panel-delete').addEvent('click', function() {
+				this.media.sg.mediaDelete(this.media);
+				this.navigation(0);
+			}.bind(this)),
+		};
 		this.dom.panel.exif = $('slideshow-panel-exif');
 		this.dom.panel.exifTitle = $('slideshow-panel-exif-title');
 		this.dom.close = $('slideshow-close').addEvent('click', this.close.bind(this));
@@ -303,22 +320,31 @@ SimpleGallery.Slideshow = new Class({
 		
 		this.dom.setStyle('display', 'none');
 		
-		this.media.unload();
+		this.slideshowMedia.unload();
 	},
-	mediaLoad: function(index)
+	mediaLoad: function()
 	{
-		if (this.medias[index].deleted && !$('medias').hasClass('show-deleted'))		
+		if (this.medias[this.mediaIndex].deleted && !$('medias').hasClass('show-deleted'))		
 			return false;
 		
-		var type = this.medias[index].type;
-		if (this.media)
-			this.media.unload();
+		this.media = this.medias[this.mediaIndex];
+		if (this.slideshowMedia)
+			this.slideshowMedia.unload();
 		
-		this.media = this[type];
+		if (this.media.type == 'image') {
+			this.dom.panel.tools.rotateLeft.setStyle('display', 'block');
+			this.dom.panel.tools.rotateRight.setStyle('display', 'block');
+		} else {
+			this.dom.panel.tools.rotateLeft.setStyle('display', 'none');
+			this.dom.panel.tools.rotateRight.setStyle('display', 'none');
+		}
+		this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
 		
-		this.dom.panel.name.set('html', this.medias[index].name);
+		this.slideshowMedia = this[this.media.type];
+		
+		this.dom.panel.name.set('html', this.medias[this.mediaIndex].name);
 		this.dom.panel.exif.empty();
-		var exif = this.medias[index].exif;
+		var exif = this.medias[this.mediaIndex].exif;
 		if (exif) {
 			if (exif.FileSize)
 				this.addExif('Size : ', exif.FileSize.toInt().toFileWeight());
@@ -335,7 +361,7 @@ SimpleGallery.Slideshow = new Class({
 		if (!this.dom.panel.exif.getElements('ul').length)
 			this.addExif('none', '');
 		
-		this.media.load(this.medias[index]);
+		this.slideshowMedia.load(this.medias[this.mediaIndex]);
 		
 		return true;
 	},
@@ -364,7 +390,7 @@ SimpleGallery.Slideshow = new Class({
 	{
 		if (this.mediaIndex + direction >= 0 && this.mediaIndex + direction < this.medias.length) {
 			this.mediaIndex+= direction;
-			if (!this.mediaLoad(this.mediaIndex)) {
+			if (!this.mediaLoad()) {
 				if (!this.navigation(direction == -1 ? -1 : 1)) {
 					this.mediaIndex-= direction;
 					return false;
@@ -386,7 +412,7 @@ SimpleGallery.Slideshow.Media = new Class({
 		
 		this.isLoad = false;
 		
-		window.addEvent('resize', this.resize.bind(this));
+		window.addEvent('resize', this.resize.bind(this, true));
 	},
 	resize: function(cssRotate)
 	{
@@ -424,7 +450,6 @@ SimpleGallery.Slideshow.Media = new Class({
 				y: refSize.y
 			};
 		}
-
 		isRotate = (cssRotate && isRotate);
 		this.dom.setStyles({
 			width: newSize[isRotate ? 'y' : 'x'],
@@ -460,13 +485,8 @@ SimpleGallery.Slideshow.Image = new Class({
 	
 		this.media = media;
 	
-		var prefix = ['', '-webkit-', '-moz-', '-o-', '-ms-'];
-		var styles = {};
-		for (var i = 0; i < prefix.length; i++)
-			styles[prefix[i] + 'transform'] = media.dom.getStyle(prefix[i] + 'transform');
-quit(styles);
-		styles.display = 'block';
-		this.dom.setStyles(styles);
+		this.dom.setStyle3('transform', 'rotate(' + this.media.rotate + 'deg)');
+		this.dom.setStyle('display', 'block');
 		
 		this.isLoad = true;
 		

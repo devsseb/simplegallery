@@ -53,14 +53,14 @@
 </div>
 <div id="medias">
 <? foreach ($response->data['album']->getMediaCollection() as $index => $media) :
-		if (!$sg->user->isAdmin() and $media->getDeleted())
+		if (!$sg->user->isAdmin() and $media->isDeleted())
 			continue;
 		$rotate = $sg->getMediaTransform($media)->rotation;
 		$width = ($rotate == 0 or $rotate == 180) ? $media->getWidth() : $media->getHeight();
 		$height = ($rotate == 0 or $rotate == 180) ? $media->getHeight() : $media->getWidth();
 ?>
 	<a
-		class="media<?=$media->getDeleted() ? ' deleted' : ''?>"
+		class="media<?=$media->isDeleted() ? ' deleted' : ''?>"
 		href="?media=slideshow&amp;id=<?=toHtml($media->getId())?>"
 		style="width:<?=ceil($width * 200 / $height)?>px;height:200px;"
 		mediaId="<?=toHtml($media->getId())?>"
@@ -73,7 +73,7 @@
 		mediaFlipVertical="<?=toHtml($media->getFlipVertical())?>"
 		mediaName="<?=toHtml(basename($media->getPath()))?>"
 		mediaExif="<?=toHtml($media->getExifData())?>"
-		mediaDeleted="<?=toHtml($media->getDeleted())?>"
+		mediaDeleted="<?=toHtml($media->isDeleted())?>"
 	>
 		<img src="?media=brick&amp;id=<?=toHtml($media->getId())?>" style="width:<?=ceil($media->getWidth() * 200 / $media->getHeight())?>px;height:200px;<?=$sg->getMediaCssTransform($media)?>" />
 		<div class="deleted-border"></div>
@@ -85,7 +85,7 @@
 		<? if ($media->getType() == 'image') : ?>
 			<li class="rotate-left" title="Rotate left"></li>
 			<li class="rotate-right" title="Rotate right"></li>
-			<li class="delete" title="Delete"></li>
+			<li class="delete" title="<?=$media->isDeleted() ? 'Restore' : 'Delete'?>"></li>
 		<? endif; ?>
 	<? endif; ?>
 		</ul>
@@ -102,6 +102,13 @@
 	<div id="slideshow-panel">
 		<div id="slideshow-close"></div>
 		<p id="slideshow-panel-name"></p>
+		<ul id="slideshow-panel-tools">
+<? if ($sg->user->isAdmin()) : ?>
+			<li id="slideshow-panel-rotateLeft" class="rotate-left" title="Rotate left"></li>
+			<li id="slideshow-panel-rotateRight" class="rotate-right" title="Rotate right"></li>
+			<li id="slideshow-panel-delete" class="delete" title="Delete"></li>
+<? endif; ?>
+		</ul>
 		<div id="slideshow-panel-exif-title">Exif data
 			<div id="slideshow-panel-exif-toogle"></div>
 			<ul id="slideshow-panel-exif"></ul>
