@@ -43,6 +43,8 @@ var SimpleGallery = new Class({
 		
 		this.mediasContainer = $('medias');
 		
+		this.menuDeleted = $('menu-deleted');
+		
 		var medias = $$('.media');
 		this.medias = [];
 		for (var i = 0, mediaEl; mediaEl = medias[i]; i++) {
@@ -60,7 +62,8 @@ var SimpleGallery = new Class({
 					vertical: mediaEl.get('mediaFlipVertical')
 				},
 				name: mediaEl.get('mediaName'),
-				exif: JSON.decode(mediaEl.get('mediaExif'))
+				exif: JSON.decode(mediaEl.get('mediaExif')),
+				deleted: mediaEl.get('mediaDeleted') == 1
 			};
 			
 			media.dom.img = media.dom.getElement('img');
@@ -133,11 +136,19 @@ var SimpleGallery = new Class({
 			if (media.dom.tools.getElement('.delete'))
 				media.dom.tools.getElement('.delete').addEvent('click', function(e) {
 					e.stopPropagation().preventDefault();
-					console.log('delete');
+					this.mediaDelete(e.target.getParent('a').media);
 				}.bind(this));
 			
 			this.medias.push(media);
 		}
+		
+		this.menuDeleted.addEvent('click', function() {
+			this.mediasContainer.toggleClass('show-deleted');
+			$$('.media.deleted').each(function(domMedia) {
+				this.mediaReloadWallData(domMedia.media);
+			}.bind(this));
+			this.mediaWall.resize();
+		}.bind(this));
 		
 		this.slideshow = new SimpleGallery.Slideshow(this.medias);
 
@@ -147,6 +158,20 @@ var SimpleGallery = new Class({
 		/*** POUR TEST ***/
 //		this.slideshow.open(1);
 
+	},
+	mediaReloadWallData: function(media)
+	{
+		var wallData = media.dom.retrieve('wallData');
+		
+		if (media.dom.getStyle('display') == 'none') {
+			wallData.width = 0;
+		} else {
+			var width = (media.rotate == 0 || media.rotate == 180) ? media.width : media.height;
+			var height = (media.rotate == 0 || media.rotate == 180) ? media.height : media.width;
+			wallData.width = (width * 200 / height).ceil();
+		}
+		wallData.height = 200;
+	
 	},
 	mediaRotate: function(media, direction)
 	{
@@ -169,11 +194,35 @@ var SimpleGallery = new Class({
 		media.dom.set('mediaRotate');
 		media.dom.img.setStyle3('transform', 'rotate(' + media.rotate + 'deg)');
 
-		var width = (media.rotate == 0 || media.rotate == 180) ? media.width : media.height;
-		var height = (media.rotate == 0 || media.rotate == 180) ? media.height : media.width;
-		var wallData = media.dom.retrieve('wallData');
-		wallData.width = (width * 200 / height).ceil();
-		wallData.height = 200;
+		this.mediaReloadWallData(media);
+
+		this.mediaWall.resize();
+		
+	},
+	mediaDelete: function(media)
+	{
+	
+		var request = new Request.JSON({
+			url: '?media=update&id=' + media.id,
+			method: 'get',
+			onError: function(error) {
+				console.error(error);
+			}
+		});
+	
+		if (media.deleted) {
+			media.deleted = false;
+			media.dom.set('mediaDeleted', false);
+			media.dom.removeClass('deleted');
+			request.send({data: {restore: true}});
+		} else {
+			media.deleted = true;
+			media.dom.set('mediaDeleted', true);
+			media.dom.addClass('deleted');
+			request.send({data: {delete: true}});
+		}
+		
+		this.mediaReloadWallData(media);
 		this.mediaWall.resize();
 		
 	}
@@ -612,6 +661,9 @@ SimpleGallery.Wall = new Class({
 		row.width = 0;
 
 		for (var i = 0,brick; brick = this.bricks[i]; i++) {
+			
+			if (brick.width <= 0)
+				continue;
 			
 			row.push(brick);
 			row.width+= brick.width;

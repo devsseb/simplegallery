@@ -1,7 +1,7 @@
 <?
 namespace Database;
 
-include_once '/home/http/derre.fr/ftp/galerie/includes/database/Table.class.php';
+include_once '/home/http/essite.net/ftp/simplegallery/includes/database/Table.class.php';
 class MediaTable extends \Database\Object\Table
 {
 	protected static $id = 'id';
@@ -23,7 +23,8 @@ class MediaTable extends \Database\Object\Table
 		'date',
 		'thumbBrickMd5',
 		'thumbSlideshowMd5',
-		'exifData'
+		'exifData',
+		'deleted'
 	);
 	protected static $attributesFactorized = array(
 		'album'

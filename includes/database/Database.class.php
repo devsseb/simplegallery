@@ -352,6 +352,7 @@ class Database
 		$what = array();
 		$with = array();
 		$order = array();
+		$limit = array();
 		
 		if (!$one = (!$what and !$table::getId())) {
 
@@ -364,7 +365,6 @@ class Database
 			$isWith = false;
 			$isOrder = false;
 			$isAsc = true;
-			$limit = array();
 			foreach ($explode as $part) {
 				$part = strtolower($part);
 				if ($part == 'all')

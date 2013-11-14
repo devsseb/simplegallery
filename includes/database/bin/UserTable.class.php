@@ -1,7 +1,7 @@
 <?
 namespace Database;
 
-include_once '/home/http/derre.fr/ftp/galerie/includes/database/Table.class.php';
+include_once '/home/http/essite.net/ftp/simplegallery/includes/database/Table.class.php';
 class UserTable extends \Database\Object\Table
 {
 	protected static $id = 'id';

@@ -15,6 +15,10 @@
 
 #medias{position:relative;}
 .media{display:block;overflow:hidden;background-color:#cecece;visibility:hidden;position:relative;}
+.media.deleted{display:none;}
+#medias.show-deleted .media.deleted{display:block;}
+.deleted-border{display:none;position:absolute;left:0px;top:0px;right:0px;bottom:0px;border:2px solid #e94319;}
+.media.deleted .deleted-border{display:block;}
 .media>img{position:absolute;margin:0px;border:0px;vertical-align:bottom;width:100%;height:100%;}
 .media-video-play{position:absolute;width:125px;height:125px;background-image:url('video-play.png');}
 .media-video-play-cover{position:absolute;width:50px;height:50px;background-image:url('video-play-cover.png');}

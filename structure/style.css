@@ -40,6 +40,7 @@ form a.form-link-right{float:right;}
 .menu-load{background-image:url('menu-load.png');}
 .menu-console{background-image:url('menu-console.png');}
 .menu-users{background-image:url('menu-users.png');}
+.menu-deleted{background-image:url('menu-deleted.png');}
 .menu-logout{background-image:url('menu-logout.png');}
 
 #content{position:absolute;left:0px;top:0px;right:0px;bottom:0px;overflow-x:hidden;overflow-y:scroll;}

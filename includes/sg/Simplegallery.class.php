@@ -19,6 +19,7 @@ class SimpleGallery
 	private $albumCoverMediaMax = 5;
 	private $sessionLifetime = 'P60D';
 	private $passwordCodeLifetime = 'PT2H';
+	private $databaseVersion = 1;
 
 	public function __construct($config)
 	{
@@ -29,12 +30,39 @@ class SimpleGallery
 
 			include 'includes/database/Database.class.php';
 			$this->db = new Database($config->database);
-			if (!$this->db->getTables())
-				$this->db->compile();
+			$this->checkDatabase();
 
 			include 'includes/Ffmpeg.class.php';
 			
 		}
+		
+		
+	}
+	
+	public function checkDatabase()
+	{
+		$tables = $this->db->getTables();
+		if (!$tables)
+			return $this->db->compile();
+
+		$databaseVersion = 0;
+		if (in_array('parameter', $tables)) {
+			$parameter = \Database\ParameterTable::findAll();
+			$databaseVersion = $parameter->getDatabaseVersion();
+		}
+		if ($databaseVersion == $this->databaseVersion)
+			return;
+		
+		$this->db->compile();
+		
+		while (++$databaseVersion <= $this->databaseVersion) {
+			if ($databaseVersion == 1)
+				$parameter = new \Database\Parameter();
+
+		}
+		$parameter->setDatabaseVersion($this->databaseVersion);
+		$parameter->save();
+		
 	}
 	
 	public function getAlbumsPath()
@@ -81,7 +109,8 @@ class SimpleGallery
 				'back', object('enable', false, 'url', '#'),
 				'albumconfig', object('enable', false, 'url', '#'),
 				'load', object('enable', false, 'url', '#'),
-				'users', object('enable', false, 'url', '?user=management')
+				'users', object('enable', false, 'url', '?user=management'),
+				'deleted', object('enable', false, 'url', '#')
 			)
 		);
 
@@ -111,6 +140,7 @@ class SimpleGallery
 							$response->menu->load->enable = true;
 							$response->menu->load->url = '?album=loader';
 							$response->menu->users->enable = true;
+							$response->menu->deleted->enable = true;
 						}
 						if ($album) {
 							$response->menu->back->enable = true;
@@ -257,8 +287,8 @@ class SimpleGallery
 						
 						$response->data['album'] = $album;
 						
+						$response->menu->back->enable = true;
 						$response->menu->back->url = '?album&id=' . $album->getId();
-						$response->menu->console->enable = false;
 					
 					break;
 				
@@ -349,20 +379,31 @@ class SimpleGallery
 							exit('Access is forbidden.');
 							
 						$media = new \Database\Media($_GET['id']);
-						$rotation = $media->getRotation();
-						if ($_GET['direction'] == 'left')
-							$rotation-= 90;
-						else
-							$rotation+= 90;
-						if ($rotation < 0)
-							$rotation = 270;
-						elseif ($rotation > 270)
-							$rotation = 0;
+						
+						if (exists($_GET, 'direction')) {
+							$rotation = $media->getRotation();
+							if ($_GET['direction'] == 'left')
+								$rotation-= 90;
+							else
+								$rotation+= 90;
+							if ($rotation < 0)
+								$rotation = 270;
+							elseif ($rotation > 270)
+								$rotation = 0;
 							
-						$media->setRotation($rotation);
+							$media->setRotation($rotation);
+						}
+
+						if (exists($_GET, 'delete')) {
+							$media->setDeleted(1);
+						}
+						
+						if (exists($_GET, 'restore')) {
+							$media->setDeleted(0);
+						}
 						$media->save();
 					
-						exit(json_encode(array('media-rotation' => $rotation)));
+						exit(json_encode(array('media-update' => true)));
 					
 					break;
 				}

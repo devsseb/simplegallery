@@ -29,6 +29,8 @@ class MediaTable extends \Database\Compilation\TableSrc
 		
 		$this->addAttribute('exifData', \Database::T_BIG_CHAR);
 
+		$this->addAttribute('deleted', \Database::T_BOOL);
+
 	}
 
 }

@@ -53,12 +53,14 @@
 </div>
 <div id="medias">
 <? foreach ($response->data['album']->getMediaCollection() as $index => $media) :
+		if (!$sg->user->isAdmin() and $media->getDeleted())
+			continue;
 		$rotate = $sg->getMediaTransform($media)->rotation;
 		$width = ($rotate == 0 or $rotate == 180) ? $media->getWidth() : $media->getHeight();
 		$height = ($rotate == 0 or $rotate == 180) ? $media->getHeight() : $media->getWidth();
 ?>
 	<a
-		class="media"
+		class="media<?=$media->getDeleted() ? ' deleted' : ''?>"
 		href="?media=slideshow&amp;id=<?=toHtml($media->getId())?>"
 		style="width:<?=ceil($width * 200 / $height)?>px;height:200px;"
 		mediaId="<?=toHtml($media->getId())?>"
@@ -71,8 +73,10 @@
 		mediaFlipVertical="<?=toHtml($media->getFlipVertical())?>"
 		mediaName="<?=toHtml(basename($media->getPath()))?>"
 		mediaExif="<?=toHtml($media->getExifData())?>"
+		mediaDeleted="<?=toHtml($media->getDeleted())?>"
 	>
 		<img src="?media=brick&amp;id=<?=toHtml($media->getId())?>" style="width:<?=ceil($media->getWidth() * 200 / $media->getHeight())?>px;height:200px;<?=$sg->getMediaCssTransform($media)?>" />
+		<div class="deleted-border"></div>
 	<? if ($media->getType() == 'video') : ?>
 		<div class="media-video-play"></div>
 	<? endif; ?>
@@ -81,7 +85,7 @@
 		<? if ($media->getType() == 'image') : ?>
 			<li class="rotate-left" title="Rotate left"></li>
 			<li class="rotate-right" title="Rotate right"></li>
-<?/*			<li class="delete" title="Delete"></li>*/?>
+			<li class="delete" title="Delete"></li>
 		<? endif; ?>
 	<? endif; ?>
 		</ul>

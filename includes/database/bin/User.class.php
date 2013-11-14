@@ -1,7 +1,7 @@
 <?
 namespace Database;
 
-include_once '/home/http/derre.fr/ftp/galerie/includes/database/Entity.class.php';
+include_once '/home/http/essite.net/ftp/simplegallery/includes/database/Entity.class.php';
 class User extends \Database\Object\Entity
 {
 	protected $_attributes = array(

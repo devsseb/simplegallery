@@ -27,6 +27,9 @@
 		<? if ($response->menu->users->enable) : ?>
 			<a title="User management" class="menu-button menu-users" href="<?=toHtml($response->menu->users->url)?>"></a>
 		<? endif; ?>
+		<? if ($response->menu->deleted->enable) : ?>
+			<a title="Show deleted medias" class="menu-button menu-deleted" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted"></a>
+		<? endif; ?>
 			<a title="Logout" class="menu-button menu-logout" href="?user=logout"></a>
 		</div>
 	<? endif; ?>
@@ -45,6 +48,8 @@
 			<? endif; ?>
 			<?include 'routes/' . $response->route . '/' . $response->action . '/page.php'?>
 		</div>
-<?/*	<div style="position:fixed;right:0px;bottom:0px;"><?=chronoGet('phptime')?></div>*/?>
+<? if ($config->debug) : ?>
+		<div style="position:fixed;right:0px;bottom:0px;"><?=chronoGet('phptime')?></div>
+<? endif; ?>
 	</body>
 </html>
