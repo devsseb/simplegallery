@@ -464,7 +464,7 @@ SimpleGallery.Slideshow.Image = new Class({
 		var styles = {};
 		for (var i = 0; i < prefix.length; i++)
 			styles[prefix[i] + 'transform'] = media.dom.getStyle(prefix[i] + 'transform');
-		
+quit(styles);
 		styles.display = 'block';
 		this.dom.setStyles(styles);
 		
@@ -669,11 +669,10 @@ SimpleGallery.Wall = new Class({
 
 		for (var i = 0,brick; brick = this.bricks[i]; i++) {
 			
-			if (brick.width <= 0)
-				continue;
-			
-			row.push(brick);
-			row.width+= brick.width;
+			if (brick.width > 0) {
+				row.push(brick);
+				row.width+= brick.width;
+			}
 
 			if (row.width > wallWidth || i == this.bricks.length - 1) {
 				wall.push(row);
@@ -725,7 +724,7 @@ SimpleGallery.Wall = new Class({
 		
 		}
 		this.wall.setStyle('height', position.top);
-		
+
 		this.fireEvent('resize');
 	}
 
