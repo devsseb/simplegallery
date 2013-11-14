@@ -434,6 +434,7 @@ SimpleGallery.Slideshow.Media = new Class({
 	{
 		this.dom.setStyle('display', 'none');
 		this.isLoad = false;
+		this.media = null;
 	},
 	unload: function()
 	{
@@ -595,6 +596,9 @@ SimpleGallery.Slideshow.Book = new Class({
 	},
 	navigation: function(direction)
 	{
+		if (!this.isLoad)
+			return;
+		
 		this.page+= direction;
 		if (this.page < 1 || this.page > this.media.exif.totalPage) {
 			this.slideshow.navigation(direction);
