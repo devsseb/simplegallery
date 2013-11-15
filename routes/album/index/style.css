@@ -38,6 +38,8 @@ li.delete{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB
 #slideshow-panel-name{margin:10px 10px 0px 10px;padding-bottom:10px;font-size:20px;border-bottom:1px solid #ccc;}
 #slideshow-panel-tools{margin:5px 0px;padding:1px 6px;overflow:hidden;background-color:#cac0af;}
 #slideshow-panel-tools li{float:left;width:20px;height:20px;cursor:pointer;}
+#slideshow-panel-date{margin:5px 0px;}
+#slideshow-panel-date input{border:none;font-size:12px;margin:0px;width:100%;text-align:center;}
 #slideshow-panel-exif-title{padding:5px 10px;font-size:15px;position:relative;cursor:pointer;background-color:#ddd;}
 #slideshow-panel-exif-toogle{position:absolute;right:3px;top:3px;width:20px;height:20px;background:transparent url('slideshow.png') 0px -20px;}
 .slideshow-panel-exif-open #slideshow-panel-exif-toogle{background:transparent url('slideshow.png') 0px -40px;}

@@ -28,6 +28,8 @@ Number.implement({
 	}
 });
 
+Date.defineParser('%Y:%m:%d %H:%M:%S');
+
 window.addEvent('domready', function() {
 
 	new SimpleGallery();
@@ -63,6 +65,7 @@ var SimpleGallery = new Class({
 					vertical: mediaEl.get('mediaFlipVertical')
 				},
 				name: mediaEl.get('mediaName'),
+				date: mediaEl.get('mediaDate'),
 				exif: JSON.decode(mediaEl.get('mediaExif')),
 				deleted: mediaEl.get('mediaDeleted') == 1
 			};
@@ -156,7 +159,7 @@ var SimpleGallery = new Class({
 		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
 		
 		/*** POUR TEST ***/
-//		this.slideshow.open(10);
+//		this.slideshow.open(4);
 
 	},
 	mediaReloadWallData: function(media)
@@ -227,6 +230,18 @@ var SimpleGallery = new Class({
 		this.mediaReloadWallData(media);
 		this.mediaWall.resize();
 		
+	},
+	mediaSetDate: function(media, date)
+	{
+	
+		new Request.JSON({
+			url: '?media=update&id=' + media.id + '&date=' + date,
+			method: 'get',
+			onError: function(error) {
+				console.error(error);
+			}
+		}).send();
+		
 	}
 });
 
@@ -257,6 +272,15 @@ SimpleGallery.Slideshow = new Class({
 				this.navigation(0);
 			}.bind(this)),
 		};
+		this.dom.panel.date = $('slideshow-panel-date');
+		this.dom.panel.date.update = this.dom.panel.date.getElement('input');
+		if (this.dom.panel.date.update)
+			this.dom.panel.date.update.addEvent('blur', function() {
+				var date = this.dom.panel.date.update.get('value');
+				if (this.dom.panel.date.update.oldValue != date)
+					this.media.sg.mediaSetDate(this.media, date);
+				this.dom.panel.date.update.oldValue = date;
+			}.bind(this));
 		this.dom.panel.exif = $('slideshow-panel-exif');
 		this.dom.panel.exifTitle = $('slideshow-panel-exif-title');
 		this.dom.close = $('slideshow-close').addEvent('click', this.close.bind(this));
@@ -338,11 +362,37 @@ SimpleGallery.Slideshow = new Class({
 			this.dom.panel.tools.rotateLeft.setStyle('display', 'none');
 			this.dom.panel.tools.rotateRight.setStyle('display', 'none');
 		}
-		this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
+		
 		
 		this.slideshowMedia = this[this.media.type];
 		
 		this.dom.panel.name.set('html', this.medias[this.mediaIndex].name);
+		this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
+		
+		var date = this.media.date;
+		if (date == '0000-00-00 00:00:00')
+			date = this.media.exif.DateTime;
+		if (date == '0000:00:00 00:00:00')
+			date = '';
+
+		if (this.dom.panel.date.update)
+			this.dom.panel.date.update.oldValue = new Date().parse(date).format('%Y-%m-%dT%H:%M');
+
+		if (date) {
+			date = new Date().parse(date);
+
+			if (this.dom.panel.date.update)
+				this.dom.panel.date.update.value = date.format('%Y-%m-%dT%H:%M');
+			else
+				this.dom.panel.date.set('text', date.format('%d/%m/%Y %H:%M'));
+				
+		} else {
+			if (this.dom.panel.date.update)
+				this.dom.panel.date.update.value = '';
+			else
+				this.dom.panel.date.set('text', '');
+		}
+		
 		this.dom.panel.exif.empty();
 		var exif = this.medias[this.mediaIndex].exif;
 		if (exif) {

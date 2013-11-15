@@ -401,6 +401,11 @@ class SimpleGallery
 						if (exists($_GET, 'restore')) {
 							$media->setDeleted(0);
 						}
+						
+						if (exists($_GET, 'date')) {
+							$media->setDate($_GET['date']);
+						}
+						
 						$media->save();
 					
 						exit(json_encode(array('media-update' => true)));

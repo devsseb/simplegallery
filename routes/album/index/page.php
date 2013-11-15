@@ -72,6 +72,7 @@
 		mediaFlipHorizontal="<?=toHtml($media->getFlipHorizontal())?>"
 		mediaFlipVertical="<?=toHtml($media->getFlipVertical())?>"
 		mediaName="<?=toHtml(basename($media->getPath()))?>"
+		mediaDate="<?=toHtml(basename($media->getDate()))?>"
 		mediaExif="<?=toHtml($media->getExifData())?>"
 		mediaDeleted="<?=toHtml($media->isDeleted())?>"
 	>
@@ -109,6 +110,11 @@
 			<li id="slideshow-panel-delete" class="delete" title="Delete"></li>
 <? endif; ?>
 		</ul>
+		<div id="slideshow-panel-date">
+<? if ($sg->user->isAdmin()) : ?>
+			<input type="datetime-local" />
+<? endif; ?>
+		</div>
 		<div id="slideshow-panel-exif-title">Exif data
 			<div id="slideshow-panel-exif-toogle"></div>
 			<ul id="slideshow-panel-exif"></ul>
