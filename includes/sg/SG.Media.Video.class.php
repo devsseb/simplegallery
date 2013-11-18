@@ -78,22 +78,11 @@ class Video extends \SG\Media {
 	public function getExif()
 	{
 	
-		
-		$orientation = 1;
-		$vertical = substr($this->getDbMedia()->getPath(), 0, strlen($this->getDbMedia()->getPath()) - strlen(pathinfo($this->getDbMedia()->getPath(), PATHINFO_EXTENSION)) - 1);
-		$vertical = strtolower(pathinfo($vertical, PATHINFO_EXTENSION));
-		if ($vertical == 'verticalleft')
-			$orientation = 6;
-		elseif ($vertical == 'verticalright')
-			$orientation = 8;
+		$exif = \Ffmpeg::getExif($this->getAlbumsPath() . $this->getDbMedia()->getPath());
+		$return = (object)$exif;
+		$return->data = $exif;
 
-		$date = '';		
-
-		return object(
-			'orientation', $orientation,
-			'date', $date,
-			'data', array()
-		);
+		return $return;
 	
 	}
 

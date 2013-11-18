@@ -181,7 +181,7 @@ abstract class Connector
 		// Select
 		$array = $query->getSelect();
 		foreach ($array as &$select)
-			if ($select != '*' and strpos($select, '(') === false and strpos($select, '.') === false)
+			if ($select != '*' and strpos($select, '(') === false and strpos($select, '.') === false and strpos(strtolower($select), ' as ') === false)
 				$select = $this->protect($select, \Database::FIELD);
 		unset($select);
 		if (!$array)

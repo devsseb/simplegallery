@@ -173,6 +173,9 @@ class Synchronizer {
 					$update['oldMd5'] = $dbMedia->getMd5();
 					$dbMedia->setMd5($searchDbMedia->getMd5());
 				}
+				if ($dbMedia->getExifData() == '') {
+					$update['oldExifDate'] = '';
+				}
 			
 				if ($update)
 					$state = 'update';

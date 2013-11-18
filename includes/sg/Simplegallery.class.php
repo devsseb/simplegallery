@@ -125,7 +125,7 @@ class SimpleGallery
 				
 					case 'index' :
 					default :
-					
+
 						$response->action = 'index';
 						
 						$album = $this->getAlbum(get($_GET, k('id')));
@@ -151,6 +151,12 @@ class SimpleGallery
 						} else
 							$albumCovers = array();
 
+						$q = new \Database\Object\Query('media');
+						$q->select('IF(date="0000-00-00",exifDate,date) AS datesort', 'media.*');
+						$q->where('album_id = ?', $album->getId());
+						$q->orderBy('datesort');
+						$medias = $q->execute();
+
 						if ($this->user->isAdmin()) {
 							if ($album) {
 								$response->menu->albumconfig->enable = true;
@@ -168,6 +174,7 @@ class SimpleGallery
 
 						$response->data['album'] = $album;
 						$response->data['albumCovers'] = $albumCovers;
+						$response->data['medias'] = $medias;
 
 					break;
 				

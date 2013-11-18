@@ -182,6 +182,53 @@ class Ffmpeg
 	
 	}
 
+	public static function getExif($file)
+	{
+		
+		$ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
+		
+		$orientation = 1;
+		$vertical = substr($file, 0, strlen($file) - strlen($ext) - 1);
+		$vertical = strtolower(pathinfo($vertical, PATHINFO_EXTENSION));
+		if ($vertical == 'verticalleft')
+			$orientation = 6;
+		elseif ($vertical == 'verticalright')
+			$orientation = 8;
+
+		$exif = array(
+			'orientation' => $orientation,
+			'date' => '0000-00-00 00:00:00'
+		);
+		
+		if ($ext == 'mts') {
+		
+			$link = tempnam(sys_get_temp_dir(), 'ffmpegexif_');
+			unlink($link);
+			symlink($file, $link.= '.' . $ext);
+
+			$log = Shell::exec('./includes/avchd2srt-core ' . Shell::escapefile($link));
+			
+			preg_match('/Output file name: \'(.*?)\'/', $log, $match);
+			unlink($link);
+
+			if (!$match)
+				throw new Exception($log);
+			
+			$exifContent = file_get_contents($match[1]);
+			unlink($match[1]);
+			
+			preg_match('/00:00:00,000.*\n[a-zA-Z]+ ([0-9].*) \(/', $exifContent, $match);
+			if ($match) {
+				$dt = DateTime::createFromFormat('d-M-Y H:i:s', $match[1]);
+				$exif['date'] = $dt->format('Y-m-d H:i:s');
+			}
+		
+		}
+		
+		return $exif;
+		
+	}
+
 }
 
 ?>

@@ -66,6 +66,7 @@ var SimpleGallery = new Class({
 				},
 				name: mediaEl.get('mediaName'),
 				date: mediaEl.get('mediaDate'),
+				exifDate: mediaEl.get('mediaExifDate'),
 				exif: JSON.decode(mediaEl.get('mediaExif')),
 				deleted: mediaEl.get('mediaDeleted') == 1
 			};
@@ -370,11 +371,10 @@ SimpleGallery.Slideshow = new Class({
 		this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
 		
 		var date = this.media.date;
-		if (date == '0000-00-00 00:00:00')
-			date = this.media.exif.DateTime;
-		if (date == '0000:00:00 00:00:00')
+		if (!date || date == '0000-00-00 00:00:00')
+			date = this.media.exifDate;
+		if (!date || date == '0000-00-00 00:00:00' || date == '0000:00:00 00:00:00')
 			date = '';
-
 		if (this.dom.panel.date.update)
 			this.dom.panel.date.update.oldValue = new Date().parse(date).format('%Y-%m-%dT%H:%M');
 

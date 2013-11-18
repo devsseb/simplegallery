@@ -51,7 +51,8 @@
 <? endforeach; ?>
 </div>
 <div id="medias">
-<? foreach ($response->data['album']->getMediaCollection() as $index => $media) :
+<? foreach ($response->data['medias'] as $index => $media) :
+		$media = new \Database\Media($media);
 		if (!$sg->user->isAdmin() and $media->isDeleted())
 			continue;
 		$rotate = $sg->getMediaTransform($media)->rotation;
@@ -72,6 +73,7 @@
 		mediaFlipVertical="<?=toHtml($media->getFlipVertical())?>"
 		mediaName="<?=toHtml(basename($media->getPath()))?>"
 		mediaDate="<?=toHtml(basename($media->getDate()))?>"
+		mediaExifDate="<?=toHtml($media->getExifDate())?>"
 		mediaExif="<?=toHtml($media->getExifData())?>"
 		mediaDeleted="<?=toHtml($media->isDeleted())?>"
 	>
