@@ -5,7 +5,6 @@
 	<a class="album" href="?albums&amp;id=<?=toHtml($album->getId())?>">
 		<div class="album-name"><?=$name?></div>
 		<div class="album-cover">
-		
 	<?
 		$covers = json_decode($album->getCoverMedias());
 		$coverSize = object('width', 200, 'height', 180);
@@ -14,7 +13,7 @@
 			foreach ($covers as $size)
 				$sprite+= $size->height;
 			foreach (array_reverse((array)$covers) as $id => $size) :
-				$media = new \Database\Media($id);
+				$media = $response->data['albumCovers'][$id];
 				$rotate = $sg->getMediaTransform($media)->rotation;
 				if ($rotate == 0 || $rotate == 180) {
 					$left = $coverSize->width - $size->width;
@@ -37,7 +36,7 @@
 				width:<?=$size->width?>px;
 				height:<?=$size->height?>px;
 			">
-				<? if ($media->getType() == 'video') : ?>
+				<? if ($media->type == 'video') : ?>
 				<div class="media-video-play-cover" style="left:<?=floor($size->width / 2 - 25)?>px;top:<?=floor($size->height / 2 - 25)?>px;<?=$sg->getAntiMediaCssTransform($media)?>"></div>
 				<? endif; ?>
 			</div>

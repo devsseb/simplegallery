@@ -104,23 +104,28 @@ class Optimizer {
 				$sgMedia = $this->getSgMedia($dbMedia);
 				$coverMedia = $sgMedia->getCoverImage();
 
-				$mediaSize = imagesize($coverMedia);
+				$media = imagesize($coverMedia);
 
 				$oldSize = object('width', $coverSize->width, 'height', $coverSize->height);
-				if ($coverSize->width < $mediaSize->width)
-					$coverSize->width = $mediaSize->width;
-				$coverSize->height+= $mediaSize->height;
+				if ($coverSize->width < $media->width)
+					$coverSize->width = $media->width;
+				$coverSize->height+= $media->height;
 			
 				$newCover = imagecreatetruecolor($coverSize->width, $coverSize->height);
 				imagecopy($newCover, $cover, 0, 0, 0, 0, $oldSize->width, $oldSize->height);
-				imagecopyresampled($newCover, $coverMedia, 0, $oldSize->height, 0, 0, $mediaSize->width, $mediaSize->height, $mediaSize->width, $mediaSize->height);
+				imagecopyresampled($newCover, $coverMedia, 0, $oldSize->height, 0, 0, $media->width, $media->height, $media->width, $media->height);
 			
 				imagedestroy($cover);
 				imagedestroy($coverMedia);
 			
 				$cover = $newCover;
 			
-				$coverMedias[$dbMedia->getId()] = $mediaSize;
+				$transform = Simplegallery::getMediaTransform($dbMedia);
+				$media->rotation = $transform->rotation;
+				$media->flip = $transform->flip;
+				$media->type = $dbMedia->getType();
+			
+				$coverMedias[$dbMedia->getId()] = $media;
 
 			}
 

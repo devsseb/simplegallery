@@ -38,6 +38,11 @@ class Collection implements \arrayaccess, \iterator, \countable
 
 		$this->position = 0;
 	}
+	
+	public function getData()
+	{
+		return $this->data;
+	}
 
 	/*
 	 * Save all entities collection in database

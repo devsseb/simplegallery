@@ -132,6 +132,25 @@ class SimpleGallery
 						if ($album and $album->getParent_id() != -1)
 							$response->menu->back->enable = true;
 						
+						$coversId = array();
+						foreach ($album->getChildren() as $children) {
+							$covers = json_decode($children->getCoverMedias());
+							if (!is_object($covers))
+								continue;
+							foreach ($covers as $id => $cover)
+								$coversId[] = $id;
+						}
+
+						if ($coversId) {
+							$q = new \Database\Object\Query();
+							$q->from('media')->where('id IN (' . implode(',', $this->db->protectArray($coversId)) . ')');
+							$covers = $q->execute()->getData();
+							foreach ($covers as $cover)
+								$albumCovers[$cover->id] = $cover;
+							
+						} else
+							$albumCovers = array();
+
 						if ($this->user->isAdmin()) {
 							if ($album) {
 								$response->menu->albumconfig->enable = true;
@@ -148,6 +167,7 @@ class SimpleGallery
 						}
 
 						$response->data['album'] = $album;
+						$response->data['albumCovers'] = $albumCovers;
 
 					break;
 				
@@ -626,7 +646,7 @@ class SimpleGallery
 			$album->setChildren($children);
 			
 		}
-			
+
 		return $album;
 	
 	}
@@ -712,17 +732,21 @@ class SimpleGallery
 	
 
 
-	public function getMediaTransform(\Database\Media $media)
+	public function getMediaTransform($media)
 	{
+	
+		if (is_numeric($media))
+			$media = new \Database\Media($media);
+	
 		$result = object(
 			'flip', object(
-				'horizontal', $media->isFlipHorizontal(),
-				'vertical', $media->isFlipVertical()
+				'horizontal', (bool)$media->flipHorizontal,
+				'vertical', (bool)$media->flipVertical
 			),
-			'rotation', $media->getRotation()
+			'rotation', $media->rotation
 		);
 
-		switch ($media->getExifOrientation()) {
+		switch ($media->exifOrientation) {
 			case 2 :
 				$result->flip->horizontal = !$result->flip->horizontal;
 			break;

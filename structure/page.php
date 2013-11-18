@@ -49,7 +49,7 @@
 			<?include 'routes/' . $response->route . '/' . $response->action . '/page.php'?>
 		</div>
 <? if ($config->debug) : ?>
-		<div style="position:fixed;right:0px;bottom:0px;"><?=chronoGet('phptime')?></div>
+		<div style="position:fixed;right:0px;bottom:0px;z-index:999;"><?=chronoGet('phptime')?></div>
 <? endif; ?>
 	</body>
 </html>

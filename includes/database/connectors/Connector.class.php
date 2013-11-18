@@ -457,6 +457,14 @@ abstract class Connector
 		return $result;
 	}
 	
+	public function protectArray($array, $type = \Database::STRING)
+	{
+		foreach ($array as &$value)
+			$value = $this->protect($value, $type);
+		unset($value);
+		return $array;
+	}
+	
 	/*
 	 * Create a sql function
 	 *
