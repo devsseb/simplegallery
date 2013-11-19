@@ -13,26 +13,38 @@
 <? endif; ?>
 	</head>
 	<body>
-	<? if ($response->menu) : ?>
-		<div id="menu">
-		<? if ($response->menu->back->enable) : ?>
-			<a title="Back" class="menu-button menu-back" href="<?=toHtml($response->menu->back->url)?>"></a>
+		<header id="header">
+		<? if ($response->structure->back->enable) : ?>
+			<a title="Back" id="back" href="<?=toHtml($response->structure->back->url)?>">&lt;</a>
 		<? endif; ?>
-		<? if ($response->menu->albumconfig->enable) : ?>
-			<a title="Album config" class="menu-button menu-albumconfig" href="<?=toHtml($response->menu->albumconfig->url)?>"></a>
+			<div id="title"><?=toHtml($response->structure->title ?: 'SimpleGallery')?></div>
+		<? if ($response->menu) : ?>
+			<div id="menu">
+				<div id="menu-button"><div></div><div></div><div></div></div>
+				<ul id="menu-unroll">
+			<? if ($response->menu->albumconfig->enable) : ?>
+					<li><a title="Configure album" href="<?=toHtml($response->menu->albumconfig->url)?>">Configure album</a></li>
+			<? endif; ?>
+			<? if ($response->menu->load->enable) : ?>
+					<li><a title="Manage albums" href="<?=toHtml($response->menu->load->url)?>">Manage albums</a></li>
+			<? endif; ?>
+			<? if ($response->menu->loadAnalyze->enable) : ?>
+					<li><a title="Analyze selected albums" id="analyzer" href="<?=toHtml($response->menu->loadAnalyze->url)?>">Analyze selected albums</a></li>
+			<? endif; ?>
+			<? if ($response->menu->loadSynchronize->enable) : ?>
+					<li><a title="Synchronize albums structure" href="<?=toHtml($response->menu->loadSynchronize->url)?>">Synchronize albums structure</a></li>
+			<? endif; ?>
+			<? if ($response->menu->users->enable) : ?>
+					<li><a title="User management" href="<?=toHtml($response->menu->users->url)?>">Manage users</a></li>
+			<? endif; ?>
+			<? if ($response->menu->deleted->enable) : ?>
+					<li><a title="Show deleted medias" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted">Show deleted medias</a></li>
+			<? endif; ?>
+					<li><a title="Logout" href="?user=logout">Logout</a></li>
+				</ul>
+			</div>
 		<? endif; ?>
-		<? if ($response->menu->load->enable) : ?>
-			<a title="Load" class="menu-button menu-load" href="<?=toHtml($response->menu->load->url)?>"></a>
-		<? endif; ?>
-		<? if ($response->menu->users->enable) : ?>
-			<a title="User management" class="menu-button menu-users" href="<?=toHtml($response->menu->users->url)?>"></a>
-		<? endif; ?>
-		<? if ($response->menu->deleted->enable) : ?>
-			<a title="Show deleted medias" class="menu-button menu-deleted" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted"></a>
-		<? endif; ?>
-			<a title="Logout" class="menu-button menu-logout" href="?user=logout"></a>
-		</div>
-	<? endif; ?>
+		</header>
 		<div id="content">
 			<? if ($message = gete($_SESSION, k('messages', 'success'))) : ?>
 				<div class="message message-success"><?=toHtml($message)?></div>
@@ -49,7 +61,7 @@
 			<?include 'routes/' . $response->route . '/' . $response->action . '/page.php'?>
 		</div>
 <? if ($config->debug) : ?>
-		<div style="position:fixed;right:0px;bottom:0px;z-index:999;"><?=chronoGet('phptime')?></div>
+		<div style="position:fixed;right:16px;bottom:0px;z-index:999;background-color:rgba(255,255,255,0.5);"><?=chronoGet('phptime')?></div>
 <? endif; ?>
 	</body>
 </html>

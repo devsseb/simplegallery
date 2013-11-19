@@ -1,52 +1,54 @@
 window.addEvent('domready', function() {
+
+	var menuButton = $('menu-button');
+	var menuUnroll = $('menu-unroll');
+	if (menuButton) {
 	
-	window.addEvent('resize', structureResize);
-	structureResize();
-	
-});
+		menuButton.addEvents({
+			mouseenter: function() {
+				menuButton.isOpen = true;
+				menuButton.addClass('open');
+				menuUnroll.setStyle('display', 'block');
+			},
+			mouseleave: function() {
+				menuButton.isOpen = false;
+				(function() {
+					if (!menuButton.isOpen) {
+						menuButton.removeClass('open');
+						menuUnroll.setStyle('display', 'none');
+					}
+				}).delay(250);
 
-function structureResize()
-{
-	var windowSize = window.getSize();
-
-	var menuSize = 50;
-
-	if (windowSize.x > windowSize.y) {
-
-		if ($('menu'))
-			$('menu').setStyles({
-				display: 'block',
-				width: menuSize,
-				height: windowSize.y
-			});
-		else
-			menuSize = 0;
-		
-		$('content').setStyles({
-			left: menuSize,
-			top: 0,
-			width: windowSize.x - menuSize,
-			height: windowSize.y
+			}
 		});
+		menuUnroll.addEvents({
+			mouseenter: function() {
+				menuButton.isOpen = true;
+				menuButton.addClass('open');
+				menuUnroll.setStyle('display', 'block');
+			},
+			mouseleave: function() {
+				menuButton.isOpen = false;
+				(function() {
+					if (!menuButton.isOpen) {
+						menuButton.removeClass('open');
+						menuUnroll.setStyle('display', 'none');
+					}
+				}).delay(250);
 
-	
-	} else {
-
-		if ($('menu'))
-			$('menu').setStyles({
-				display: 'block',
-				width: windowSize.x,
-				height: menuSize
-			});
-		else
-			menuSize = 0;
-		
-		$('content').setStyles({
-			left: 0,
-			top: menuSize,
-			width: windowSize.x,
-			height: windowSize.y - menuSize
+			}
 		});
+	
 	}
 
-}
+	var headerHeight = $('header').getSize().y;
+	
+	$('content').addEvent('scroll', function(e) {
+		if (this.getScroll().y > headerHeight && !document.body.hasClass('header-reduce'))
+			document.body.addClass('header-reduce');
+		else if (this.getScroll().y <= headerHeight && document.body.hasClass('header-reduce'))
+			document.body.removeClass('header-reduce');
+	});
+
+});
+

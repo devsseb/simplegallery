@@ -44,7 +44,7 @@
 			endforeach;
 		else :
 	?>
-			No media found
+			<span class="no-media-found">No media found</span>
 	<? endif; ?>
 		</div>
 	</a>

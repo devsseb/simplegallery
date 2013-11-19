@@ -1,3 +1,4 @@
+#synchronizer{font-size:14px;}
 .album-synchronize{}
 .album-synchronize:nth-child(2n+1){background-color:#e6e6e6;}
 .album-synchronize.album-new{background-color:#b8e6ba;}

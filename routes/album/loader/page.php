@@ -1,9 +1,4 @@
-<h1>Loader</h1>
 <div id="loader">
-	<div class="loader-menu">
-		<a href="?album=analyzer" id="analyzer">Analyze selected albums</a> -
-		<a href="?album=synchronizer">Synchronize albums structure</a>
-	</div>
 	<? foreach ($response->data['albums'] as $album) :
 		$margin = substr_count($album->getPath(), '/') * 20;
 	?>

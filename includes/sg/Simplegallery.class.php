@@ -105,10 +105,15 @@ class SimpleGallery
 			'route', $route,
 			'action', $action,
 			'data', array(),
-			'menu', object(
+			'structure', object(
 				'back', object('enable', false, 'url', '#'),
+				'title', ''
+			),
+			'menu', object(
 				'albumconfig', object('enable', false, 'url', '#'),
 				'load', object('enable', false, 'url', '#'),
+					'loadAnalyze', object('enable', false, 'url', '?album=analyzer'),
+					'loadSynchronize', object('enable', false, 'url', '?album=synchronizer'),
 				'users', object('enable', false, 'url', '?user=management'),
 				'deleted', object('enable', false, 'url', '#')
 			)
@@ -129,8 +134,8 @@ class SimpleGallery
 						$response->action = 'index';
 						
 						$album = $this->getAlbum(get($_GET, k('id')));
-						if ($album and $album->getParent_id() != -1)
-							$response->menu->back->enable = true;
+						if (!$album)
+							exit('Album not found');
 						
 						$coversId = array();
 						foreach ($album->getChildren() as $children) {
@@ -152,7 +157,7 @@ class SimpleGallery
 							$albumCovers = array();
 
 						$q = new \Database\Object\Query('media');
-						$q->select('IF(date="0000-00-00",exifDate,date) AS datesort', 'media.*');
+						$q->select('IF(date="0000-00-00 00:00:00",exifDate,date) AS datesort', 'media.*');
 						$q->where('album_id = ?', $album->getId());
 						$q->orderBy('datesort');
 						$medias = $q->execute();
@@ -167,13 +172,41 @@ class SimpleGallery
 							$response->menu->users->enable = true;
 							$response->menu->deleted->enable = true;
 						}
-						if ($album) {
-							$response->menu->back->enable = true;
-							$response->menu->back->url = '?album&id=' . $album->getParent_id();
+						if ($album->getParent_id() > -1) {
+							$response->structure->back->enable = true;
+							$response->structure->back->url = '?album&id=' . $album->getParent_id();
 						}
 
+						$response->structure->title = $album->getName() ?: basename($album->getPath());
 						$response->data['album'] = $album;
 						$response->data['albumCovers'] = $albumCovers;
+						$response->data['medias'] = $medias;
+
+					break;
+				
+					case 'timeline' :
+					
+						$q = new \Database\Object\Query('media');
+						$q->select('IF(date="0000-00-00 00:00:00",exifDate,date) AS datesort', 'media.*');
+						$q->where('date != "0000-00-00 00:00:00" OR exifDate != "0000-00-00 00:00:00"');
+						$q->one()->limit(1);
+						
+						$qMin = clone $q;
+						$qMax = clone $q;
+						$qMin->orderBy('datesort', 'ASC');
+						$qMax->orderBy('datesort', 'DESC');
+						
+						$min = $qMin->execute();
+						$max = $qMax->execute();
+						
+						$q = new \Database\Object\Query('media');
+						$q->select('SUBSTRING(IF(date="0000-00-00 00:00:00",exifDate,date), 1, 7) as yearmonth', 'COUNT(*)');
+						$q->groupBy('yearmonth');
+						$group = $q->execute();
+						
+						trace($min->datesort, $max->datesort, $group);
+						quit(Debug::chronoGet('phptime'));
+						
 						$response->data['medias'] = $medias;
 
 					break;
@@ -185,10 +218,14 @@ class SimpleGallery
 
 						$response->data['albums'] = \Database\AlbumTable::findAllOrderPath();
 
-						$response->menu->back->enable = true;
-						$response->menu->back->url = '?';
+						$response->structure->back->enable = true;
+						$response->structure->back->url = '?';
 
+						$response->menu->loadAnalyze->enable = true;
+						$response->menu->loadSynchronize->enable = true;
 						$response->menu->users->enable = true;
+						
+						$response->structure->title = 'Manage albums';
 
 					break;
 					
@@ -197,11 +234,12 @@ class SimpleGallery
 						if (!$this->user->isAdmin())
 							error('Access is forbidden.', '?');
 	
-						$response->menu->back->enable = true;
-						$response->menu->back->url = '?album=loader';
+						$response->structure->back->enable = true;
+						$response->structure->back->url = '?album=loader';
 
 						$response->menu->users->enable = true;
-							
+						
+						$response->structure->title = 'Synchronization albums structures';
 					
 					break;
 					
@@ -243,8 +281,10 @@ class SimpleGallery
 							error('Access is forbidden.', '?');
 					
 						$response->data['albums'] = $_POST['albums'];	
-						$response->menu->back->enable = true;
-						$response->menu->back->url = '?album=loader';
+						$response->structure->back->enable = true;
+						$response->structure->back->url = '?album=loader';
+						
+						$response->structure->title = 'Medias analyze';
 					
 					break;
 					
@@ -314,8 +354,8 @@ class SimpleGallery
 						
 						$response->data['album'] = $album;
 						
-						$response->menu->back->enable = true;
-						$response->menu->back->url = '?album&id=' . $album->getId();
+						$response->structure->back->enable = true;
+						$response->structure->back->url = '?album&id=' . $album->getId();
 					
 					break;
 				
@@ -444,7 +484,7 @@ class SimpleGallery
 			
 			case 'user' :
 			
-				$response->menu->back->url = '?';
+				$response->structure->back->url = '?';
 				$response->menu->albumconfig->enable = false;
 				$response->menu->load->enable = false;
 			
@@ -513,6 +553,10 @@ class SimpleGallery
 					
 						$response->data['groups'] = \Database\GroupTable::findAllOrderName();
 						$response->data['users'] = \Database\UserTable::findAllWithGroup();
+						
+						$response->structure->back->enable = true;
+						$response->structure->back->url = '?';
+						$response->structure->title = 'Users management';
 					
 					break;
 				
