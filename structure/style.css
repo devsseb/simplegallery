@@ -70,8 +70,8 @@ form a.form-link-right{float:right;}
 .text-left{text-align:left;}
 .text-right{text-align:right;}
 
-.message{padding:10px;text-align:center;}
-.message-success{background-color:#6de06d;color:#214121;}
+.message{padding:10px;text-align:center;font-size:20px;}
+.message-success{background-color:#b2e9b2;color:#214121;}
 .message-error{background-color:#d66b6b;color:#4b1313;}
 .message-information{background-color:#f8f8a5;color:#5f5f2f;}
 

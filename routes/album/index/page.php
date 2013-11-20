@@ -1,4 +1,4 @@
-<? if ($response->data['album']) : ?>
+<? if ($response->data['albumOrMedia']) : ?>
 <div id="albums">
 <? foreach ($response->data['album']->getChildren()->findAllOrderPath() as $album) :
 	$name = toHtml($album->getName()?:basename($album->getPath())) ?>
@@ -124,5 +124,5 @@
 	</div>
 </div>
 <? else : ?>
-	<div class="noalbum">no album</div>
+	<div class="noalbumormedia">no album or media</div>
 <? endif; ?>

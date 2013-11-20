@@ -177,10 +177,13 @@ class SimpleGallery
 							$response->structure->back->url = '?album&id=' . $album->getParent_id();
 						}
 
+						$albumOrMedia = (count($album->getChildren()) or $medias);
+
 						$response->structure->title = $album->getName() ?: basename($album->getPath());
 						$response->data['album'] = $album;
 						$response->data['albumCovers'] = $albumCovers;
 						$response->data['medias'] = $medias;
+						$response->data['albumOrMedia'] = $albumOrMedia;
 
 					break;
 				
@@ -638,15 +641,10 @@ class SimpleGallery
 
 		if (!$this->user->isAdmin()) {
 
-			if ($id) {
+			if ($album and $album->getPath() != '') {
 				
 				// Retrieve album access
-				$access = false;
-				foreach ($this->user->getGroupCollection() as $userGroup) {
-					$albumGroupAccess = $album->getGroupCollection()->findOneById($userGroup->getId())->getAccess();
-					if ($access = ($albumGroupAccess == -1 or $albumGroupAccess == 1))
-						break;
-				}
+				$access = $this->getAlbumAccess($album);
 				if (!$access)
 					error('Access is forbidden', '?');
 					
@@ -663,7 +661,10 @@ class SimpleGallery
 				$q->AndWhere('(access = ? OR access = ?)', -1, 1);
 				$q->Orderby('path', 'DESC');
 				$parent = $q->one()->execute();
+				if (!$parent)
+					$parent = \Database\AlbumTable::findOneByPathWithGroup('');
 				$album->setParent($parent);
+			
 			}
 			
 			// Retrieve children access
@@ -700,6 +701,50 @@ class SimpleGallery
 
 		return $album;
 	
+	}
+	
+	private function getAlbumAccess(\Database\Album $album)
+	{
+		
+	
+		$access = false;
+		foreach ($this->user->getGroupCollection() as $userGroup) {
+			$albumGroup = $album->getGroupCollection()->findOneById($userGroup->getId());
+			if ($albumGroup) {
+				
+				if ($albumGroup->getAccess() == -1 or $albumGroup->getAccess() == 1) {
+					$access = true;
+					break;
+				}
+
+			} else {
+				// If no group has already set by admin for this album
+				$q = new \Database\Object\Query('album');
+				$q->leftJoin('group');
+				$explode = explode('/', $album->getPath());
+				array_splice($explode, - 2);
+				$where = '(';
+				$whereValues = array();
+				for ($i = 0; $i < count($explode); $i++) {
+					$path = implode('/', array_slice($explode, 0, $i+1)) . '/';
+					$where.= ' OR path = ?';
+					$whereValues[] = $path;
+				}
+				$q->where($where . ')', $whereValues);
+				
+				$q->AndWhere('group_id = ?', $userGroup->getId());
+				$q->AndWhere('access IS NOT NULL');
+				$q->Orderby('path', 'DESC');
+				$parent = $q->one()->execute();
+				
+				if ($parent and ($parent->getAccess() == -1 or $parent->getAccess() == 1)) {
+					$access = true;
+					break;
+				}
+			}
+		}
+			
+		return $access;
 	}
 	
 	private function getAlbumConfig($id)
@@ -754,6 +799,10 @@ class SimpleGallery
 	
 	private function setAlbumAccess($album, $groups)
 	{
+		foreach ($groups as $group)
+			if ($group->getAccess_inherited() == null)
+				$group->setAccess_inherited(-2);
+		
 		$album->setGroupCollection($groups);
 		$album->save();
 		$children = \Database\AlbumTable::findByParent_idWithGroup($album->getId());

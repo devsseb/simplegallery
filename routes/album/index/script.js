@@ -146,13 +146,14 @@ var SimpleGallery = new Class({
 			this.medias.push(media);
 		}
 		
-		this.menuDeleted.addEvent('click', function() {
-			this.mediasContainer.toggleClass('show-deleted');
-			$$('.media.deleted').each(function(domMedia) {
-				this.mediaReloadWallData(domMedia.media);
+		if (this.menuDeleted)
+			this.menuDeleted.addEvent('click', function() {
+				this.mediasContainer.toggleClass('show-deleted');
+				$$('.media.deleted').each(function(domMedia) {
+					this.mediaReloadWallData(domMedia.media);
+				}.bind(this));
+				this.mediaWall.resize();
 			}.bind(this));
-			this.mediaWall.resize();
-		}.bind(this));
 		
 		this.slideshow = new SimpleGallery.Slideshow(this.medias);
 
@@ -260,19 +261,22 @@ SimpleGallery.Slideshow = new Class({
 		this.dom.panel = $('slideshow-panel');
 		this.dom.panel.name = $('slideshow-panel-name');
 		this.dom.panel.tools = {
-			rotateLeft: $('slideshow-panel-rotateLeft').addEvent('click', function() {
-				this.media.sg.mediaRotate(this.media, 'left');
-				this.navigation(0);
-			}.bind(this)),
-			rotateRight: $('slideshow-panel-rotateRight').addEvent('click', function() {
-				this.media.sg.mediaRotate(this.media, 'right');
-				this.navigation(0);
-			}.bind(this)),
-			delete: $('slideshow-panel-delete').addEvent('click', function() {
-				this.media.sg.mediaDelete(this.media);
-				this.navigation(0);
-			}.bind(this)),
+			rotateLeft: $('slideshow-panel-rotateLeft'),
+			rotateRight: $('slideshow-panel-rotateRight'),
+			delete: $('slideshow-panel-delete')
 		};
+		this.dom.panel.tools.rotateLeft && this.dom.panel.tools.rotateLeft.addEvent('click', function() {
+			this.media.sg.mediaRotate(this.media, 'left');
+			this.navigation(0);
+		}.bind(this));
+		this.dom.panel.tools.rotateRight && this.dom.panel.tools.rotateRight.addEvent('click', function() {
+			this.media.sg.mediaRotate(this.media, 'right');
+			this.navigation(0);
+		}.bind(this));
+		this.dom.panel.tools.delete && this.dom.panel.tools.delete.addEvent('click', function() {
+			this.media.sg.mediaDelete(this.media);
+			this.navigation(0);
+		}.bind(this));
 		this.dom.panel.date = $('slideshow-panel-date');
 		this.dom.panel.date.update = this.dom.panel.date.getElement('input');
 		if (this.dom.panel.date.update)

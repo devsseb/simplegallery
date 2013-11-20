@@ -1,4 +1,4 @@
-.noalbum{font-size:25px;text-align:center;}
+.noalbumormedia{font-size:25px;text-align:center;	}
 
 #walls{position:absolute;right:0px;bottom:0px;}
 
@@ -7,7 +7,7 @@
 .album-name{z-index:2;position:absolute;left:2px;right:2px;top:25px;text-align:center;text-decoration:none;color:#fff;background-color:rgba(121,175,201,0.75);font-size:15px;padding:2px;font-family:caviar_dreams;font-weight:bold;}
 .album-cover{z-index:1;height:180px;position:relative;text-align:center;line-height:180px;font-size:20px;}
 .album-cover-media{box-shadow:0px 0px 2px #333;position:absolute;-webkit-backface-visibility:hidden;background-color:#d8d8d8;}
-.no-media-found{font-style:italic;font-size:20px;}
+.no-media-found{font-style:italic;font-size:20px;color:#cf4b4b;}
 
 #medias{position:relative;}
 .media{display:block;overflow:hidden;background-color:#cecece;visibility:hidden;position:relative;}
