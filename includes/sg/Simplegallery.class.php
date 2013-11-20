@@ -283,6 +283,9 @@ class SimpleGallery
 					
 						if (!$this->user->isAdmin())
 							error('Access is forbidden.', '?');
+
+						if (!exists($_POST, 'albums'))
+							error('Please select at least one album to analyze', '?album=loader');
 					
 						$response->data['albums'] = $_POST['albums'];	
 						$response->structure->back->enable = true;

@@ -113,9 +113,9 @@ header #title{font-size:38px;height:100%;line-height:50px;color:#fff;font-family
 
 #menu-unroll{background-color:#687188;display:none;position:absolute;right:0px;top:50px;}
 .header-reduce #menu-unroll{top:20px;}
-#menu-unroll li{padding:3px 10px;font-size:17px;white-space:nowrap;}
-#menu-unroll li:hover{background-color:#cf4b4b;}
-#menu-unroll li a{color:#fff;display:block;}
+#menu-unroll li a{font-size:17px;white-space:nowrap;padding:3px 10px;color:#fff;display:block;}
+#menu-unroll li a:hover{background-color:#cf4b4b;}
+#menu-unroll li a:active{background-color:#ffcfcf;color:#cf4b4b;}
 
 #content{overflow-x:hidden;overflow-y:scroll;position:absolute;z-index:1;left:0px;top:50px;right:0px;bottom:0px;}
 .header-reduce #content{top:20px;}
