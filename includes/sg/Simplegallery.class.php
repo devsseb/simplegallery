@@ -19,7 +19,7 @@ class SimpleGallery
 	private $albumCoverMediaMax = 5;
 	private $sessionLifetime = 'P60D';
 	private $passwordCodeLifetime = 'PT2H';
-	private $databaseVersion = 1;
+	private $databaseVersion = 2;
 
 	public function __construct($config)
 	{
@@ -34,6 +34,7 @@ class SimpleGallery
 
 			include 'includes/Ffmpeg.class.php';
 			
+			\Database\Album::setGetNameCallback(array($this, 'getAlbumName'));
 		}
 		
 		
@@ -136,7 +137,7 @@ class SimpleGallery
 						$album = $this->getAlbum(get($_GET, k('id')));
 						if (!$album)
 							exit('Album not found');
-						
+
 						$coversId = array();
 						foreach ($album->getChildren() as $children) {
 							$covers = json_decode($children->getCoverMedias());
@@ -179,7 +180,7 @@ class SimpleGallery
 
 						$albumOrMedia = (count($album->getChildren()) or $medias);
 
-						$response->structure->title = $album->getName() ?: basename($album->getPath());
+						$response->structure->title = $album->getAutoName();
 						$response->data['album'] = $album;
 						$response->data['albumCovers'] = $albumCovers;
 						$response->data['medias'] = $medias;
@@ -359,6 +360,10 @@ class SimpleGallery
 						
 						$response->structure->back->enable = true;
 						$response->structure->back->url = '?album&id=' . $album->getId();
+					
+						$response->menu->load->enable = true;
+						$response->menu->load->url = '?album=loader';
+						$response->menu->users->enable = true;
 					
 					break;
 				
@@ -902,6 +907,15 @@ class SimpleGallery
 				
 			return $styles;
 	
+	}
+	
+	public function getAlbumName($name)
+	{
+		preg_match('/(?:[\d-~]{2,})?\s*(.*)/', $name, $match);
+		if ($match and trim($match[1]))
+			return trim($match[1]);
+		
+		return $name;
 	}
 	
 /****************************

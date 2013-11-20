@@ -8,7 +8,7 @@
 			<div class="spacer" style="width:<?=$margin?>px"></div>
 			<div class="album-names">
 				<div class="album-basename"><?=toHtml(basename($album->getPath()) ?: '/')?></div>
-				<input class="album-name" name="name" value="<?=toHtml($album->getName())?>" />
+				<input class="album-name" name="name" value="<?=toHtml($album->getName())?>" placeholder="<?=toHtml($album->getAutoName())?>" />
 			</div>
 		</div>
 	<? endforeach; ?>

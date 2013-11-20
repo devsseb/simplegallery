@@ -5,7 +5,7 @@
 	<div class="simpleform-caption">Configurating the album <?=toHtml($album->getPath())?></div>
 	<p>
 		<label for="name">Name : </label><br />
-		<input type="text" name="name" placeholder="<?=toHtml(basename($album->getPath()))?>" value="<?=toHtml($album->getName())?>" />
+		<input type="text" name="name" placeholder="<?=toHtml($album->getAutoName())?>" value="<?=toHtml($album->getName())?>" />
 	</p>
 	
 	<table class="album-groups">

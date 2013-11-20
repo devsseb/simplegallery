@@ -4,8 +4,14 @@
 .album:hover{background-color:#f1efd7;}
 .spacer{display:inline-block;}
 .album-names{display:inline-block;}
-.album-basename{line-height:23px;font-style:italic;color:#707070;}
-.album-name{line-height:23px;border:none;background-color:transparent;margin:0px;padding:0px;display:block;font-size:inherit;width:200px;}
+.album-basename{line-height:23px;font-style:italic;font-size:15px;}
+.album-name{line-height:23px;border:none;background-color:transparent;margin:0px;padding:0px;display:block;font-size:inherit;width:200px;font-weight:bold;}
+.album-name::-webkit-input-placeholder{color:#8a8a8a;font-weight:normal;}
+.album-name::-moz-placeholder{color:#8a8a8a;font-weight:normal;}
+.album-name:-ms-input-placeholder{color:#8a8a8a;font-weight:normal;}
+.album-name:-moz-placeholder{color:#8a8a8a;font-weight:normal;}
+
+
 .album-name:hover{background-color:#fff;}
 .album-name:focus{border:none;}
 

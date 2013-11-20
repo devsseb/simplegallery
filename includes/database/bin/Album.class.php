@@ -4,6 +4,8 @@ namespace Database;
 include_once '/home/http/essite.net/ftp/simplegallery/includes/database/Entity.class.php';
 class Album extends \Database\Object\Entity
 {
+	private static $getNameCallback = NULL;
+
 	protected $_attributes = array(
 		'id' => null,
 		'inode' => '',
@@ -27,6 +29,19 @@ class Album extends \Database\Object\Entity
 		'access_inherited' => null
 	);
 	
+	public static function setGetNameCallback($callback)
+	{
+		self::$getNameCallback = $callback;
+	}
+
+	public function getAutoName()
+	{
+		if ($name = $this->getName())
+			return $name;
+		if (self::$getNameCallback)
+			return call_user_func(self::$getNameCallback, basename($this->getPath()));
+		return basename($this->getPath());
+	}
 
 
 }

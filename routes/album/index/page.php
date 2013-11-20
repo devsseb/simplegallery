@@ -1,9 +1,8 @@
 <? if ($response->data['albumOrMedia']) : ?>
 <div id="albums">
-<? foreach ($response->data['album']->getChildren()->findAllOrderPath() as $album) :
-	$name = toHtml($album->getName()?:basename($album->getPath())) ?>
+<? foreach ($response->data['album']->getChildren()->findAllOrderPath() as $album) : ?>
 	<a class="album" href="?albums&amp;id=<?=toHtml($album->getId())?>">
-		<div class="album-name"><?=$name?></div>
+		<div class="album-name"><?=toHtml($album->getAutoName())?></div>
 		<div class="album-cover">
 	<?
 		$covers = json_decode($album->getCoverMedias());

@@ -34,6 +34,38 @@ abstract class EntitySrc
 		return $this->userMethods;
 
 	}
+	
+	public function getUserVariables()
+	{
+	
+		$class = get_called_class();
+		$reflection = new \ReflectionClass($class);
+		$source = file($reflection->getFileName());
+		
+		$variables = $reflection->getProperties();
+		$values = $reflection->getDefaultProperties();
+		
+		$this->userProperties = array();
+		foreach ($variables as &$variable) {
+			if (!array_key_exists($variable->getName(), $values))
+				continue;
+			
+			$var = '';
+			if ($variable->isPrivate())
+				$var.= 'private ';
+			if ($variable->isProtected())
+				$var.= 'protected ';
+			if ($variable->isPublic())
+				$var.= 'public ';
+			if ($variable->isStatic())
+				$var.= 'static ';
+			$var.= '$' . $variable->getName() . ' = ' . var_export($values[$variable->getName()], true) . ';';
+			
+			$this->userProperties[] = $var;
+		}
+		return $this->userProperties;
+
+	}
 
 	public function compile($table)
 	{
@@ -67,7 +99,7 @@ abstract class EntitySrc
 		
 		$replace['attributesExtended'] = implode(',' . chr(10) . chr(9) . chr(9), $attributesExtended);
 		
-		
+		$replace['userVariables'] = chr(9) . implode(chr(10) . chr(9), $this->getUserVariables());
 		$replace['userFunctions'] = implode(chr(10), $this->getUserFunctions());
 		
 		$return = preg_replace_callback('/\|\w+\|/', function($match) use ($replace) {

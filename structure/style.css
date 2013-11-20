@@ -43,12 +43,13 @@
 body{margin:0px;padding:0px;background-color:#edf0f5;overflow:hidden;font-size:12px;font-family:caviar_dreams, Verdana;color:#000;}
 
 a{text-decoration:none;color:#cf4b4b;}
+input{font-family:inherit;}
 
 ul{list-style-type:none;margin:0px;padding:0px;}
 .simpleform{margin:auto;width:500px;font-size:18px;}
 .simpleform-caption{text-decoration:underline;text-align:center;font-size:22px;}
 .simpleform p{margin:5px 0px;}
-.simpleform input{font-family:inherit;font-size:18px;}
+.simpleform input{font-size:18px;}
 .simpleform input[type=text],
 .simpleform input[type=email],
 .simpleform input[type=password]{font-size:18px;width:100%;border:1px solid #b8ced6;background-color:#fff;}
