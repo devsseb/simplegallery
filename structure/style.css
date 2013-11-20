@@ -40,32 +40,46 @@
 }
 
 
-body{margin:0px;padding:0px;background-color:#edf0f5;overflow:hidden;font-size:12px;font-family:caviar_dreams, Verdana;}
+body{margin:0px;padding:0px;background-color:#edf0f5;overflow:hidden;font-size:12px;font-family:caviar_dreams, Verdana;color:#000;}
 
-a{text-decoration:none;color:#bb8018;}
+a{text-decoration:none;color:#cf4b4b;}
 
-h1{font-size:20px;font-weight:bold;text-align:center;background-color:#daedf5;margin:0px;padding:10px;}
-h2{font-size:17px;font-weight:normal;text-align:left;background-color:#99d4ec;margin:0px;padding:8px;}
-
-ul{list-style-type:none;}
-
-.form-container{background-color:#9dc8ff;font-size:16px;overflow:hidden;padding:50px 0px;}
-form{margin:auto;max-width:600px;background-color:#9dc8ff;padding:0px 50px;font-size:16px;overflow:hidden;}
-.form-caption{font-weight:bold;text-align:center;}
-form p{margin:10px 0px;}
-form label{}
-form input{width:100%;margin:0px;padding:13px;border:1px solid #38456b;border-bottom-width:5px;background-color:#e5f1e6;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
-form input:focus{outline:none;border:1px solid #8c91a2;border-bottom-width:5px;background-color:#fff;}
-form input[type=checkbox]{width:14px;height:14px;margin:0px;vertical-align:middle;}
-form input[type=radio]{width:14px;height:14px;margin:0px;vertical-align:middle;}
-form label.checkbox{display:inline-block;padding:16px;border:1px solid #38456b;background-color:#e5f1e6;}
-form p.form-control{text-align:right;}
-form input[type=submit]{width:auto;cursor:pointer;border-radius:5px;font-size:16px;font-weight:bold;border-bottom-width:1px;}
-form input[type=submit]:hover{background-color:#fff;}
-form a.form-link-left{float:left;}
-form a.form-link-right{float:right;}
-#registration{float:left;}
-
+ul{list-style-type:none;margin:0px;padding:0px;}
+.simpleform{margin:auto;width:500px;font-size:18px;}
+.simpleform-caption{text-decoration:underline;text-align:center;font-size:22px;}
+.simpleform p{margin:5px 0px;}
+.simpleform input{font-family:inherit;font-size:18px;}
+.simpleform input[type=text],
+.simpleform input[type=email],
+.simpleform input[type=password]{font-size:18px;width:100%;border:1px solid #b8ced6;background-color:#fff;}
+.simpleform input[type=button],
+.simpleform input[type=submit]{
+	margin:2px;padding:2px 7px 2px 7px;	border:1px solid #bababa;background-color:#f7f7f7;color: #000;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	border-radius:2px;
+	background-image: -moz-linear-gradient(0deg, #ddd, #f7f7f7);
+	background-image: -ms-linear-gradient(0deg, #ddd, #f7f7f7);
+	background-image: -o-linear-gradient(0deg, #ddd, #f7f7f7);
+	background-image: -webkit-linear-gradient(0deg, #ddd, #f7f7f7);
+	background-image: linear-gradient(0deg, #ddd, #f7f7f7);
+	
+}
+.simpleform input[type=button]:hover,
+.simpleform input[type=submit]:hover{
+	border-color:#ababab;
+	background-image: -moz-linear-gradient(0deg, #f7f7f7, #ddd);
+	background-image: -ms-linear-gradient(0deg, #f7f7f7, #ddd);
+	background-image: -o-linear-gradient(0deg, #f7f7f7, #ddd);
+	background-image: -webkit-linear-gradient(0deg, #f7f7f7, #ddd);
+	background-image: linear-gradient(0deg, #f7f7f7, #ddd);
+}
+.simpleform input[type=button]:active,
+.simpleform input[type=submit]:active{
+	color:#cf4b4b;
+}
+.simpleform-options{text-align:right;}
+.simpleform-buttons{text-align:right;}
 .text-center{text-align:center;}
 .text-left{text-align:left;}
 .text-right{text-align:right;}
@@ -96,7 +110,7 @@ header #title{font-size:38px;height:100%;line-height:50px;color:#fff;font-family
 .header-reduce  #menu-button div:nth-child(3){top:70%;}
 #menu-button.open div{background-color:#cf4b4b;}
 
-#menu-unroll{background-color:#687188;list-style-type:none;margin:0px;padding:0px;display:none;position:absolute;right:0px;top:50px;}
+#menu-unroll{background-color:#687188;display:none;position:absolute;right:0px;top:50px;}
 .header-reduce #menu-unroll{top:20px;}
 #menu-unroll li{padding:3px 10px;font-size:17px;white-space:nowrap;}
 #menu-unroll li:hover{background-color:#cf4b4b;}

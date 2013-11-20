@@ -512,6 +512,7 @@ class SimpleGallery
 							$this->userRegistration($code);
 					
 						$response->menu = false;
+						$response->structure->back->enable = true;
 						
 					
 					break;
@@ -531,6 +532,7 @@ class SimpleGallery
 							$response->data['update'] = $this->userLostPassword($code);
 							
 						$response->menu = false;
+						$response->structure->back->enable = true;
 					
 					break;
 					
