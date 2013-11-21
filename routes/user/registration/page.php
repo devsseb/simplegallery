@@ -2,11 +2,11 @@
 	<div class="simpleform-caption">Registration</div>
 	<p>
 		<label for="email">Email :</label><br />
-		<input type="email" id="email" name="email" value="<?=get($_POST, k('email'))?>" />
+		<input type="email" id="email" name="email" value="<?=toHtml(get($_POST, k('email')))?>" />
 	</p>
 	<p>
 		<label for="name">Name :</label><br />
-		<input type="text" id="name" name="name" value="<?=get($_POST, k('name'))?>" />
+		<input type="text" id="name" name="name" value="<?=toHtml(get($_POST, k('name')))?>" />
 	</p>
 	<p>
 		<label for="password">Password :</label><br />

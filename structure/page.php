@@ -40,6 +40,7 @@
 			<? if ($response->menu->deleted->enable) : ?>
 					<li><a title="Show deleted medias" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted">Show deleted medias</a></li>
 			<? endif; ?>
+					<li><a title="My profile" href="?user=profile">My profile</a></li>
 					<li><a title="Logout" href="?user=logout">Logout</a></li>
 				</ul>
 			</div>
@@ -47,15 +48,15 @@
 		</header>
 		<div id="content">
 			<? if ($message = gete($_SESSION, k('messages', 'success'))) : ?>
-				<div class="message message-success"><?=toHtml($message)?></div>
+				<div class="message message-success"><?=nl2br(toHtml($message))?></div>
 				<?unset($_SESSION['messages']['success'])?>
 			<? endif; ?>
 			<? if ($message = gete($_SESSION, k('messages', 'error'))) : ?>
-				<div class="message message-error"><?=toHtml($message)?></div>
+				<div class="message message-error"><?=nl2br(toHtml($message))?></div>
 				<?unset($_SESSION['messages']['error'])?>
 			<? endif; ?>
 			<? if ($message = gete($_SESSION, k('messages', 'information'))) : ?>
-				<div class="message message-information"><?=toHtml($message)?></div>
+				<div class="message message-information"><?=nl2br(toHtml($message))?></div>
 				<?unset($_SESSION['messages']['information'])?>
 			<? endif; ?>
 			<?include 'routes/' . $response->route . '/' . $response->action . '/page.php'?>

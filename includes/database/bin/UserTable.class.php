@@ -16,9 +16,9 @@ class UserTable extends \Database\Object\Table
 		'admin',
 		'passwordCode',
 		'passwordCodeTime',
-		'mailUpdate',
-		'mailUpdateCode',
-		'mailUpdateCodeTime'
+		'emailUpdate',
+		'emailUpdateCode',
+		'emailUpdateCodeTime'
 	);
 	protected static $attributesFactorized = array(
 		'groupCollection',

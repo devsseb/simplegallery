@@ -136,12 +136,13 @@ class Book implements \arrayaccess, \iterator, \countable
 		switch ($this->getType()) {
 			case self::CBZ :
 
+				$index = 0;
 				while ($entry = zip_read($this->archive)) {
 					if (!$this->pageIsImage($name = zip_entry_name($entry)))
 						continue;
 
 					$name = pathinfo(strtolower($name));
-					$this->pages[$name['dirname'] . '/' . $name['filename']] = $entry;
+					$this->pages[$name['dirname'] . '/' . $name['filename']] = $index++;
 				
 				}
 
@@ -191,47 +192,47 @@ class Book implements \arrayaccess, \iterator, \countable
 		
 		$entry = $this->pages[$num - 1];
 
-		if (gettype($entry) == 'resource' or get_class($entry) != 'Object') {
+		switch ($this->getType()) {
+			case self::CBZ :
 
-			switch ($this->getType()) {
-				case self::CBZ :
+				zip_close($this->archive);
+				$this->archive = zip_open($this->file);
+				$index = 0;
+				$entryIndex = $entry;
+				while ($entry = zip_read($this->archive)) {
+					if ($index++ == $entryIndex) {
+					
+						$page->name = zip_entry_name($entry);
+						while($read = zip_entry_read($entry))
+							$page->content.= $read;
+					
+						break;
+					}
+					
+				}
 
-					$page->name = zip_entry_name($entry);
-					while($read = zip_entry_read($entry))
-						$page->content.= $read;
+			break;
+			case self::CBR :
 
-				break;
-				case self::CBR :
+				$page->name = $entry->getName();
+				$stream = $entry->getStream();
+				while ($read = fread($stream, 1024))
+					$page->content.=$read;
+				fclose($stream);
 
-					$page->name = $entry->getName();
-					$stream = $entry->getStream();
-					while ($read = fread($stream, 1024))
-						$page->content.=$read;
-					fclose($stream);
-
-				break;
-			}
-
-			$page->total = $this->count();
-
-			preg_match($this->regPageName, $page->name, $match);
-			$page->type = $match[1];
-		
-			$this->pages[$num - 1] = $page;
-		} else {
-		
-			$page = $entry;
-			
+			break;
 		}
 
+		$page->total = $this->count();
+
+		preg_match($this->regPageName, $page->name, $match);
+		$page->type = $match[1];
 
 		if ($page->type == 'jpeg')
 			$page->type = 'jpg';
 
 		if ($width or $height) {
-		
-			$page = clone $page;
-		
+
 			$page->content = imagecreatefromstring($page->content);
 			$pageSize = imagesize($page->content);
 			
@@ -247,9 +248,11 @@ class Book implements \arrayaccess, \iterator, \countable
 				
 			$resize = imagecreatetruecolor($size->width, $size->height);
 			imagecopyresampled($resize, $page->content, 0, 0, 0, 0, $size->width, $size->height, $pageSize->width, $pageSize->height);
+			imagedestroy($page->content);
 			
 			ob_start();
 			imagejpeg($resize);
+			imagedestroy($resize);
 			$page->content = ob_get_contents();
 			ob_end_clean();
 

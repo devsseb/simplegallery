@@ -13,7 +13,7 @@
 <? else : ?>
 	<p>
 		<label for="email">Email :</label><br />
-		<input type="email" id="email" name="email" value="<?=get($_POST, k('email'))?>" />
+		<input type="email" id="email" name="email" value="<?=toHtml(get($_POST, k('email')))?>" />
 	</p>
 <? endif; ?>
 	<p class="simpleform-buttons">

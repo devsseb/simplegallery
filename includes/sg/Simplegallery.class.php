@@ -19,7 +19,8 @@ class SimpleGallery
 	private $albumCoverMediaMax = 5;
 	private $sessionLifetime = 'P60D';
 	private $passwordCodeLifetime = 'PT2H';
-	private $databaseVersion = 2;
+	private $emailUpdateCodeLifetime = 'PT48H';
+	private $databaseVersion = 3;
 
 	public function __construct($config)
 	{
@@ -112,7 +113,7 @@ class SimpleGallery
 			),
 			'menu', object(
 				'albumconfig', object('enable', false, 'url', '#'),
-				'load', object('enable', false, 'url', '#'),
+				'load', object('enable', false, 'url', '?album=loader'),
 					'loadAnalyze', object('enable', false, 'url', '?album=analyzer'),
 					'loadSynchronize', object('enable', false, 'url', '?album=synchronizer'),
 				'users', object('enable', false, 'url', '?user=management'),
@@ -169,7 +170,6 @@ class SimpleGallery
 								$response->menu->albumconfig->url = '?album=config&id=' . $album->getId();
 							}
 							$response->menu->load->enable = true;
-							$response->menu->load->url = '?album=loader';
 							$response->menu->users->enable = true;
 							$response->menu->deleted->enable = true;
 						}
@@ -239,7 +239,6 @@ class SimpleGallery
 							error('Access is forbidden.', '?');
 	
 						$response->structure->back->enable = true;
-						$response->structure->back->url = '?album=loader';
 
 						$response->menu->users->enable = true;
 						
@@ -289,7 +288,6 @@ class SimpleGallery
 					
 						$response->data['albums'] = $_POST['albums'];	
 						$response->structure->back->enable = true;
-						$response->structure->back->url = '?album=loader';
 						
 						$response->structure->title = 'Medias analyze';
 					
@@ -365,7 +363,6 @@ class SimpleGallery
 						$response->structure->back->url = '?album&id=' . $album->getId();
 					
 						$response->menu->load->enable = true;
-						$response->menu->load->url = '?album=loader';
 						$response->menu->users->enable = true;
 					
 					break;
@@ -570,6 +567,25 @@ class SimpleGallery
 						$response->structure->back->enable = true;
 						$response->structure->back->url = '?';
 						$response->structure->title = 'Users management';
+					
+					break;
+					
+					case 'profile' :
+					
+						if ($_POST)
+							$this->userUpdate($_POST);
+						
+						
+						if (exists($_GET, 'mcode'))
+							$this->userUpdateEmail($_GET['mcode']);
+						
+						$response->structure->back->enable = true;
+
+						if ($this->user->isAdmin()) {
+							$response->menu->load->enable = true;
+							$response->menu->users->enable = true;
+							$response->menu->deleted->enable = true;
+						}
 					
 					break;
 				
@@ -982,7 +998,7 @@ class SimpleGallery
 			
 			$user = \Database\UserTable::findOneByActivecode($data);
 			if (!$user)
-				error('Code is invalid.', '?user=registration');
+				error('Registration code is invalid.', '?user=registration');
 			
 			$user->setActiveCode(false);
 			$user->setActive(true);
@@ -1090,7 +1106,7 @@ class SimpleGallery
 
 				$user = \Database\UserTable::findOneByPasswordcodeAndIsActiveAndUpperPasswordcodetime($data['pcode'], $timeMin);
 				if (!$user)
-					error('Lost passord code is invalid.', '?user=lost-password');
+					error('Lost passord code is invalid or outdated.', '?user=lost-password');
 				if ($data['password'] != $data['password-verification'])
 					error('The two passwords are differents. Please retype your password.', '?user=lost-password&pcode=' . $data['pcode']);
 				if (trim($data['password']) == '')
@@ -1114,7 +1130,7 @@ class SimpleGallery
 			if ($user)
 				return $user->getPasswordCode();
 			
-			error('Lost passord code is invalid.', '?');
+			error('Lost passord code is invalid or outdated.', '?');
 		
 		}
 		
@@ -1214,6 +1230,58 @@ class SimpleGallery
 	
 		success('User "' . $user->getName() . '" has been deleted successfully.', '?user=management');
 	
+	}
+	
+	private function userUpdate($data)
+	{
+		$this->user->setName($data['name']);
+		if (trim($data['password'])) {
+			if ($data['password'] != $data['password-verification'])
+				error('The two passwords are differents. Please retype your password.', '?user=profile');
+			$this->user->setCryptPassword($data['password']);
+		}
+		
+		if ($mailUpdate = $this->user->getEmail() != $data['email']) {
+		
+			if (\Database\UserTable::findOneByEmail($data['email']))
+				error('The mail "' . $data['email'] . '" is already registered.', '?user=profile');
+		
+			$this->user->setEmailUpdate($data['email']);
+			$this->user->setEmailUpdateCode(randomString(12));
+			$this->user->setEmailUpdateCodeTime(date('Y-m-d H:i:s'));
+			
+			$link = httpUrl() . '?user=profile&mcode=' . $this->user->getEmailUpdateCode();
+			$this->sendMail(
+				$this->user->getEmailUpdate(),
+				'Mail update, please valid your mail',
+				'Hello ' . toHtml($this->user->getName()) . ',' . chr(10) . chr(10) . 'To activate your email updating, please click on the following link :' . chr(10) . '<a href="' . $link . '">' . $link . '</a>'
+			);
+			
+		}
+		
+		$this->user->save();
+		
+		success('Your profile has been updated successfully.' . ($mailUpdate ? chr(10) . 'Please check your mailbox to activate your new mail.' : ''), '?user=profile');
+			
+	}
+	
+	private function userUpdateEmail($code)
+	{
+		$timeMin = new DateTime();
+		$timeMin->sub(new DateInterval($this->emailUpdateCodeLifetime));
+		$timeMin = $timeMin->format('Y-m-d H:i:s');
+
+		$user = \Database\UserTable::findOneByEmailupdatecodeAndIsActiveAndUpperEmailupdatecode($code, $timeMin);
+
+		if (!$user)
+			error('Update email code is invalid or outdated.', '?user=profile');
+
+		$user->setEmail($user->getEmailUpdate());
+		$user->setEmailUpdate('');
+		$user->setEmailUpdateCode('');
+		$user->setEmailUpdateCodeTime('');
+		$user->save();
+		success('You email has been updated successfully.', '?user=profile');
 	}
 
 }

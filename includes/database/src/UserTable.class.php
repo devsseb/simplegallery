@@ -15,9 +15,9 @@ class UserTable extends \Database\Compilation\TableSrc
 		$this->addAttribute('admin', \Database::T_BOOL);
 		$this->addAttribute('passwordCode', \Database::T_CHAR);
 		$this->addAttribute('passwordCodeTime', \Database::T_DATETIME);
-		$this->addAttribute('mailUpdate', \Database::T_CHAR);
-		$this->addAttribute('mailUpdateCode', \Database::T_CHAR);
-		$this->addAttribute('mailUpdateCodeTime', \Database::T_CHAR);
+		$this->addAttribute('emailUpdate', \Database::T_CHAR);
+		$this->addAttribute('emailUpdateCode', \Database::T_CHAR);
+		$this->addAttribute('emailUpdateCodeTime', \Database::T_CHAR);
 
 		$this->addLink('group', \Database::R_N_N);
 

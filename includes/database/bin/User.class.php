@@ -16,9 +16,9 @@ class User extends \Database\Object\Entity
 		'admin' => '',
 		'passwordCode' => '',
 		'passwordCodeTime' => '',
-		'mailUpdate' => '',
-		'mailUpdateCode' => '',
-		'mailUpdateCodeTime' => ''
+		'emailUpdate' => '',
+		'emailUpdateCode' => '',
+		'emailUpdateCodeTime' => ''
 	);
 	protected $_attributesFactorized = array(
 		'groupCollection' => null,

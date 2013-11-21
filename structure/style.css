@@ -49,10 +49,11 @@ ul{list-style-type:none;margin:0px;padding:0px;}
 .simpleform{margin:auto;width:500px;font-size:18px;}
 .simpleform-caption{text-decoration:underline;text-align:center;font-size:22px;}
 .simpleform p{margin:5px 0px;}
+.simpleform .label-help{font-size:13px;float:right;margin-top:6px;color:#416aa8;font-style:italic;}
 .simpleform input{font-size:18px;}
 .simpleform input[type=text],
 .simpleform input[type=email],
-.simpleform input[type=password]{font-size:18px;width:100%;border:1px solid #b8ced6;background-color:#fff;}
+.simpleform input[type=password]{font-size:18px;width:100%;border:1px solid #b8ced6;background-color:#fff;color:#3d3330;}
 .simpleform input[type=button],
 .simpleform input[type=submit]{
 	margin:2px;padding:2px 7px 2px 7px;	border:1px solid #bababa;background-color:#f7f7f7;color: #000;
