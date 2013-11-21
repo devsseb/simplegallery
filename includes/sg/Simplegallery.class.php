@@ -20,7 +20,7 @@ class SimpleGallery
 	private $sessionLifetime = 'P60D';
 	private $passwordCodeLifetime = 'PT2H';
 	private $emailUpdateCodeLifetime = 'PT48H';
-	private $databaseVersion = 3;
+	private $databaseVersion = 4;
 
 	public function __construct($config)
 	{
@@ -49,8 +49,8 @@ class SimpleGallery
 
 		$databaseVersion = 0;
 		if (in_array('parameter', $tables)) {
-			$parameter = \Database\ParameterTable::findAll();
-			$databaseVersion = $parameter->getDatabaseVersion();
+			$this->parameters = \Database\ParameterTable::findAll();
+			$databaseVersion = $this->parameters->getDatabaseVersion();
 		}
 		if ($databaseVersion == $this->databaseVersion)
 			return;
@@ -59,11 +59,13 @@ class SimpleGallery
 		
 		while (++$databaseVersion <= $this->databaseVersion) {
 			if ($databaseVersion == 1)
-				$parameter = new \Database\Parameter();
+				$this->parameters = new \Database\Parameter();
+			if ($databaseVersion == 4)
+				$this->parameters->setGalerieName('SimpleGallery');
 
 		}
-		$parameter->setDatabaseVersion($this->databaseVersion);
-		$parameter->save();
+		$this->parameters->setDatabaseVersion($this->databaseVersion);
+		$this->parameters->save();
 		
 	}
 	
@@ -117,7 +119,8 @@ class SimpleGallery
 					'loadAnalyze', object('enable', false, 'url', '?album=analyzer'),
 					'loadSynchronize', object('enable', false, 'url', '?album=synchronizer'),
 				'users', object('enable', false, 'url', '?user=management'),
-				'deleted', object('enable', false, 'url', '#')
+				'deleted', object('enable', false, 'url', '#'),
+				'parameters', object('enable', false, 'url', '?parameter')
 			)
 		);
 
@@ -172,6 +175,7 @@ class SimpleGallery
 							$response->menu->load->enable = true;
 							$response->menu->users->enable = true;
 							$response->menu->deleted->enable = true;
+							$response->menu->parameters->enable = true;
 						}
 						if ($album->getParent_id() > -1) {
 							$response->structure->back->enable = true;
@@ -190,6 +194,10 @@ class SimpleGallery
 				
 					case 'timeline' :
 					
+						if (!$this->user->isAdmin())
+							error('Access is forbidden.', '?'); // For dévelopement
+							
+
 						$q = new \Database\Object\Query('media');
 						$q->select('IF(date="0000-00-00 00:00:00",exifDate,date) AS datesort', 'media.*');
 						$q->where('date != "0000-00-00 00:00:00" OR exifDate != "0000-00-00 00:00:00"');
@@ -228,6 +236,7 @@ class SimpleGallery
 						$response->menu->loadAnalyze->enable = true;
 						$response->menu->loadSynchronize->enable = true;
 						$response->menu->users->enable = true;
+						$response->menu->parameters->enable = true;
 						
 						$response->structure->title = 'Manage albums';
 
@@ -241,6 +250,7 @@ class SimpleGallery
 						$response->structure->back->enable = true;
 
 						$response->menu->users->enable = true;
+						$response->menu->parameters->enable = true;
 						
 						$response->structure->title = 'Synchronization albums structures';
 					
@@ -288,6 +298,9 @@ class SimpleGallery
 					
 						$response->data['albums'] = $_POST['albums'];	
 						$response->structure->back->enable = true;
+						
+						$response->menu->users->enable = true;
+						$response->menu->parameters->enable = true;
 						
 						$response->structure->title = 'Medias analyze';
 					
@@ -364,6 +377,7 @@ class SimpleGallery
 					
 						$response->menu->load->enable = true;
 						$response->menu->users->enable = true;
+						$response->menu->parameters->enable = true;
 					
 					break;
 				
@@ -510,6 +524,9 @@ class SimpleGallery
 					
 					case 'registration' :
 					
+						if ($this->parameters->isDisableRegistration() and !$this->noAdminUser())
+							error('Registration is disabled.', '?');
+					
 						if ($_POST)
 							$this->userRegistration($_POST);
 							
@@ -566,6 +583,11 @@ class SimpleGallery
 						
 						$response->structure->back->enable = true;
 						$response->structure->back->url = '?';
+						
+						$response->menu->load->enable = true;
+						$response->menu->users->enable = true;
+						$response->menu->parameters->enable = true;
+						
 						$response->structure->title = 'Users management';
 					
 					break;
@@ -585,6 +607,7 @@ class SimpleGallery
 							$response->menu->load->enable = true;
 							$response->menu->users->enable = true;
 							$response->menu->deleted->enable = true;
+							$response->menu->parameters->enable = true;
 						}
 					
 					break;
@@ -619,6 +642,33 @@ class SimpleGallery
 			
 				$response->menu = false;
 				$response->data['config'] = $this->config;
+			
+			break;
+			
+			case 'parameter' :
+
+				switch ($action) {
+					case 'index' :
+					default :
+
+						if (!$this->user->isAdmin())
+							exit('Access is forbidden.');
+
+						$response->action = 'index';
+						
+						$response->structure->back->enable = true;
+
+						$response->menu->load->enable = true;
+						$response->menu->users->enable = true;
+						$response->menu->deleted->enable = true;
+
+						
+						
+						if ($_POST)
+							$this->setParameters($_POST);
+						
+					break;
+				}
 			
 			break;
 		
@@ -1282,6 +1332,15 @@ class SimpleGallery
 		$user->setEmailUpdateCodeTime('');
 		$user->save();
 		success('You email has been updated successfully.', '?user=profile');
+	}
+
+	private function setParameters($data)
+	{
+		$this->parameters->setGalleryName($data['galleryName']);
+		$this->parameters->setDisableRegistration(get($data, k('disableRegistration')));
+		$this->parameters->save();
+		
+		success('The parameters have been updated successfully.', '?parameter');
 	}
 
 }

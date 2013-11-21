@@ -18,7 +18,9 @@
 	<p class="simpleform-options">
 		<a href="?user=lost-password">Lost password</a>
 	</p>
+	<? if (!$sg->parameters->isDisableRegistration()) : ?>
 	<p class="simpleform-options">
 		<a href="?user=registration">Registration</a>
 	</p>
+	<? endif; ?>
 </form>

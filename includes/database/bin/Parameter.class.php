@@ -7,7 +7,9 @@ class Parameter extends \Database\Object\Entity
 	
 
 	protected $_attributes = array(
-		'databaseVersion' => ''
+		'databaseVersion' => '',
+		'galleryName' => '',
+		'disableRegistration' => ''
 	);
 	protected $_attributesFactorized = array(
 		

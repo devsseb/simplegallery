@@ -17,7 +17,7 @@
 		<? if ($response->structure->back->enable) : ?>
 			<a title="Back" id="back" href="<?=toHtml($response->structure->back->url)?>">&lt;</a>
 		<? endif; ?>
-			<div id="title"><?=toHtml($response->structure->title ?: 'SimpleGallery')?></div>
+			<div id="title"><?=toHtml($response->structure->title ?: $sg->parameters->getGalleryName())?></div>
 		<? if ($response->menu) : ?>
 			<div id="menu">
 				<div id="menu-button"><div></div><div></div><div></div></div>
@@ -39,6 +39,9 @@
 			<? endif; ?>
 			<? if ($response->menu->deleted->enable) : ?>
 					<li><a title="Show deleted medias" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted">Show deleted medias</a></li>
+			<? endif; ?>
+			<? if ($response->menu->parameters->enable) : ?>
+					<li><a title="Parameters" href="<?=toHtml($response->menu->parameters->url)?>">Parameters</a></li>
 			<? endif; ?>
 					<li><a title="My profile" href="?user=profile">My profile</a></li>
 					<li><a title="Logout" href="?user=logout">Logout</a></li>

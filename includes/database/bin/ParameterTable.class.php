@@ -7,7 +7,9 @@ class ParameterTable extends \Database\Object\Table
 	protected static $id = null;
 	protected static $name = 'parameter';
 	protected static $attributes = array(
-		'databaseVersion'
+		'databaseVersion',
+		'galleryName',
+		'disableRegistration'
 	);
 	protected static $attributesFactorized = array(
 		
