@@ -120,11 +120,6 @@ class Optimizer {
 			
 				$cover = $newCover;
 			
-				$transform = Simplegallery::getMediaTransform($dbMedia);
-				$media->rotation = $transform->rotation;
-				$media->flip = $transform->flip;
-				$media->type = $dbMedia->getType();
-			
 				$coverMedias[$dbMedia->getId()] = $media;
 
 			}
