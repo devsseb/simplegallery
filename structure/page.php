@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>SG2</title>
+		<title><?=toHtml($sg->parameters->getGalleryName() . ($response->structure->title ? ' - ' . $response->structure->title : ''))?></title>
 		<link rel="stylesheet" type="text/css" href="structure/style.css" />
 <? if (is_file($file = 'routes/' . $response->route . '/' . $response->action . '/style.css')) : ?>
 		<link rel="stylesheet" type="text/css" href="<?=toHtml($file)?>" />
