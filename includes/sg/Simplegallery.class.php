@@ -515,7 +515,13 @@ class SimpleGallery
 					
 					case 'comment' :
 					
+						if ($this->parameters->isDisableComments())
+							exit('Comments are disable');
+					
 						if (exists($_POST, 'id') and exists($_POST, 'text')) {
+					
+							if (\Database\MediaTable::findOneByIdWithAlbum($_POST['id'])->getAlbum()->isDisableComments())
+								exit('Comments are disable for this album');
 					
 							$comment = new \Database\Comment();
 							$comment->setDate(date('Y-m-d H:m:i'));
@@ -531,6 +537,9 @@ class SimpleGallery
 								'text', $comment->getText()
 							))));
 						} else if (exists($_POST, 'deleteId')) {
+
+							if (\Database\CommentTable::findOneByIdWithMediaAndAlbum($_POST['deleteId'])->getMedia()->getAlbum()->isDisableComments())
+								exit('Comments are disable for this album');
 
 							$comment = new \Database\Comment($_POST['deleteId']);
 							$comment->delete();
