@@ -7,6 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="<?=toHtml($file)?>" />
 <? endif; ?>
 		<script type='text/javascript' src="structure/mootools.js"></script>
+		<script>var locale = <?=json_encode($response->js)?>;</script>
 		<script type='text/javascript' src="structure/script.js"></script>
 <? if (is_file($file = 'routes/' . $response->route . '/' . $response->action . '/script.js')) : ?>
 		<script type='text/javascript' src="<?=toHtml($file)?>"></script>
@@ -21,7 +22,7 @@
 			)))?>" />
 		<? endif; ?>	
 		<? if ($response->structure->back->enable) : ?>
-			<a title="Back" id="back" href="<?=toHtml($response->structure->back->url)?>">&lt;</a>
+			<a title="<?=$sg->l('structure.back')?>" id="back" href="<?=toHtml($response->structure->back->url)?>">&lt;</a>
 		<? endif; ?>
 			<div id="title"><?=toHtml($response->structure->title ?: $sg->parameters->getGalleryName())?></div>
 		<? if ($response->menu) : ?>
@@ -29,28 +30,28 @@
 				<div id="menu-button"><div></div><div></div><div></div></div>
 				<ul id="menu-unroll">
 			<? if ($response->menu->albumconfig->enable) : ?>
-					<li><a title="Configure album" href="<?=toHtml($response->menu->albumconfig->url)?>">Configure album</a></li>
+					<li><a title="<?=$sg->l('structure.menu.configure-album')?>" href="<?=toHtml($response->menu->albumconfig->url)?>"><?=$sg->l('structure.menu.configure-album')?></a></li>
 			<? endif; ?>
 			<? if ($response->menu->load->enable) : ?>
-					<li><a title="Manage albums" href="<?=toHtml($response->menu->load->url)?>">Manage albums</a></li>
+					<li><a title="<?=$sg->l('structure.menu.menu.manage-albums')?>" href="<?=toHtml($response->menu->load->url)?>"><?=$sg->l('structure.menu.manage-albums')?></a></li>
 			<? endif; ?>
 			<? if ($response->menu->loadAnalyze->enable) : ?>
-					<li><a title="Analyze selected albums" id="analyzer" href="<?=toHtml($response->menu->loadAnalyze->url)?>">Analyze selected albums</a></li>
+					<li><a title="<?=$sg->l('structure.menu.analyze-selected-albums')?>" id="analyzer" href="<?=toHtml($response->menu->loadAnalyze->url)?>"><?=$sg->l('structure.menu.analyze-selected-albums')?></a></li>
 			<? endif; ?>
 			<? if ($response->menu->loadSynchronize->enable) : ?>
-					<li><a title="Synchronize albums structure" href="<?=toHtml($response->menu->loadSynchronize->url)?>">Synchronize albums structure</a></li>
+					<li><a title="<?=$sg->l('structure.menu.synchronize-albums-structure')?>" href="<?=toHtml($response->menu->loadSynchronize->url)?>"><?=$sg->l('structure.menu.synchronize-albums-structure')?></a></li>
 			<? endif; ?>
 			<? if ($response->menu->users->enable) : ?>
-					<li><a title="User management" href="<?=toHtml($response->menu->users->url)?>">Manage users</a></li>
+					<li><a title="<?=$sg->l('structure.menu.manage-users')?>" href="<?=toHtml($response->menu->users->url)?>"><?=$sg->l('structure.menu.manage-users')?></a></li>
 			<? endif; ?>
 			<? if ($response->menu->deleted->enable) : ?>
-					<li><a title="Show deleted medias" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted">Show deleted medias</a></li>
+					<li><a title="<?=$sg->l('structure.menu.show-deleted-medias')?>" href="<?=toHtml($response->menu->deleted->url)?>" id="menu-deleted"><?=$sg->l('structure.menu.show-deleted-medias')?></a></li>
 			<? endif; ?>
 			<? if ($response->menu->parameters->enable) : ?>
-					<li><a title="Parameters" href="<?=toHtml($response->menu->parameters->url)?>">Parameters</a></li>
+					<li><a title="<?=$sg->l('structure.menu.parameters')?>" href="<?=toHtml($response->menu->parameters->url)?>"><?=$sg->l('structure.menu.parameters')?></a></li>
 			<? endif; ?>
-					<li><a title="My profile" href="?user=profile">My profile</a></li>
-					<li><a title="Logout" href="?user=logout">Logout</a></li>
+					<li><a title="<?=$sg->l('structure.menu.my-profile')?>" href="?user=profile"><?=$sg->l('structure.menu.my-profile')?></a></li>
+					<li><a title="<?=$sg->l('structure.menu.logout')?>" href="?user=logout"><?=$sg->l('structure.menu.logout')?></a></li>
 				</ul>
 			</div>
 		<? endif; ?>

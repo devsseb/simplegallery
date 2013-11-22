@@ -1,4 +1,5 @@
-<? if ($response->data['albumOrMedia']) : ?>
+<?
+if ($response->data['albumOrMedia']) : ?>
 <div id="albums">
 <? foreach ($response->data['album']->getChildren()->findAllOrderPath() as $album) : ?>
 	<a class="album" href="?albums&amp;id=<?=toHtml($album->getId())?>">
@@ -43,7 +44,7 @@
 			endforeach;
 		else :
 	?>
-			<span class="no-media-found">No media found</span>
+			<span class="no-media-found"><?=$sg->l('album.index.no-media')?></span>
 	<? endif; ?>
 		</div>
 	</a>
@@ -89,7 +90,7 @@
 		<? if ($media->getType() == 'image') : ?>
 			<li class="rotate-left" title="Rotate left"></li>
 			<li class="rotate-right" title="Rotate right"></li>
-			<li class="delete" title="<?=$media->isDeleted() ? 'Restore' : 'Delete'?>"></li>
+			<li class="delete" title="<?=$sg->l('album.index.tools.' . ($media->isDeleted() ? 'restore' : 'delete'))?>"></li>
 		<? endif; ?>
 	<? endif; ?>
 		</ul>
@@ -108,9 +109,9 @@
 		<p id="slideshow-panel-name"></p>
 <? if ($sg->user->isAdmin()) : ?>
 		<ul id="slideshow-panel-tools">
-			<li id="slideshow-panel-rotateLeft" class="rotate-left" title="Rotate left"></li>
-			<li id="slideshow-panel-rotateRight" class="rotate-right" title="Rotate right"></li>
-			<li id="slideshow-panel-delete" class="delete" title="Delete"></li>
+			<li id="slideshow-panel-rotateLeft" class="rotate-left" title="<?=$sg->l('album.index.tools.rotate-left')?>"></li>
+			<li id="slideshow-panel-rotateRight" class="rotate-right" title="<?=$sg->l('album.index.tools.rotate-right')?>"></li>
+			<li id="slideshow-panel-delete" class="delete" title="<?=$sg->l('album.index.tools.delete')?>"></li>
 		</ul>
 <? endif; ?>
 		<div id="slideshow-panel-date">
@@ -120,20 +121,20 @@
 		</div>
 		<div class="slideshow-panel-extra">
 			<div class="slideshow-panel-extra-toogle"></div>
-			<div class="slideshow-panel-extra-title">Exif data</div>
+			<div class="slideshow-panel-extra-title"><?=$sg->l('album.index.extra.exif')?></div>
 			<ul class="slideshow-panel-extra-data" id="extra-exif"></ul>
 		</div>
 <? if (!$sg->parameters->isDisableComments() and !$response->data['album']->isDisableComments()) : ?>
 		<div class="slideshow-panel-extra slideshow-panel-extra-open">
 			<div class="slideshow-panel-extra-toogle"></div>
-			<div class="slideshow-panel-extra-title">Comments</div>
+			<div class="slideshow-panel-extra-title"><?=$sg->l('album.index.extra.comments')?></div>
 			<ul class="slideshow-panel-extra-data" id="extra-comments">
-				<li><textarea id="extra-comments-input" cols="1" rows="1" placeholder="Add a comment"></textarea></li>
+				<li><textarea id="extra-comments-input" cols="1" rows="1" placeholder="<?=$sg->l('album.index.extra.add-comment')?>"></textarea></li>
 			</ul>
 		</div>
 <? endif; ?>
 	</div>
 </div>
 <? else : ?>
-	<div class="noalbumormedia">no album or media</div>
+	<div class="noalbumormedia"><?=$sg->l('album.index.no-album-or-media')?></div>
 <? endif; ?>

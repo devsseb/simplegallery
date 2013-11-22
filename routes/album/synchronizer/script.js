@@ -24,9 +24,9 @@ var SimpleGallerySynchronizer = new Class({
 			onComplete: function()
 			{
 				new Element('div.synchronize-complete').adopt(
-					new Element('span', {html: 'Albums synchronized'}),
+					new Element('span', {html: locale['albums-synchronized']}),
 					new Element('br'),
-					new Element('a', {href: '?album=loader', html: 'back'})
+					new Element('a', {href: '?album=loader', html: locale.back})
 				).inject(this.container);
 			}.bind(this)
 		}).send();

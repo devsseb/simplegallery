@@ -227,13 +227,13 @@ var SimpleGallery = new Class({
 			media.dom.set('mediaDeleted', false);
 			media.dom.removeClass('deleted');
 			request.send({data: {restore: true}});
-			media.dom.tools.getElement('.delete').set('title', 'Delete');
+			media.dom.tools.getElement('.delete').set('title', locale.album.delete);
 		} else {
 			media.deleted = true;
 			media.dom.set('mediaDeleted', true);
 			media.dom.addClass('deleted');
 			request.send({data: {delete: true}});
-			media.dom.tools.getElement('.delete').set('title', 'Resore');
+			media.dom.tools.getElement('.delete').set('title', locale.album.restore);
 		}
 		
 		this.mediaReloadWallData(media);
@@ -444,7 +444,7 @@ SimpleGallery.Slideshow = new Class({
 		
 		this.dom.panel.name.set('html', this.medias[this.mediaIndex].name);
 		if (this.dom.panel.tools.delete)
-			this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
+			this.dom.panel.tools.delete.set('title', this.media.deleted ? locale.album.restore : locale.album.delete);
 		
 		var date = this.media.date;
 		if (!date || date == '0000-00-00 00:00:00')
@@ -473,18 +473,18 @@ SimpleGallery.Slideshow = new Class({
 		var exif = this.medias[this.mediaIndex].exif;
 		if (exif) {
 			if (exif.FileSize)
-				this.addExif('Size : ', exif.FileSize.toInt().toFileWeight());
+				this.addExif(locale.album.exif.size + ' : ', exif.FileSize.toInt().toFileWeight());
 			if (exif.FileDateTime)
-				this.addExif('Date : ', exif.DateTime);
+				this.addExif(locale.album.exif.date + ' : ', exif.DateTime);
 			if (exif.Make || exif.Model)
-				this.addExif('Camera : ', exif.Make + ' ' + exif.Model);
+				this.addExif(locale.album.exif.camera + ' : ', exif.Make + ' ' + exif.Model);
 			if (exif.ExifImageWidth && exif.ExifImageLength)
-				this.addExif('Dimension : ', exif.ExifImageWidth + ' x ' + exif.ExifImageLength);
+				this.addExif(locale.album.exif.dimension + ' : ', exif.ExifImageWidth + ' x ' + exif.ExifImageLength);
 			if (exif.Flash !== undefined)
-				this.addExif('Flash : ', (exif.Flash & 1) != 0 ? 'Yes' : 'No');
+				this.addExif(locale.album.exif.flash + ' : ', (exif.Flash & 1) != 0 ? locale.album.exif.yes : locale.album.exif.no);
 		}
 		
-		if (!this.dom.panel.exif.getElements('ul').length)
+		if (!this.dom.panel.exif.getElements('li').length)
 			this.addExif('none', '');
 		
 		if (this.dom.panel.comments) {
@@ -717,7 +717,6 @@ SimpleGallery.Slideshow.Book = new Class({
 			this.media.height = this.dom.naturalHeight;
 			this.resize();
 			this.dom.fade('in');
-//			this.dom.setStyle('visibility', 'visible');
 		}.bind(this));
 	},
 	load: function(media)
@@ -792,7 +791,6 @@ SimpleGallery.Slideshow.Book = new Class({
 	showPage: function()
 	{
 		this.dom.fade('out');
-//		this.dom.setStyle('visibility', 'hidden');
 		this.dom.set('src', '?media=slideshow&id=' + this.media.id + '&data[page]=' + this.page);	
 	},
 	cache: function()

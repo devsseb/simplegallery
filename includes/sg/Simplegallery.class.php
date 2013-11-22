@@ -29,6 +29,10 @@ class SimpleGallery
 			$this->albumsPath = realpath($this->config->albumsPath) . '/';
 			$this->thumbsPath = realpath($this->config->thumbsPath) . '/';
 
+			include 'includes/Localization.class.php';
+			$this->localization = new Localization();
+			$this->localization->storeMessage('locales/');
+
 			include 'includes/database/Database.class.php';
 			$this->db = new Database($config->database);
 			$this->checkDatabase();
@@ -121,7 +125,8 @@ class SimpleGallery
 				'users', object('enable', false, 'url', '?user=management'),
 				'deleted', object('enable', false, 'url', '#'),
 				'parameters', object('enable', false, 'url', '?parameter')
-			)
+			),
+			'js', object()
 		);
 
 		switch ($response->route) {
@@ -722,6 +727,8 @@ class SimpleGallery
 			break;
 		
 		}
+
+		$response->js->{$response->route} = $this->locale($response->route . '.' . $response->action . '.js');
 
 		return $response;
 		
@@ -1392,6 +1399,20 @@ class SimpleGallery
 		$this->parameters->save();
 		
 		success('The parameters have been updated successfully.', '?parameter');
+	}
+
+	public function locale()
+	{
+		$args = func_get_args();
+		if (count($args) > 1)
+			$args[1] = array_merge(array(null), array_splice($args, 1));
+			
+		return call_user_func_array(array($this->localization, 'getMessage'), $args);
+	}
+	
+	public function l()
+	{
+		return toHtml(call_user_func_array(array($this, 'locale'), func_get_args()));
 	}
 
 }

@@ -174,7 +174,7 @@ var SimpleGalleryMediasAnalyzer = new Class({
 				} else {
 					if (domProgress)
 						domProgress.destroy();
-					new Element('span.media-synchronization', {html: 'Thumbnail "' + command.media.code + '" ' + (command.media.state == 'new' ? 'generated' : 'updated')}).inject(domMedia);
+					new Element('span.media-synchronization', {html: locale.album['thumbnail-' + command.media.state == 'new' ? 'generated' : 'updated'].replace('%1', command.media.code)}).inject(domMedia);
 				}
 			}
 			
@@ -225,7 +225,7 @@ var SimpleGalleryMediasAnalyzer = new Class({
 			command = JSON.decode(command);
 
 			if (this.albums[command.album.fs] && command.album.state != 'found')
-				new Element('span.album-cover-synchronization', {html: 'Cover ' + (command.album.state == 'new' ? 'generated' : 'updated')}).inject(this.albums[command.album.fs]);
+				new Element('span.album-cover-synchronization', {html: locale.album['cover-' + command.media.state == 'new' ? 'generated' : 'updated']}).inject(this.albums[command.album.fs]);
 		}
 	},
 	complete: function(state)
@@ -234,9 +234,9 @@ var SimpleGalleryMediasAnalyzer = new Class({
 		if (event.target.response) {
 			
 			new Element('div.synchronize-complete').adopt(
-				new Element('span', {html: 'Medias ' + (state == 'analyze' ? 'analyzed' : 'synchronized')}),
+				new Element('span', {html: locale.album['medias-' + state == 'analyze' ? 'analyzed' : 'synchronized']}),
 				new Element('br'),
-				new Element('a.syncrhonize', {href: '#', html: 'Synchronize medias selected', events: {click: this.synchronize.bind(this)}})
+				new Element('a.syncrhonize', {href: '#', html: locale.album['synchronize-medias-selected'], events: {click: this.synchronize.bind(this)}})
 			).inject(this.container);
 
 			$$('.media-check').set('disabled');
@@ -246,7 +246,7 @@ var SimpleGalleryMediasAnalyzer = new Class({
 		} else if (state == 'analyze') {
 		
 			new Element('div.synchronize-complete').adopt(
-				new Element('span.no', {html: 'No media found'})
+				new Element('span.no', {html: locale.album['no-media-found']})
 			).inject(this.container);
 		
 		}

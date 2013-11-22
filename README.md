@@ -1,5 +1,4 @@
 **TODO :**
-* Support language
 * Add possibilite to download medias and albums
 * Sort medias manually
 * Add possibilite to sort albums manualy
@@ -18,3 +17,4 @@
 * ~~Add possibilite to keep user connection~~
 * ~~Add comments for medias~~
 * ~~Add date for medias~~
+* ~~Support language~~
