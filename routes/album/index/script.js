@@ -30,6 +30,12 @@ Number.implement({
 
 Date.defineParser('%Y:%m:%d %H:%M:%S');
 
+String.implement({
+ 	toHtml: function() {
+	    return new Element('span',{text:String(this)}).get('html').replace(/\n/g, '<br />');
+	}
+});
+
 window.addEvent('domready', function() {
 
 	new SimpleGallery();
@@ -291,18 +297,20 @@ SimpleGallery.Slideshow = new Class({
 			rotateRight: $('slideshow-panel-rotateRight'),
 			delete: $('slideshow-panel-delete')
 		};
-		this.dom.panel.tools.rotateLeft && this.dom.panel.tools.rotateLeft.addEvent('click', function() {
-			this.media.sg.mediaRotate(this.media, 'left');
-			this.navigation(0);
-		}.bind(this));
-		this.dom.panel.tools.rotateRight && this.dom.panel.tools.rotateRight.addEvent('click', function() {
-			this.media.sg.mediaRotate(this.media, 'right');
-			this.navigation(0);
-		}.bind(this));
-		this.dom.panel.tools.delete && this.dom.panel.tools.delete.addEvent('click', function() {
-			this.media.sg.mediaDelete(this.media);
-			this.navigation(0);
-		}.bind(this));
+		if (this.dom.panel.tools.rotateLeft) {
+			this.dom.panel.tools.rotateLeft && this.dom.panel.tools.rotateLeft.addEvent('click', function() {
+				this.media.sg.mediaRotate(this.media, 'left');
+				this.navigation(0);
+			}.bind(this));
+			this.dom.panel.tools.rotateRight && this.dom.panel.tools.rotateRight.addEvent('click', function() {
+				this.media.sg.mediaRotate(this.media, 'right');
+				this.navigation(0);
+			}.bind(this));
+			this.dom.panel.tools.delete && this.dom.panel.tools.delete.addEvent('click', function() {
+				this.media.sg.mediaDelete(this.media);
+				this.navigation(0);
+			}.bind(this));
+		}
 		this.dom.panel.date = $('slideshow-panel-date');
 		this.dom.panel.date.update = this.dom.panel.date.getElement('input');
 		if (this.dom.panel.date.update)
@@ -421,19 +429,22 @@ SimpleGallery.Slideshow = new Class({
 		if (this.slideshowMedia)
 			this.slideshowMedia.unload();
 		
-		if (this.media.type == 'image') {
-			this.dom.panel.tools.rotateLeft.setStyle('display', 'block');
-			this.dom.panel.tools.rotateRight.setStyle('display', 'block');
-		} else {
-			this.dom.panel.tools.rotateLeft.setStyle('display', 'none');
-			this.dom.panel.tools.rotateRight.setStyle('display', 'none');
+		if (this.dom.panel.tools.rotateLeft) {
+			if (this.media.type == 'image') {
+				this.dom.panel.tools.rotateLeft.setStyle('display', 'block');
+				this.dom.panel.tools.rotateRight.setStyle('display', 'block');
+			} else {
+				this.dom.panel.tools.rotateLeft.setStyle('display', 'none');
+				this.dom.panel.tools.rotateRight.setStyle('display', 'none');
+			}
 		}
 		
 		
 		this.slideshowMedia = this[this.media.type];
 		
 		this.dom.panel.name.set('html', this.medias[this.mediaIndex].name);
-		this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
+		if (this.dom.panel.tools.delete)
+			this.dom.panel.tools.delete.set('title', this.media.deleted ? 'Restore' : 'Delete');
 		
 		var date = this.media.date;
 		if (!date || date == '0000-00-00 00:00:00')
@@ -477,7 +488,7 @@ SimpleGallery.Slideshow = new Class({
 			this.addExif('none', '');
 		
 		if (this.dom.panel.comments) {
-			this.dom.panel.comments.input.getAllNext().destroy();
+			this.dom.panel.comments.input.getParent('li').getAllNext().destroy();
 			var comments = this.medias[this.mediaIndex].comments;
 			for (var i = 0, comment; comment = comments[i]; i++) {
 				this.extraAddComment(comment.id, comment.username, new Date().parse(comment.date).format('%d/%m/%Y %H:%m:%S'), comment.text);
@@ -540,7 +551,7 @@ SimpleGallery.Slideshow = new Class({
 				new Element('span.extra-comment-date', {text: ' ' + date}),
 				window.sgUser.admin ? domDelete : null
 			),
-			new Element('div.extra-comment-text', {text: text})
+			new Element('div.extra-comment-text', {html: text.toHtml()})
 		).inject(this.dom.panel.comments);
 	},
 	extraDeleteComment: function(id)

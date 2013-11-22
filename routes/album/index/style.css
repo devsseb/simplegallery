@@ -34,7 +34,7 @@ li.delete{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB
 #slideshow-panel-name{margin:10px 10px 0px 10px;padding-bottom:10px;font-size:20px;border-bottom:1px solid #ccc;}
 #slideshow-panel-tools{margin:5px 0px;padding:1px 6px;overflow:hidden;background-color:#cac0af;}
 #slideshow-panel-tools li{float:left;width:20px;height:20px;cursor:pointer;}
-#slideshow-panel-date{margin:5px 0px;}
+#slideshow-panel-date{margin:5px 0px;text-align:center;}
 #slideshow-panel-date input{border:none;font-size:12px;margin:0px;width:100%;text-align:center;}
 
 .slideshow-panel-extra{padding:5px 5px 5px 10px;font-size:15px;position:relative;background-color:#ddd;}
@@ -47,7 +47,7 @@ li.delete{background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB
 .exif-data-title{color:#aaa;}
 .exif-data-value{}
 
-#extra-comments-input{width:200px;}
+#extra-comments-input{width:200px;height:15px;}
 .extra-comment-username{font-weight:bold;font-size:13px;}
 .extra-comment-date{font-style:italic;font-size:10px;}
 .extra-comment-text{font-size:15px;}

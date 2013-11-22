@@ -106,13 +106,13 @@
 	<div id="slideshow-panel">
 		<div id="slideshow-close"></div>
 		<p id="slideshow-panel-name"></p>
-		<ul id="slideshow-panel-tools">
 <? if ($sg->user->isAdmin()) : ?>
+		<ul id="slideshow-panel-tools">
 			<li id="slideshow-panel-rotateLeft" class="rotate-left" title="Rotate left"></li>
 			<li id="slideshow-panel-rotateRight" class="rotate-right" title="Rotate right"></li>
 			<li id="slideshow-panel-delete" class="delete" title="Delete"></li>
-<? endif; ?>
 		</ul>
+<? endif; ?>
 		<div id="slideshow-panel-date">
 <? if ($sg->user->isAdmin()) : ?>
 			<input type="datetime-local" />
