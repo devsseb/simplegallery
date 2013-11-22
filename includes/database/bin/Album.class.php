@@ -16,7 +16,8 @@ class Album extends \Database\Object\Entity
 		'mediasTotal' => '',
 		'coverMedias' => '',
 		'coverMediasMd5' => '',
-		'coverMd5' => ''
+		'coverMd5' => '',
+		'disableComments' => ''
 	);
 	protected $_attributesFactorized = array(
 		'parent' => null,

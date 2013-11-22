@@ -75,6 +75,9 @@
 		mediaExifDate="<?=toHtml($media->getExifDate())?>"
 		mediaExif="<?=toHtml($media->getExifData())?>"
 		mediaDeleted="<?=toHtml($media->isDeleted())?>"
+<? if (!$sg->parameters->isDisableComments() and !$response->data['album']->isDisableComments()) : ?>
+		mediaComments="<?=toHtml(json_encode(get($response->data['comments'], k($media->getId()), array())))?>"
+<? endif; ?>
 	>
 		<img src="?media=brick&amp;id=<?=toHtml($media->getId())?>" style="width:<?=ceil($media->getWidth() * 200 / $media->getHeight())?>px;height:200px;<?=$sg->getMediaCssTransform($media)?>" />
 		<div class="deleted-border"></div>
@@ -115,11 +118,20 @@
 			<input type="datetime-local" />
 <? endif; ?>
 		</div>
-		<div id="slideshow-panel-exif-title">Exif data
-			<div id="slideshow-panel-exif-toogle"></div>
-			<ul id="slideshow-panel-exif"></ul>
+		<div class="slideshow-panel-extra">
+			<div class="slideshow-panel-extra-toogle"></div>
+			<div class="slideshow-panel-extra-title">Exif data</div>
+			<ul class="slideshow-panel-extra-data" id="extra-exif"></ul>
 		</div>
-		
+<? if (!$sg->parameters->isDisableComments() and !$response->data['album']->isDisableComments()) : ?>
+		<div class="slideshow-panel-extra slideshow-panel-extra-open">
+			<div class="slideshow-panel-extra-toogle"></div>
+			<div class="slideshow-panel-extra-title">Comments</div>
+			<ul class="slideshow-panel-extra-data" id="extra-comments">
+				<li><textarea id="extra-comments-input" cols="1" rows="1" placeholder="Add a comment"></textarea></li>
+			</ul>
+		</div>
+<? endif; ?>
 	</div>
 </div>
 <? else : ?>

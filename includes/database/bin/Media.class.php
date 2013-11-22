@@ -27,7 +27,8 @@ class Media extends \Database\Object\Entity
 		'deleted' => ''
 	);
 	protected $_attributesFactorized = array(
-		'album' => null
+		'album' => null,
+		'commentCollection' => null
 	);
 	protected $_attributesExtended = array(
 		

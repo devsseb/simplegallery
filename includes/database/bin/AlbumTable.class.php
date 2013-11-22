@@ -16,7 +16,8 @@ class AlbumTable extends \Database\Object\Table
 		'mediasTotal',
 		'coverMedias',
 		'coverMediasMd5',
-		'coverMd5'
+		'coverMd5',
+		'disableComments'
 	);
 	protected static $attributesFactorized = array(
 		'parent',

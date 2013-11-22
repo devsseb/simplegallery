@@ -50,5 +50,8 @@ window.addEvent('domready', function() {
 			document.body.removeClass('header-reduce');
 	});
 
+	if ($('sgUser'))
+		window.sgUser = JSON.decode($('sgUser').get('value'));
+
 });
 

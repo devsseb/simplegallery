@@ -20,7 +20,7 @@ class SimpleGallery
 	private $sessionLifetime = 'P60D';
 	private $passwordCodeLifetime = 'PT2H';
 	private $emailUpdateCodeLifetime = 'PT48H';
-	private $databaseVersion = 4;
+	private $databaseVersion = 5;
 
 	public function __construct($config)
 	{
@@ -61,7 +61,7 @@ class SimpleGallery
 			if ($databaseVersion == 1)
 				$this->parameters = new \Database\Parameter();
 			if ($databaseVersion == 4)
-				$this->parameters->setGalerieName('SimpleGallery');
+				$this->parameters->setGalleryName('SimpleGallery');
 
 		}
 		$this->parameters->setDatabaseVersion($this->databaseVersion);
@@ -110,7 +110,7 @@ class SimpleGallery
 			'action', $action,
 			'data', array(),
 			'structure', object(
-				'back', object('enable', false, 'url', '#'),
+				'back', object('enable', false, 'url', '?'),
 				'title', ''
 			),
 			'menu', object(
@@ -162,10 +162,22 @@ class SimpleGallery
 							$albumCovers = array();
 
 						$q = new \Database\Object\Query('media');
-						$q->select('IF(date="0000-00-00 00:00:00",exifDate,date) AS datesort', 'media.*');
+						$q->select('IF(media.date="0000-00-00 00:00:00",exifDate,media.date) AS datesort', 'media.*');
 						$q->where('album_id = ?', $album->getId());
 						$q->orderBy('datesort');
 						$medias = $q->execute();
+
+						$q = new \Database\Object\Query('comment');
+						$q->select('comment.id AS id', 'media.id AS mediaId', 'comment.date', 'text', 'name AS username');
+						$q->leftJoin('media');
+						$q->leftJoin('user');
+						$q->where('album_id = ?', $album->getId());
+						$q->addOrderBy('comment.date');
+						$comments = $q->execute();
+						$commentsIndexed = array();
+						foreach ($comments as $comment)
+							$commentsIndexed[$comment->mediaId][] = $comment;
+						unset($comments);
 
 						if ($this->user->isAdmin()) {
 							if ($album) {
@@ -188,6 +200,7 @@ class SimpleGallery
 						$response->data['album'] = $album;
 						$response->data['albumCovers'] = $albumCovers;
 						$response->data['medias'] = $medias;
+						$response->data['comments'] = $commentsIndexed;
 						$response->data['albumOrMedia'] = $albumOrMedia;
 
 					break;
@@ -231,7 +244,6 @@ class SimpleGallery
 						$response->data['albums'] = \Database\AlbumTable::findAllOrderPath();
 
 						$response->structure->back->enable = true;
-						$response->structure->back->url = '?';
 
 						$response->menu->loadAnalyze->enable = true;
 						$response->menu->loadSynchronize->enable = true;
@@ -500,13 +512,42 @@ class SimpleGallery
 						exit(json_encode(array('media-update' => true)));
 					
 					break;
+					
+					case 'comment' :
+					
+						if (exists($_POST, 'id') and exists($_POST, 'text')) {
+					
+							$comment = new \Database\Comment();
+							$comment->setDate(date('Y-m-d H:m:i'));
+							$comment->setText($_POST['text']);
+							$comment->setUser_id($this->user->getId());
+							$comment->setMedia_id($_POST['id']);
+							$comment->save();
+
+					
+							exit(json_encode(array('media-comment' => object(
+								'id', $comment->getId(),
+								'date', $comment->getDate(),
+								'text', $comment->getText()
+							))));
+						} else if (exists($_POST, 'deleteId')) {
+
+							$comment = new \Database\Comment($_POST['deleteId']);
+							$comment->delete();
+						
+							exit(json_encode(array('comment-delete' => true)));
+						
+						}
+
+					
+					break;
+					
 				}
 			
 			break;
 			
 			case 'user' :
 			
-				$response->structure->back->url = '?';
 				$response->menu->albumconfig->enable = false;
 				$response->menu->load->enable = false;
 			
@@ -582,7 +623,6 @@ class SimpleGallery
 						$response->data['users'] = \Database\UserTable::findAllWithGroup();
 						
 						$response->structure->back->enable = true;
-						$response->structure->back->url = '?';
 						
 						$response->menu->load->enable = true;
 						$response->menu->users->enable = true;
@@ -860,6 +900,7 @@ class SimpleGallery
 			error('Album not found.');
 			
 		$album->setName($config['name']);
+		$album->setDisableComments(get($config, k('disableComments')));		
 		
 		$groupCollection = new \Database\Object\Collection('group');
 		foreach (get($config, k('groups'), array()) as $groupId => $access) {
@@ -1338,6 +1379,7 @@ class SimpleGallery
 	{
 		$this->parameters->setGalleryName($data['galleryName']);
 		$this->parameters->setDisableRegistration(get($data, k('disableRegistration')));
+		$this->parameters->setDisableComments(get($data, k('disableComments')));
 		$this->parameters->save();
 		
 		success('The parameters have been updated successfully.', '?parameter');

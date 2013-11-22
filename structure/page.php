@@ -14,6 +14,12 @@
 	</head>
 	<body>
 		<header id="header">
+		<? if (gete($sg, k('user'))) : ?>
+			<input type="hidden" id="sgUser" value="<?=toHtml(json_encode(array(
+				'name' => $sg->user->getName(),
+				'admin' => $sg->user->isAdmin()
+			)))?>" />
+		<? endif; ?>	
 		<? if ($response->structure->back->enable) : ?>
 			<a title="Back" id="back" href="<?=toHtml($response->structure->back->url)?>">&lt;</a>
 		<? endif; ?>

@@ -43,7 +43,7 @@
 body{margin:0px;padding:0px;background-color:#edf0f5;overflow:hidden;font-size:12px;font-family:caviar_dreams, Verdana;color:#000;}
 
 a{text-decoration:none;color:#cf4b4b;}
-input{font-family:inherit;}
+input,textarea{font-family:inherit;}
 
 ul{list-style-type:none;margin:0px;padding:0px;}
 .simpleform{margin:auto;width:500px;font-size:18px;}
@@ -96,7 +96,7 @@ header{background-color:#b8ced6;z-index:2;position:relative;height:50px;}
 header #back{position:absolute;left:0px;top:0px;width:50px;height:100%;font-size:50px;color:#687188;line-height:50px;text-align:center;font-family:time;}
 .header-reduce header #back{font-size:30px;line-height:20px;color:#b8ced6;}
 header #back:hover{color:#cf4b4b;}
-header #title{font-size:38px;height:100%;line-height:50px;color:#fff;font-family:caviar_dreams;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;margin:0px 50px 0px 50px;}
+header #title{font-size:38px;height:100%;line-height:50px;color:#fff;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;margin:0px 50px 0px 50px;}
 .header-reduce header #title{font-size:15px;line-height:20px;}
 
 #menu{position:absolute;top:0px;right:0px;height:100%;}

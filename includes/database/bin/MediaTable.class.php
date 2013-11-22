@@ -27,7 +27,8 @@ class MediaTable extends \Database\Object\Table
 		'deleted'
 	);
 	protected static $attributesFactorized = array(
-		'album'
+		'album',
+		'commentCollection'
 	);
 	protected static $attributesExtended = array(
 		
@@ -40,6 +41,18 @@ class MediaTable extends \Database\Object\Table
 			'onTableClass' => '\Database\AlbumTable',
 			'onAttribute' => 'id',
 			'onAttributeFactorized' => 'mediaCollection',
+			'nnTable' => '',
+			'nnAttribute' => '',
+			'nnOnAttribute' => '',
+			'nnAttributes' => array()
+		),
+		array(
+			'relationship' => \Database::R_N_1,
+			'attribute' => 'id',
+			'attributeFactorized' => 'commentCollection',
+			'onTableClass' => '\Database\CommentTable',
+			'onAttribute' => 'media_id',
+			'onAttributeFactorized' => 'media',
 			'nnTable' => '',
 			'nnAttribute' => '',
 			'nnOnAttribute' => '',

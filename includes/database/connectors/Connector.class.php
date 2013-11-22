@@ -227,7 +227,9 @@ abstract class Connector
 		// Group by
 		if ($array = $query->getGroupBy()) {
 			foreach ($array as &$group)
+				if (strpos($group, '.') === false)
 					$group = $this->protect($group, \Database::FIELD);
+					
 			unset($group);
 			$sql.= ' GROUP BY ' . implode(',',$array);
 		}
@@ -238,8 +240,12 @@ abstract class Connector
 
 		// Order by
 		if ($array = $query->getOrderBy()) {
-			foreach ($array as &$order)
-				$order = $this->protect($order[0], \Database::FIELD) . ' ' . $order[1];
+			foreach ($array as &$order) {
+				if (strpos($order[0], '.') === false)
+					$order = $this->protect($order[0], \Database::FIELD) . ' ' . $order[1];
+				else
+					$order = $order[0] . ' ' . $order[1];
+			}
 			unset($order);
 			$sql.= ' ORDER BY ' . implode(',',$array);
 		}

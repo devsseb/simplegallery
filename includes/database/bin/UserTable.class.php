@@ -22,6 +22,7 @@ class UserTable extends \Database\Object\Table
 	);
 	protected static $attributesFactorized = array(
 		'groupCollection',
+		'commentCollection',
 		'usersessionCollection'
 	);
 	protected static $attributesExtended = array(
@@ -38,6 +39,18 @@ class UserTable extends \Database\Object\Table
 			'nnTable' => 'user_group',
 			'nnAttribute' => 'user_id',
 			'nnOnAttribute' => 'group_id',
+			'nnAttributes' => array()
+		),
+		array(
+			'relationship' => \Database::R_N_1,
+			'attribute' => 'id',
+			'attributeFactorized' => 'commentCollection',
+			'onTableClass' => '\Database\CommentTable',
+			'onAttribute' => 'user_id',
+			'onAttributeFactorized' => 'user',
+			'nnTable' => '',
+			'nnAttribute' => '',
+			'nnOnAttribute' => '',
 			'nnAttributes' => array()
 		),
 		array(

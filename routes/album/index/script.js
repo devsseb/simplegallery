@@ -68,9 +68,10 @@ var SimpleGallery = new Class({
 				date: mediaEl.get('mediaDate'),
 				exifDate: mediaEl.get('mediaExifDate'),
 				exif: JSON.decode(mediaEl.get('mediaExif')),
-				deleted: mediaEl.get('mediaDeleted') == 1
+				deleted: mediaEl.get('mediaDeleted') == 1,
+				comments: JSON.decode(mediaEl.get('mediaComments'))
 			};
-			
+
 			media.dom.img = media.dom.getElement('img');
 			media.dom.addEvent('resize', function(mediaDom) {
 			
@@ -161,7 +162,7 @@ var SimpleGallery = new Class({
 		this.mediaWall = new SimpleGallery.Wall(this.mediasContainer, medias, {onResize: medias.setStyle.bind(medias, 'visibility', 'visible')});
 		
 		/*** POUR TEST ***/
-//		this.slideshow.open(4);
+//		this.slideshow.open(0);
 
 	},
 	mediaReloadWallData: function(media)
@@ -244,6 +245,31 @@ var SimpleGallery = new Class({
 			}
 		}).send();
 		
+	},
+	mediaAddComment: function(media, text, callback)
+	{
+		new Request.JSON({
+			url: '?media=comment',
+			data: {id: media.id, text: text},
+			onError: function(error) {
+				console.error(error);
+			},
+			onSuccess: function(response)
+			{
+				if (callback)
+					callback(response['media-comment']);
+			}
+		}).send();
+	},
+	mediaDeleteComment: function(id)
+	{
+		new Request.JSON({
+			url: '?media=comment',
+			data: {deleteId: id},
+			onError: function(error) {
+				console.error(error);
+			}
+		}).send();
 	}
 });
 
@@ -286,17 +312,52 @@ SimpleGallery.Slideshow = new Class({
 					this.media.sg.mediaSetDate(this.media, date);
 				this.dom.panel.date.update.oldValue = date;
 			}.bind(this));
-		this.dom.panel.exif = $('slideshow-panel-exif');
-		this.dom.panel.exifTitle = $('slideshow-panel-exif-title');
 		this.dom.close = $('slideshow-close').addEvent('click', this.close.bind(this));
+
+		this.dom.panel.exif = $('extra-exif');
+		this.dom.panel.comments = $('extra-comments');		
+		if (this.dom.panel.comments)
+			this.dom.panel.comments.input = $('extra-comments-input');
 		
-		this.dom.panel.exifTitle.addEvent('click', function() {
-			if (this.dom.panel.exifTitle.hasClass('slideshow-panel-exif-open'))
-				this.dom.panel.exifTitle.removeClass('slideshow-panel-exif-open');
+		$$('.slideshow-panel-extra-title').addEvent('click', function(e) {
+			if (this.getParent().hasClass('slideshow-panel-extra-open'))
+				this.getParent().removeClass('slideshow-panel-extra-open');
 			else
-				this.dom.panel.exifTitle.addClass('slideshow-panel-exif-open');
+				this.getParent().addClass('slideshow-panel-extra-open');
 			window.fireEvent('resize');
-		}.bind(this));
+		});
+		
+		if (this.dom.panel.comments) {
+			this.dom.panel.comments.input.addEvents({
+				keydown: function(e) {
+					if (e.key == 'enter' && !e.shift)
+						return false;
+				}.bind(this),
+				keyup: function(e) {
+					if (e.key == 'enter' && !e.shift) {
+						var text = e.target.get('value');
+						var domComment = this.extraAddComment(0, window.sgUser.name, new Date().format('%d/%m/%Y'), text);
+						this.media.sg.mediaAddComment(this.media, text, function(comment) {
+							domComment.getElement('.extra-comment-date').set('text', ' ' + new Date().parse(comment.date).format('%d/%m/%Y %H:%m:%S'));
+							domComment.getElement('input.extra-comment-id').set('value', comment.id);
+							var domDelete = domComment.getElement('.extra-comment-delete');
+							if (domDelete)
+								domDelete.setStyle('display', 'inline');
+						});
+					
+					}
+				}.bind(this),
+				paste: function() {
+					this.set('rows', (this.get('value').match(/\n|\r\n/g) || []).length + 1);
+				},
+				input: function() {
+					this.set('rows', (this.get('value').match(/\n|\r\n/g) || []).length + 1);
+				},
+				textinput: function() {
+					this.set('rows', (this.get('value').match(/\n|\r\n/g) || []).length + 1);
+				},
+			});
+		}
 		
 		this.image = new SimpleGallery.Slideshow.Image(this);
 		this.video = new SimpleGallery.Slideshow.Video(this);
@@ -415,6 +476,14 @@ SimpleGallery.Slideshow = new Class({
 		if (!this.dom.panel.exif.getElements('ul').length)
 			this.addExif('none', '');
 		
+		if (this.dom.panel.comments) {
+			this.dom.panel.comments.input.getAllNext().destroy();
+			var comments = this.medias[this.mediaIndex].comments;
+			for (var i = 0, comment; comment = comments[i]; i++) {
+				this.extraAddComment(comment.id, comment.username, new Date().parse(comment.date).format('%d/%m/%Y %H:%m:%S'), comment.text);
+			}
+		}
+
 		this.slideshowMedia.load(this.medias[this.mediaIndex]);
 		
 		return true;
@@ -453,6 +522,31 @@ SimpleGallery.Slideshow = new Class({
 			return true;
 		}
 		return false;
+	},
+	extraAddComment: function(id, username, date, text)
+	{
+		var domDelete = new Element('span.extra-comment-delete', {
+			text: ' x',
+			title: 'delete comment',
+			events: {click: function(e) {
+				this.extraDeleteComment(e.target.getParent('li').getElement('input.extra-comment-id').get('value'));
+			}.bind(this)},
+			styles: {display: id ? 'inline' : 'none'}
+		});
+		return new Element('li').adopt(
+			new Element('input.extra-comment-id', {type: 'hidden', value: id}),
+			new Element('div').adopt(
+				new Element('span.extra-comment-username', {text: username}),
+				new Element('span.extra-comment-date', {text: ' ' + date}),
+				window.sgUser.admin ? domDelete : null
+			),
+			new Element('div.extra-comment-text', {text: text})
+		).inject(this.dom.panel.comments);
+	},
+	extraDeleteComment: function(id)
+	{
+		this.media.sg.mediaDeleteComment(id);
+		document.getElement('input.extra-comment-id[value=' + id + ']').getParent('li').destroy();
 	}
 });
 
@@ -656,10 +750,10 @@ SimpleGallery.Slideshow.Book = new Class({
 		this.parentUnload();
 	},
 	resizePages: function() {
+
 		this.domPages.setStyle('height',
 			this.slideshow.dom.panel.getSize().y -
-			this.slideshow.dom.panel.name.getComputedSize({styles: ['padding','border','margin']}).totalHeight -
-			this.slideshow.dom.panel.exifTitle.getComputedSize({styles: ['padding','border','margin']}).totalHeight
+			this.domPages.getPosition(this.slideshow.dom.panel).y
 		);
 		this.domPages.getElements('.slideshow-panel-book-page').each(function(page, index) {
 			var percent = page.getSize().y / page.retrieve('size').height;

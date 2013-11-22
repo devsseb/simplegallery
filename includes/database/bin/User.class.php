@@ -22,6 +22,7 @@ class User extends \Database\Object\Entity
 	);
 	protected $_attributesFactorized = array(
 		'groupCollection' => null,
+		'commentCollection' => null,
 		'usersessionCollection' => null
 	);
 	protected $_attributesExtended = array(

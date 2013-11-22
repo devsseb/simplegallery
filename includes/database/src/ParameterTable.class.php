@@ -9,6 +9,7 @@ class ParameterTable extends \Database\Compilation\TableSrc
 		$this->addAttribute('databaseVersion', \Database::T_INTEGER);
 		$this->addAttribute('galleryName', \Database::T_CHAR);
 		$this->addAttribute('disableRegistration', \Database::T_BOOL);
+		$this->addAttribute('disableComments', \Database::T_BOOL);
 
 	}
 

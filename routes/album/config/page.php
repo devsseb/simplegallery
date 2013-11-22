@@ -7,6 +7,10 @@
 		<label for="name">Name : </label><br />
 		<input type="text" name="name" placeholder="<?=toHtml($album->getAutoName())?>" value="<?=toHtml($album->getName())?>" />
 	</p>
+	<p>
+		<label for="disableComments">Disable comments :</label><br />
+		<input type="checkbox" id="disableComments" name="disableComments" value="1"<?=$album->isDisableComments() ? ' checked="checked"' : ''?> />
+	</p>
 	
 	<table class="album-groups">
 		<tr><th title="Inherit">I</th><th title="Forbidden">F</th><th title="Granted">G</th><th>Group</th></tr>

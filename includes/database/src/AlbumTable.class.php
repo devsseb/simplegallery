@@ -20,6 +20,8 @@ class AlbumTable extends \Database\Compilation\TableSrc
 		$this->addAttribute('coverMediasMd5', \Database::T_CHAR);
 		$this->addAttribute('coverMd5', \Database::T_CHAR);
 		
+		$this->addAttribute('disableComments', \Database::T_BOOL);
+		
 		$this->addLink('group', \Database::R_N_N, null, null, null, null, null, null, null, array(
 			object(
 				'name', 'access',
