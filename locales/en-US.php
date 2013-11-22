@@ -23,7 +23,7 @@ $locale = array(
 	
 	'album' => array(
 	
-		'analyze' => array(
+		'analyzer' => array(
 			'js' => array(
 				'thumbnail-generated' => 'Thumbnail "%1" generated',
 				'thumbnail-updated' => 'Thumbnail "%1" updated',

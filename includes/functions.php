@@ -207,4 +207,14 @@ if (!function_exists('json_last_error_msg')) {
 		throw new Exception($error);
 	}
 }
+
+function toUtf8(&$data) {
+	if (is_string($data))
+		return $data = utf8_encode($data);
+	if (is_array($data) or is_object($data)) {
+		foreach ($data as &$value)
+			toutf8($value);
+		unset($value);
+	}
+}
 ?>

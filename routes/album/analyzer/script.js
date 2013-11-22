@@ -223,7 +223,7 @@ var SimpleGalleryMediasAnalyzer = new Class({
 	{
 		for (var i = 0, command; command = commands[i]; i++) {
 			command = JSON.decode(command);
-
+console.log(command);
 			if (this.albums[command.album.fs] && command.album.state != 'found')
 				new Element('span.album-cover-synchronization', {html: locale.album['cover-' + command.media.state == 'new' ? 'generated' : 'updated']}).inject(this.albums[command.album.fs]);
 		}
@@ -234,7 +234,7 @@ var SimpleGalleryMediasAnalyzer = new Class({
 		if (event.target.response) {
 			
 			new Element('div.synchronize-complete').adopt(
-				new Element('span', {html: locale.album['medias-' + state == 'analyze' ? 'analyzed' : 'synchronized']}),
+				new Element('span', {html: locale.album['medias-' + (state == 'analyze' ? 'analyzed' : 'synchronized')]}),
 				new Element('br'),
 				new Element('a.syncrhonize', {href: '#', html: locale.album['synchronize-medias-selected'], events: {click: this.synchronize.bind(this)}})
 			).inject(this.container);

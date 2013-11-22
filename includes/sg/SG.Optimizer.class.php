@@ -47,8 +47,10 @@ class Optimizer {
 		$exif = $sgMedia->getExif();
 		$dbMedia->setExifOrientation($exif->orientation);
 		$dbMedia->setExifDate($exif->date);
+		toUtf8($exif->data);
 		$dbMedia->setExifData(json_encode($exif->data));
-		
+		$dbMedia->save();
+
 		$sgMedia->generate($callback);
 	}
 	
